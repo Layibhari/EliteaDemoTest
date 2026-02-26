@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.annotation.Nonnull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,6 +38,7 @@ public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
 	 * Retrieve all {@link PetType}s from the data store.
 	 * @return a Collection of {@link PetType}s.
 	 */
+	@Cacheable("pets")
 	@Query("SELECT ptype FROM PetType ptype ORDER BY ptype.name")
 	List<PetType> findPetTypes();
 
