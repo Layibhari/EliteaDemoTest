@@ -148,6 +148,41 @@ class OwnerTests {
 	}
 
 	@Nested
+	class ToString {
+
+		@Test
+		void shouldIncludeOwnerFields() {
+			owner.setId(42);
+			owner.setAddress("110 W. Liberty St.");
+			owner.setCity("Madison");
+			owner.setTelephone("6085551023");
+
+			String result = owner.toString();
+
+			assertThat(result).contains("firstName = 'George'");
+			assertThat(result).contains("lastName = 'Franklin'");
+			assertThat(result).contains("address = '110 W. Liberty St.'");
+			assertThat(result).contains("city = 'Madison'");
+			assertThat(result).contains("telephone = '6085551023'");
+		}
+
+		@Test
+		void shouldIndicateNewOwner() {
+			// owner has no id set, so isNew() == true
+			String result = owner.toString();
+			assertThat(result).contains("new = true");
+		}
+
+		@Test
+		void shouldIndicateExistingOwner() {
+			owner.setId(1);
+			String result = owner.toString();
+			assertThat(result).contains("new = false");
+		}
+
+	}
+
+	@Nested
 	class AddVisit {
 
 		@Test
@@ -165,13 +200,15 @@ class OwnerTests {
 			Visit visit = new Visit();
 			visit.setDescription("checkup");
 
-			assertThatThrownBy(() -> owner.addVisit(null, visit)).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> owner.addVisit(null, visit)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Pet identifier must not be null");
 		}
 
 		@Test
 		void shouldThrowWhenVisitIsNull() {
 			assertThatThrownBy(() -> owner.addVisit(savedPet.getId(), null))
-				.isInstanceOf(IllegalArgumentException.class);
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Visit must not be null");
 		}
 
 		@Test
@@ -179,7 +216,8 @@ class OwnerTests {
 			Visit visit = new Visit();
 			visit.setDescription("checkup");
 
-			assertThatThrownBy(() -> owner.addVisit(999, visit)).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> owner.addVisit(999, visit)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Invalid Pet identifier");
 		}
 
 	}
