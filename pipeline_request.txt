@@ -1,0 +1,20 @@
+pipeline_name: qr-generator-auto-pipeline
+environment: production
+target: aws_ec2
+instance_type: t2.micro
+ami: latest-ubuntu
+deploy_using: docker-compose
+labels: [ai-generated, demo, qr-generator]
+email_notification: true
+email_recipient: demo@example.com
+version_file: VERSION
+frontend_port: 3000
+backend_port: 8000
+frontend_framework: vanilla-js
+backend_framework: fastapi
+test_command_frontend: npm test
+test_command_backend: pytest
+lint_command_frontend: npm run lint
+lint_command_backend: flake8
+build_command_frontend: npm run build
+build_command_backend: # No build step needed for Python
