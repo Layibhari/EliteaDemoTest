@@ -7,7 +7,20 @@ plugins {
   id 'org.cyclonedx.bom' version '3.2.0'
   id 'io.spring.javaformat' version '0.0.47'
   id "io.spring.nohttp" version "0.0.11"
+  id 'pl.allegro.tech.build.axion-release' version '1.21.1'
 }
+
+scmVersion {
+    repository {
+        type = 'git'       // use git repository
+    }
+    tag {
+        prefix = ''        // no "v" in tags, optional
+    }
+    versionIncrementer 'incrementMinor' 
+}
+
+project.version = scmVersion.version
 
 gradle.startParameter.excludedTaskNames += [ "checkFormatAot", "checkFormatAotTest" ]
 
@@ -82,6 +95,19 @@ tasks.named("formatMain").configure { dependsOn("checkstyleNohttp") }
 
 tasks.named("formatTest").configure { dependsOn("checkstyleTest") }
 tasks.named("formatTest").configure { dependsOn("checkstyleNohttp") }
+
+
+tasks.register("openTestReport") {
+    group = "Verification"
+    description = "Opens test report in browser after build"
+
+    dependsOn build
+
+    doLast {
+        println("Opening test report...")
+        java.awt.Desktop.desktop.browse(file("build/reports/tests/test/index.html").toURI())
+    }
+}
 
 checkstyleAot.enabled = false
 checkstyleAotTest.enabled = false
