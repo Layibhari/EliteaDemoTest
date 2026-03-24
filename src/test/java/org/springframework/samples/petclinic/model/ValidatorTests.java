@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import jakarta.validation.ConstraintViolation;
@@ -55,6 +56,62 @@ class ValidatorTests {
 		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
 		assertThat(violation.getPropertyPath()).hasToString("firstName");
 		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenLastNameEmpty() {
+
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Person person = new Person();
+		person.setFirstName("James");
+		person.setLastName("");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath()).hasToString("lastName");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateOwnerWithBlankFieldsAndNonNumericTelephone() {
+
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Owner owner = new Owner();
+		owner.setFirstName("");
+		owner.setLastName("");
+		owner.setAddress("");
+		owner.setCity("");
+		owner.setTelephone("telephone");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		assertThat(constraintViolations).hasSize(5);
+		assertThat(constraintViolations).extracting(violation -> violation.getPropertyPath().toString())
+			.containsExactlyInAnyOrder("firstName", "lastName", "address", "city", "telephone");
+	}
+
+	@Test
+	void shouldNotValidateOwnerWhenTelephoneIsNonNumeric() {
+
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Owner owner = new Owner();
+		owner.setFirstName("George");
+		owner.setLastName("Franklin");
+		owner.setAddress("110 W. Liberty St.");
+		owner.setCity("Madison");
+		owner.setTelephone("invalid");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Owner> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath()).hasToString("telephone");
+		assertThat(violation.getMessage()).isEqualTo("numeric value out of bounds (<10 digits>.<0 digits> expected)");
 	}
 
 }
