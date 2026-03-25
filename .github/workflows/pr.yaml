@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: pr
         uses: actions/checkout@v4
-      - name: get the code
-        run: mvn compile
       - name: test the code
         run: mvn test
       - name: get package
