@@ -1,15 +1,51 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'home')}">
+<html xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout (~{::body},'home')}">
 
 <body>
 
-  <h2 th:text="#{welcome}">Welcome</h2>
-  <div class="row">
-    <div class="col-md-12">
-      <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
-    </div>
+<div class="container home-page">
+
+  <div class="text-center hero-section">
+    <h1>🐾Welcome to  PetClinic</h1>
+    <p class="lead">Caring for your pets with love and expertise.</p>
+    <a th:href="@{/owners/find}" class="btn btn-primary btn-lg">Get Started</a>
   </div>
+
+  <hr/>
+
+  <div class="row text-center services">
+
+    <div class="col-md-4 service-box">
+      <h3>🐶 Pet Owners</h3>
+      <p>Manage pet owners and their details efficiently.</p>
+      <a th:href="@{/owners/find}" class="btn btn-default">Explore</a>
+    </div>
+
+    <div class="col-md-4 service-box">
+      <h3>🐱 Pet Records</h3>
+      <p>Track pets, breeds, and medical history.</p>
+      <a th:href="@{/owners/find}" class="btn btn-default">View Pets</a>
+    </div>
+
+    <div class="col-md-4 service-box">
+      <h3>📅 Vet Visits</h3>
+      <p>Schedule and manage visits with ease.</p>
+      <a th:href="@{/owners/find}" class="btn btn-default">Check Visits</a>
+    </div>
+
+  </div>
+
+  <hr/>
+
+
+  <div class="text-center">
+    <img class="img-responsive center-block"
+         th:src="@{/resources/images/pets.png}" />
+  </div>
+
+</div>
 
 </body>
 
