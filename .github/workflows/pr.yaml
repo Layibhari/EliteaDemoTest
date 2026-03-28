@@ -1,0 +1,21 @@
+name: pr_request
+on:
+    pull_request:
+        branches:
+            - dev
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: get the build
+              uses: action/checkout@v6
+            - name: compile the code
+              run: mvn compile
+            - name: test the code
+              run: mvn test
+            - name: package the code 
+              run: mvn package
+             
+             
+
+ 
