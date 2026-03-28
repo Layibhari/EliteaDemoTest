@@ -1,0 +1,18 @@
+name: pull_request 
+on:
+    pull_request:
+        branches:
+            - dev
+jobs:
+    build:
+        runs-on: ubuntu-laatest
+        steps:
+            - name: get the code
+              uses: actions/checkout@v4
+            - name: compile the code 
+              run: mvn compile 
+            - name: test the code 
+              run: mvn test 
+            - name: create a package
+              run: mvn package   
+        
