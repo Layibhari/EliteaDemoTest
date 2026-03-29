@@ -4,10 +4,65 @@
 
 <body>
 
-  <h2 th:text="#{welcome}">Welcome</h2>
-  <div class="row">
-    <div class="col-md-12">
-      <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
+  <div class="welcome-hero">
+    <div class="hero-content">
+      <h1 class="hero-title" th:text="#{welcomeTitle}">Welcome to PetClinic</h1>
+      <p class="hero-subtitle" th:text="#{welcomeSubtitle}">Manage your pets and their health records with ease</p>
+      <div class="hero-actions">
+        <a th:href="@{/owners/find}" class="btn btn-primary btn-lg">
+          <i class="fa fa-search"></i> Find Pet Owners
+        </a>
+        <a th:href="@{/vets.html}" class="btn btn-outline-primary btn-lg">
+          <i class="fa fa-user-md"></i> View Veterinarians
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row features-section">
+    <div class="col-md-4 feature-card">
+      <div class="feature-icon">
+        <i class="fa fa-users"></i>
+      </div>
+      <h3>Pet Owners</h3>
+      <p>Find and manage pet owner information. Add new owners and keep track of their pets.</p>
+      <a th:href="@{/owners/find}" class="feature-link">Manage Owners <i class="fa fa-arrow-right"></i></a>
+    </div>
+    <div class="col-md-4 feature-card">
+      <div class="feature-icon">
+        <i class="fa fa-user-md"></i>
+      </div>
+      <h3>Veterinarians</h3>
+      <p>Our experienced veterinarians are ready to help with all your pet health needs.</p>
+      <a th:href="@{/vets.html}" class="feature-link">View Vets <i class="fa fa-arrow-right"></i></a>
+    </div>
+    <div class="col-md-4 feature-card">
+      <div class="feature-icon">
+        <i class="fa fa-paw"></i>
+      </div>
+      <h3>Pets & Visits</h3>
+      <p>Track pet health records, schedule visits, and maintain complete medical history.</p>
+      <a th:href="@{/owners/find}" class="feature-link">Find Pets <i class="fa fa-arrow-right"></i></a>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="row text-center">
+      <div class="col-md-4 stat-item">
+        <i class="fa fa-heartbeat"></i>
+        <h3>Quality Care</h3>
+        <p>Best veterinary services for your beloved pets</p>
+      </div>
+      <div class="col-md-4 stat-item">
+        <i class="fa fa-clock-o"></i>
+        <h3>Easy Scheduling</h3>
+        <p>Quick and easy visit scheduling system</p>
+      </div>
+      <div class="col-md-4 stat-item">
+        <i class="fa fa-shield"></i>
+        <h3>Safe & Secure</h3>
+        <p>Your pet data is safely stored and protected</p>
+      </div>
     </div>
   </div>
 
