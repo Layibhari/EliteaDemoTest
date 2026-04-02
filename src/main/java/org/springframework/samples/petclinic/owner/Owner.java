@@ -172,5 +172,8 @@ public class Owner extends Person {
 
 		pet.addVisit(visit);
 	}
+	public String getFullName() {
+		return this.getFirstName() + " " + this.getLastName();
+	}
 
 }
