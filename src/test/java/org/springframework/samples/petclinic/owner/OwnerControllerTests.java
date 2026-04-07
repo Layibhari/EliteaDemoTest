@@ -251,7 +251,7 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "ABC123")) // teléfono inválido
+				.param("telephone", "ABC12345")) // longitud OK, patrón inválido
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
