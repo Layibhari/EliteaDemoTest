@@ -1,27 +1,66 @@
-<!doctype html>
-<html
-  xmlns:th="https://www.thymeleaf.org"
-  th:replace="~{fragments/layout :: layout (~{::body},'home')}"
->
-  <body>
-    <!-- Improved title -->
-    <h2 th:text="#{welcome}">Welcome to Spring PetClinic!</h2>
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" 
+      th:replace="~{fragments/layout :: layout (~{::body},'home')}">
 
-    <!-- Short description under the title -->
-    <p th:text="#{welcome.description}">
-      Your favorite place for managing pets!
-    </p>
+<body>
 
-    <div class="row">
-      <div class="col-md-12">
-        <!-- Responsive image with proper alt text -->
-        <img
-          class="img-fluid mx-auto d-block"
-          src="../static/resources/images/pets.png"
-          th:src="@{/resources/images/pets.png}"
-          alt="Cute pets"
-        />
+  <!-- Hero Section -->
+  <section class="text-center py-5 bg-light">
+    <div class="container">
+      <h1 class="display-4 mb-3" th:text="#{welcome}">Welcome to Spring PetClinic!</h1>
+      <p class="lead mb-4" th:text="#{welcome.description}">
+        Your favorite place for managing pets and keeping them healthy!
+      </p>
+      <a href="/owners/find" class="btn btn-primary btn-lg">Find an Owner</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Manage Pets</h5>
+              <p class="card-text">Easily add, update, and track your pets' information and visits.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Appointments</h5>
+              <p class="card-text">Schedule and manage vet visits for your pets efficiently.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Health Tracking</h5>
+              <p class="card-text">Keep track of vaccinations, treatments, and pet health records.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </body>
+  </section>
+
+  <!-- Hero Image / Banner -->
+  <section class="text-center py-5 bg-white">
+    <div class="container">
+      <img class="img-fluid mx-auto d-block" 
+           src="../static/resources/images/pets.png" 
+           th:src="@{/resources/images/pets.png}" 
+           alt="Happy pets" />
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 bg-light">
+    <p>&copy; 2026 Spring PetClinic. All rights reserved.</p>
+  </footer>
+
+</body>
 </html>
