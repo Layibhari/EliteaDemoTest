@@ -1,24 +1,8 @@
-/*
- * Copyright 2012-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.springframework.samples.petclinic.owner;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,18 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import jakarta.validation.Valid;
-
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * @author Juergen Hoeller
- * @author Ken Krebs
- * @author Arjen Poutsma
- * @author Michael Isvy
- * @author Wick Dynex
- */
 @Controller
 class OwnerController {
 
@@ -63,12 +37,11 @@ class OwnerController {
 
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
-		return ownerId == null ? new Owner()
-				: this.owners.findById(ownerId)
-					.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId
-							+ ". Please ensure the ID is correct " + "and the owner exists in the database."));
+		return ownerId == null ? new Owner() : this.owners.findById(ownerId)
+			.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId + "."));
 	}
 
+	// =================== CREACIÓN ===================
 	@GetMapping("/owners/new")
 	public String initCreationForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
@@ -86,38 +59,67 @@ class OwnerController {
 		return "redirect:/owners/" + owner.getId();
 	}
 
+	// =================== BÚSQUEDA ===================
 	@GetMapping("/owners/find")
-	public String initFindForm() {
+	public String initFindForm(Model model) {
+		model.addAttribute("owner", new Owner());
 		return "owners/findOwners";
 	}
 
 	@GetMapping("/owners")
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
+	public String processFindForm(Owner owner, BindingResult result, @RequestParam(defaultValue = "1") int page,
 			Model model) {
-		// allow parameterless GET request for /owners to return all records
 		String lastName = owner.getLastName();
-		if (lastName == null) {
-			lastName = ""; // empty string signifies broadest possible search
-		}
+		if (lastName == null)
+			lastName = "";
 
-		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+
 		if (ownersResults.isEmpty()) {
-			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
 			return "owners/findOwners";
 		}
 
 		if (ownersResults.getTotalElements() == 1) {
-			// 1 owner found
-			owner = ownersResults.iterator().next();
-			return "redirect:/owners/" + owner.getId();
+			Owner singleOwner = ownersResults.iterator().next();
+			return "redirect:/owners/" + singleOwner.getId();
 		}
 
-		// multiple owners found
 		return addPaginationModel(page, model, ownersResults);
 	}
 
+	// Nuevo endpoint para buscar por apellido (parámetro opcional)
+	@GetMapping("/owners/searchByLastName")
+	public String searchByLastName(@RequestParam(name = "lastName", required = false) String lastName,
+			@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result, Model model) {
+		if (lastName == null)
+			lastName = "";
+		owner.setLastName(lastName);
+
+		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+
+		if (ownersResults.isEmpty()) {
+			result.rejectValue("lastName", "notFound", "not found");
+			return "owners/findOwners";
+		}
+
+		if (ownersResults.getTotalElements() == 1) {
+			Owner singleOwner = ownersResults.iterator().next();
+			return "redirect:/owners/" + singleOwner.getId();
+		}
+
+		return addPaginationModel(page, model, ownersResults);
+	}
+
+	// Nuevo endpoint para mostrar todos los propietarios
+	@GetMapping("/owners/showAll")
+	public String showAllOwners(@RequestParam(defaultValue = "1") int page, Model model) {
+		Pageable pageable = PageRequest.of(page - 1, 5);
+		Page<Owner> ownersResults = owners.findAll(pageable);
+		return addPaginationModel(page, model, ownersResults);
+	}
+
+	// =================== UTILIDADES ===================
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();
 		model.addAttribute("currentPage", page);
@@ -128,11 +130,11 @@ class OwnerController {
 	}
 
 	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		Pageable pageable = PageRequest.of(page - 1, 5);
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
 
+	// =================== EDICIÓN ===================
 	@GetMapping("/owners/{ownerId}/edit")
 	public String initUpdateOwnerForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
@@ -158,17 +160,12 @@ class OwnerController {
 		return "redirect:/owners/{ownerId}";
 	}
 
-	/**
-	 * Custom handler for displaying an owner.
-	 * @param ownerId the ID of the owner to display
-	 * @return a ModelMap with the model attributes for the view
-	 */
+	// =================== DETALLE ===================
 	@GetMapping("/owners/{ownerId}")
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		Owner owner = this.owners.findById(ownerId)
+			.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId));
 		mav.addObject(owner);
 		return mav;
 	}
