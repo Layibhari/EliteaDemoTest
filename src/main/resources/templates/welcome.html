@@ -1,16 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'home')}"
+>
+  <body>
+    <!-- Improved title -->
+    <h2 th:text="#{welcome}">Welcome to Spring PetClinic!</h2>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'home')}">
+    <!-- Short description under the title -->
+    <p th:text="#{welcome.description}">
+      Your favorite place for managing pets!
+    </p>
 
-<body>
-
-  <h2 th:text="#{welcome}">Welcome</h2>
-  <div class="row">
-    <div class="col-md-12">
-      <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
+    <div class="row">
+      <div class="col-md-12">
+        <!-- Responsive image with proper alt text -->
+        <img
+          class="img-fluid mx-auto d-block"
+          src="../static/resources/images/pets.png"
+          th:src="@{/resources/images/pets.png}"
+          alt="Cute pets"
+        />
+      </div>
     </div>
-  </div>
-
-</body>
-
+  </body>
 </html>
