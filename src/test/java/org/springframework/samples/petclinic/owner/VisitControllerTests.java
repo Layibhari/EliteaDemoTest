@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,7 +32,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BindingResult;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -76,7 +79,8 @@ class VisitControllerTests {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
 				.param("name", "George")
-				.param("description", "Visit Description"))
+				.param("description", "Visit Description")
+				.param("date", String.valueOf(LocalDate.now().plusDays(1))))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
@@ -89,6 +93,26 @@ class VisitControllerTests {
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void processNewVisitFormHasErrorsWhenDateIsNotInFuture() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "George")
+				.param("description", "Visit Description") // Removed 'name' for clarity
+				.param("date", String.valueOf(LocalDate.now())))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasFieldErrors("visit", "date"))
+			.andExpect(model().attributeHasFieldErrorCode("visit", "date", "Future"))
+			.andExpect(view().name("pets/createOrUpdateVisitForm"))
+			.andExpect(result -> {
+				BindingResult bindingResult = (BindingResult) result.getModelAndView()
+					.getModel()
+					.get("org.springframework.validation.BindingResult.visit");
+				String message = bindingResult.getFieldError("date").getDefaultMessage();
+				assertEquals("Visit date must be in the future", message);
+			});
 	}
 
 }

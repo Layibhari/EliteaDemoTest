@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.owner;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.Future;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
@@ -37,16 +38,17 @@ public class Visit extends BaseEntity {
 
 	@Column(name = "visit_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Future(message = "Visit date must be in the future")
 	private LocalDate date;
 
 	@NotBlank
 	private String description;
 
 	/**
-	 * Creates a new instance of Visit for the current date
+	 * Creates a new instance of Visit for at least tommorow
 	 */
 	public Visit() {
-		this.date = LocalDate.now();
+		this.date = LocalDate.now().plusDays(1);
 	}
 
 	public LocalDate getDate() {
