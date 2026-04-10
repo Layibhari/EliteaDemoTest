@@ -21,11 +21,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -61,7 +57,7 @@ class VisitController {
 	 */
 	@ModelAttribute("visit")
 	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
-			Map<String, Object> model) {
+			@RequestParam(value = "visitId", required = false) Integer visitId, Map<String, Object> model) {
 		Optional<Owner> optionalOwner = owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
 				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
@@ -73,6 +69,14 @@ class VisitController {
 		}
 		model.put("pet", pet);
 		model.put("owner", owner);
+
+		if (visitId != null) {
+			return pet.getVisits()
+				.stream()
+				.filter(v -> v.getId().equals(visitId))
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("Visit not found"));
+		}
 
 		Visit visit = new Visit();
 		pet.addVisit(visit);
@@ -98,6 +102,33 @@ class VisitController {
 		owner.addVisit(petId, visit);
 		this.owners.save(owner);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
+		return "redirect:/owners/{ownerId}";
+	}
+
+	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/{visitId}/edit")
+	public String initUpdateVisitForm() {
+		return "pets/editVisitForm";
+	}
+
+	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/{visitId}/edit")
+	public String processUpdateVisitForm(@PathVariable int ownerId, @PathVariable int petId, @PathVariable int visitId,
+			@Valid Visit visit, BindingResult result, RedirectAttributes redirectAttributes) {
+
+		if (result.hasErrors()) {
+			return "pets/editVisitForm";
+		}
+
+		Owner owner = owners.findById(ownerId).orElseThrow();
+		Pet pet = owner.getPet(petId);
+
+		Visit existingVisit = pet.getVisits().stream().filter(v -> v.getId().equals(visitId)).findFirst().orElseThrow();
+
+		existingVisit.setDescription(visit.getDescription());
+		existingVisit.setDate(visit.getDate());
+
+		owners.save(owner);
+
+		redirectAttributes.addFlashAttribute("message", "Visit updated");
 		return "redirect:/owners/{ownerId}";
 	}
 
