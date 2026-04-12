@@ -22,7 +22,7 @@ jobs:
               with:
                 languages: java
             - name: package the code
-              run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
+              run: mvn --batch-mode -Dmaven.test.failure.ignore=true test package
             - name: Perform code quality analysis
               uses: github/codeql-action/analyze@v4
             - name: publish test results
