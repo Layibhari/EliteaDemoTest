@@ -1,10 +1,6 @@
 ---
 name: release-branch
 
-permisions:
-  contents: read
-  packages: write
-  security-events: write
 on:
   push:
     branches:
@@ -13,6 +9,10 @@ on:
 jobs:
     maven-build-job:
         runs-on: ubuntu-latest
+        ermissions:
+            contents: read
+            packages: write
+            security-events: write
         steps:
             - name: get the code
               uses: actions/checkout@v6
