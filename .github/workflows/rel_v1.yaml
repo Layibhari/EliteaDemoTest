@@ -56,7 +56,7 @@ jobs:
                 images: ghcr.io/${{ github.repository_owner }}/spring-petclinic
 
             - name: build the docker image
-              uses: docker/build-push-action@v7
+              uses: docker/build-push-action@v6
               with:
                 push: true
                 context: .
