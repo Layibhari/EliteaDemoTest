@@ -1,6 +1,10 @@
 ---
 name: pull-request-workflow
 
+permissions:
+  checks: write
+  contents: read
+  
 on:
   pull_request:
     branches:
