@@ -9,7 +9,7 @@ on:
 jobs:
     maven-build-job:
         runs-on: ubuntu-latest
-        ermissions:
+        permissions:
             contents: read
             packages: write
             security-events: write
