@@ -25,11 +25,16 @@ jobs:
               run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
             - name: Perform code quality analysis
               uses: github/codeql-action/analyze@v4
-            - name: publish test results
-              uses: EnricoMi/publish-unit-test-result-action@v2
+            # - name: publish test results
+            #   uses: EnricoMi/publish-unit-test-result-action@v2
+            #   with:
+            #     files: '**/target/surefire-reports/**/*.xml'
+            #     comment_mode: always
+            - name: upload JAR as artifact
+              uses: actions/upload-artifact@v4
               with:
-                files: '**/target/surefire-reports/**/*.xml'
-                comment_mode: always
+                name: spring-petclinic-jar
+                path: target/*.jar
     docker-build-job:
         runs-on: ubuntu-latest
         steps:
