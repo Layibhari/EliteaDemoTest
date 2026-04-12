@@ -7,7 +7,4 @@
 	<module name="SuppressionFilter">
 		<property name="file" value="${config_loc}/nohttp-checkstyle-suppressions.xml"/>
 	</module>
-	<module name="FileFilter">
-  		<property name="fileNamePattern" value="toolchains.xml"/>
-	</module>
 </module>
