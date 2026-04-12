@@ -27,6 +27,9 @@ jobs:
               uses: github/codeql-action/init@v4
               with:
                 languages: java
+
+            - name: Remove generated toolchains.xml
+              run: rm -f toolchains.xml
             - name: package the code
               run: mvn clean package
             # - name: Perform code quality analysis
