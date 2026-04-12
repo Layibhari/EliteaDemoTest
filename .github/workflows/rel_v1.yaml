@@ -51,12 +51,12 @@ jobs:
                 password: ${{ secrets.GITHUB_TOKEN }}
             - name: Extract metadata
               id: metadata
-              uses: docker/metadata-action@v7
+              uses: docker/metadata-action@v6
               with:
                 images: ghcr.io/${{ github.repository_owner }}/spring-petclinic
 
             - name: build the docker image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@v7
               with:
                 push: true
                 context: .
