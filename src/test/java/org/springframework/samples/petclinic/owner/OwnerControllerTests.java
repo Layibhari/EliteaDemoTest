@@ -16,23 +16,6 @@
 
 package org.springframework.samples.petclinic.owner;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledInNativeImage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.aot.DisabledInAotMode;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
@@ -47,7 +30,28 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * Test class for {@link OwnerController}
@@ -76,6 +80,7 @@ class OwnerControllerTests {
 		george.setAddress("110 W. Liberty St.");
 		george.setCity("Madison");
 		george.setTelephone("6085551023");
+		george.setEmail("george@example.com");
 		Pet max = new Pet();
 		PetType dog = new PetType();
 		dog.setName("dog");
@@ -116,18 +121,23 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "1316761638"))
+				.param("telephone", "1316761638")
+				.param("email", "joe@example.com"))
 			.andExpect(status().is3xxRedirection());
 	}
 
 	@Test
 	void processCreationFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
+			.perform(post("/owners/new").param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("city", "London")
+				.param("email", "invalid-email"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", "address"))
 			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(model().attributeHasFieldErrors("owner", "email"))
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
@@ -177,7 +187,40 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
 			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
 			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("email", is("george@example.com"))))
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testFindOwnersWithEmptyPhone() throws Exception {
+		Page<Owner> page = new PageImpl<>(List.of(george(), new Owner()));
+		given(this.owners.findByLastNameStartingWith(eq(""), any(Pageable.class))).willReturn(page);
+
+		mockMvc.perform(get("/owners").param("phone", ""))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listOwners"))
+			.andExpect(view().name("owners/ownersList"));
+	}
+
+	@Test
+	void testFindOwnersWithPhoneParam() throws Exception {
+		Page<Owner> page = new PageImpl<>(List.of(george(), new Owner()));
+		given(this.owners.findByTelephoneContaining(eq("5510"), any(Pageable.class))).willReturn(page);
+
+		mockMvc.perform(get("/owners").param("phone", "5510"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listOwners"))
+			.andExpect(view().name("owners/ownersList"));
+	}
+
+	@Test
+	void testFindOwnersWithNoResult() throws Exception {
+		given(this.owners.findByTelephoneContaining(eq("99999"), any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of()));
+
+		mockMvc.perform(get("/owners").param("phone", "99999"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("owners/findOwners"));
 	}
 
 	@Test
@@ -187,7 +230,8 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "1616291589"))
+				.param("telephone", "1616291589")
+				.param("email", "joe@example.com"))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
@@ -205,11 +249,13 @@ class OwnerControllerTests {
 			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
 				.param("lastName", "Bloggs")
 				.param("address", "")
-				.param("telephone", ""))
+				.param("telephone", "")
+				.param("email", "joe@"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", "address"))
 			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(model().attributeHasFieldErrors("owner", "email"))
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
@@ -222,6 +268,7 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
 			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
 			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("email", is("george@example.com"))))
 			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
 			.andExpect(model().attribute("owner",
 					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
@@ -239,6 +286,7 @@ class OwnerControllerTests {
 		owner.setAddress("Center Street");
 		owner.setCity("New York");
 		owner.setTelephone("0123456789");
+		owner.setEmail("john@example.com");
 
 		when(owners.findById(pathOwnerId)).thenReturn(Optional.of(owner));
 

@@ -92,16 +92,25 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners")
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
-			Model model) {
-		// allow parameterless GET request for /owners to return all records
-		String lastName = owner.getLastName();
-		if (lastName == null) {
-			lastName = ""; // empty string signifies broadest possible search
+	public String processFindForm(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String phone, Owner owner, BindingResult result, Model model) {
+		Page<Owner> ownersResults;
+
+		if (phone != null && !phone.isEmpty()) {
+			// find owners by phone number
+			ownersResults = findPaginatedForOwnersTelephone(page, phone);
+		}
+		else {
+			// allow parameterless GET request for /owners to return all records
+			String lastName = owner.getLastName();
+			if (lastName == null) {
+				lastName = ""; // empty string signifies broadest possible search
+			}
+
+			// find owners by last name
+			ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		}
 
-		// find owners by last name
-		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		if (ownersResults.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
@@ -131,6 +140,12 @@ class OwnerController {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
 		return owners.findByLastNameStartingWith(lastname, pageable);
+	}
+
+	private Page<Owner> findPaginatedForOwnersTelephone(int page, String telephone) {
+		int pageSize = 5;
+		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		return owners.findByTelephoneContaining(telephone, pageable);
 	}
 
 	@GetMapping("/owners/{ownerId}/edit")

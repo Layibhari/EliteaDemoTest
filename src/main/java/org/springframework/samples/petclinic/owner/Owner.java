@@ -31,8 +31,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object representing an owner.
@@ -61,6 +62,11 @@ public class Owner extends Person {
 	@Pattern(regexp = "\\d{10}", message = "{telephone.invalid}")
 	private String telephone;
 
+	@Column
+	@NotBlank
+	@Email
+	private String email;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_id")
 	@OrderBy("name")
@@ -88,6 +94,14 @@ public class Owner extends Person {
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public List<Pet> getPets() {
@@ -153,6 +167,7 @@ public class Owner extends Person {
 			.append("address", this.address)
 			.append("city", this.city)
 			.append("telephone", this.telephone)
+			.append("email", this.email)
 			.toString();
 	}
 
