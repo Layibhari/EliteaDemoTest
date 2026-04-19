@@ -52,7 +52,7 @@ class PetValidatorTests {
 
 	private static final String petTypeName = "Dog";
 
-	private static final LocalDate petBirthDate = LocalDate.of(1990, 1, 1);
+	private static final LocalDate petBirthDate = LocalDate.of(2020, 1, 1);
 
 	@BeforeEach
 	void setUp() {
@@ -68,6 +68,42 @@ class PetValidatorTests {
 		pet.setName(petName);
 		pet.setType(petType);
 		pet.setBirthDate(petBirthDate);
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	void testValidPetAge_5YearsOld() {
+		petType.setName(petTypeName);
+		pet.setName(petName);
+		pet.setType(petType);
+		pet.setBirthDate(LocalDate.now().minusYears(5));
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	void testValidPetAge_BornToday() {
+		petType.setName(petTypeName);
+		pet.setName(petName);
+		pet.setType(petType);
+		pet.setBirthDate(LocalDate.now());
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	void testValidPetAge_Exactly20Years() {
+		petType.setName(petTypeName);
+		pet.setName(petName);
+		pet.setType(petType);
+		pet.setBirthDate(LocalDate.now().minusYears(20));
 
 		petValidator.validate(pet, errors);
 
@@ -110,6 +146,32 @@ class PetValidatorTests {
 			petValidator.validate(pet, errors);
 
 			assertTrue(errors.hasFieldErrors("birthDate"));
+		}
+
+		@Test
+		void testInvalidPetAge_FutureDate() {
+			petType.setName(petTypeName);
+			pet.setName(petName);
+			pet.setType(petType);
+			pet.setBirthDate(LocalDate.now().plusDays(1));
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("birthDate"));
+			assertTrue(errors.getFieldError("birthDate").getCode().contains("future"));
+		}
+
+		@Test
+		void testInvalidPetAge_Over20Years() {
+			petType.setName(petTypeName);
+			pet.setName(petName);
+			pet.setType(petType);
+			pet.setBirthDate(LocalDate.now().minusYears(20).minusDays(1));
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("birthDate"));
+			assertTrue(errors.getFieldError("birthDate").getCode().contains("tooOld"));
 		}
 
 	}

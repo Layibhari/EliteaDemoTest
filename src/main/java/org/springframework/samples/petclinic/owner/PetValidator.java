@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -50,6 +53,16 @@ public class PetValidator implements Validator {
 		// birth date validation
 		if (pet.getBirthDate() == null) {
 			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
+		}
+		else {
+			LocalDate birthDate = pet.getBirthDate();
+			LocalDate now = LocalDate.now();
+			if (birthDate.isAfter(now)) {
+				errors.rejectValue("birthDate", "birthDate.future", "Birth date cannot be in the future");
+			}
+			else if (birthDate.isBefore(now.minusYears(20))) {
+				errors.rejectValue("birthDate", "birthDate.tooOld", "Pet age cannot exceed 20 years");
+			}
 		}
 	}
 
