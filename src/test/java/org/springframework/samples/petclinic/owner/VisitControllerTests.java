@@ -32,6 +32,7 @@ import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -65,14 +66,14 @@ class VisitControllerTests {
 	}
 
 	@Test
-	void initNewVisitForm() throws Exception {
+	void testInitNewVisitForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
 	}
 
 	@Test
-	void processNewVisitFormSuccess() throws Exception {
+	void testProcessNewVisitFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
 				.param("name", "George")
@@ -82,13 +83,54 @@ class VisitControllerTests {
 	}
 
 	@Test
-	void processNewVisitFormHasErrors() throws Exception {
+	void testProcessNewVisitFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID).param("name",
 					"George"))
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void testProcessNewVisitFormDuplicateVisit() throws Exception {
+		// 先模拟该宠物在今天已经有一个已保存的预约
+		Owner owner = this.owners.findById(TEST_OWNER_ID).get();
+		Pet pet = owner.getPet(TEST_PET_ID);
+		Visit existingVisit = new Visit();
+		existingVisit.setDate(LocalDate.now());
+		existingVisit.setDescription("Existing Visit");
+		existingVisit.setId(999); // 设置 ID 模拟已持久化
+		pet.addVisit(existingVisit);
+
+		// 再次提交今天的预约，预期拦截
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("date", LocalDate.now().toString())
+				.param("description", "Duplicate Visit"))
+			.andExpect(model().attributeHasFieldErrors("visit", "date"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void testProcessNewVisitFormDifferentDays() throws Exception {
+		// 先模拟该宠物在今天已经有一个预约
+		Owner owner = this.owners.findById(TEST_OWNER_ID).get();
+		Pet pet = owner.getPet(TEST_PET_ID);
+		Visit existingVisit = new Visit();
+		existingVisit.setDate(LocalDate.now());
+		existingVisit.setDescription("Today's Visit");
+		existingVisit.setId(999);
+		pet.addVisit(existingVisit);
+
+		// 提交明天的预约，预期成功
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("date", LocalDate.now().plusDays(1).toString())
+				.param("description", "Tomorrow's Visit"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
 }

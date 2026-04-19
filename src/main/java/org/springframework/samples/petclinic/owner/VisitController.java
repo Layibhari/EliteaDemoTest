@@ -91,6 +91,19 @@ class VisitController {
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
+
+		// 业务拦截：检查该宠物是否在同一天已有其他预约
+		Pet pet = owner.getPet(petId);
+		if (pet != null && visit.getDate() != null) {
+			boolean hasConflict = pet.getVisits()
+				.stream()
+				.anyMatch(v -> !v.isNew() && v.getDate().equals(visit.getDate()));
+
+			if (hasConflict) {
+				result.rejectValue("date", "duplicate", "already exists");
+			}
+		}
+
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}

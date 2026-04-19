@@ -23,6 +23,7 @@ import org.springframework.samples.petclinic.model.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -32,7 +33,8 @@ import jakarta.validation.constraints.NotBlank;
  * @author Dave Syer
  */
 @Entity
-@Table(name = "visits")
+@Table(name = "visits",
+		uniqueConstraints = @UniqueConstraint(name = "unique_pet_visit_date", columnNames = { "pet_id", "visit_date" }))
 public class Visit extends BaseEntity {
 
 	@Column(name = "visit_date")

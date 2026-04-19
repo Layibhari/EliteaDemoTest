@@ -51,5 +51,6 @@ CREATE TABLE IF NOT EXISTS visits (
   pet_id INT(4) UNSIGNED,
   visit_date DATE,
   description VARCHAR(255),
-  FOREIGN KEY (pet_id) REFERENCES pets(id)
+  FOREIGN KEY (pet_id) REFERENCES pets(id),
+  CONSTRAINT unique_pet_visit_date UNIQUE (pet_id, visit_date)
 ) engine=InnoDB;
