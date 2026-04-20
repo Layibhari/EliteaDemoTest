@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,15 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +37,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.validation.Valid;
@@ -51,9 +57,24 @@ class OwnerController {
 	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
 	private final OwnerRepository owners;
+	private final OwnerTrie ownerTrie; // In-memory Trie for fast partial searches
 
 	public OwnerController(OwnerRepository owners) {
 		this.owners = owners;
+		this.ownerTrie = new OwnerTrie();
+	}
+
+	/**
+	 * Populates the Trie on application startup.
+	 * Note: Requires a findAll() method in OwnerRepository.
+	 * If you don't have one, you can add `Iterable<Owner> findAll();` to the interface.
+	 */
+	@PostConstruct
+	public void initTrie() {
+		// Populate the Trie with all existing owners from the database
+		for (Owner owner : this.owners.findAll()) {
+			this.ownerTrie.insert(owner);
+		}
 	}
 
 	@InitBinder
@@ -82,6 +103,8 @@ class OwnerController {
 		}
 
 		this.owners.save(owner);
+		this.ownerTrie.insert(owner); // Add to Trie upon creation
+
 		redirectAttributes.addFlashAttribute("message", "New Owner Created");
 		return "redirect:/owners/" + owner.getId();
 	}
@@ -117,6 +140,29 @@ class OwnerController {
 		// multiple owners found
 		return addPaginationModel(page, model, ownersResults);
 	}
+
+	// ---------------------------------------------------------
+	// NEW: Trie-based Search Endpoint
+	// ---------------------------------------------------------
+	@GetMapping("/owners/trieSearch")
+	public String searchUsingTrie(@RequestParam("lastName") String partialName, Model model) {
+		List<Owner> matches = ownerTrie.searchByPrefix(partialName);
+
+		if (matches.isEmpty()) {
+			model.addAttribute("error", "No owners found matching that prefix.");
+			return "owners/findOwners";
+		}
+
+		if (matches.size() == 1) {
+			return "redirect:/owners/" + matches.get(0).getId();
+		}
+
+		model.addAttribute("listOwners", matches);
+		// Note: A real Trie doesn't natively support Spring Data pagination without custom wrappers.
+		// For simplicity, we pass the raw list to the view.
+		return "owners/ownersList";
+	}
+	// ---------------------------------------------------------
 
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();
@@ -154,6 +200,8 @@ class OwnerController {
 
 		owner.setId(ownerId);
 		this.owners.save(owner);
+		this.ownerTrie.insert(owner); // Update the Trie.
+
 		redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
 		return "redirect:/owners/{ownerId}";
 	}
@@ -173,4 +221,61 @@ class OwnerController {
 		return mav;
 	}
 
+	// ---------------------------------------------------------
+	// NEW: Trie Data Structure Implementations
+	// ---------------------------------------------------------
+	private static class TrieNode {
+		Map<Character, TrieNode> children = new HashMap<>();
+		List<Owner> owners = new ArrayList<>(); // Store owners that end at or pass through this node
+	}
+
+	private static class OwnerTrie {
+		private final TrieNode root = new TrieNode();
+
+		public void insert(Owner owner) {
+			String lastName = owner.getLastName();
+			if (lastName == null || lastName.trim().isEmpty()) {
+				return;
+			}
+
+			TrieNode current = root;
+			for (char c : lastName.toLowerCase().toCharArray()) {
+				current = current.children.computeIfAbsent(c, k -> new TrieNode());
+			}
+
+			// Prevent duplicate references if updating an existing owner
+			boolean exists = current.owners.stream().anyMatch(o -> o.getId().equals(owner.getId()));
+			if (!exists) {
+				current.owners.add(owner);
+			} else {
+				// Replace the old owner object with the newly updated one
+				current.owners.removeIf(o -> o.getId().equals(owner.getId()));
+				current.owners.add(owner);
+			}
+		}
+
+		public List<Owner> searchByPrefix(String prefix) {
+			if (prefix == null || prefix.trim().isEmpty()) {
+				return Collections.emptyList();
+			}
+
+			TrieNode current = root;
+			for (char c : prefix.toLowerCase().toCharArray()) {
+				current = current.children.get(c);
+				if (current == null) {
+					return Collections.emptyList(); // Prefix not found
+				}
+			}
+			return collectAllOwners(current);
+		}
+
+		// Recursively gather all owners stored under a specific prefix node
+		private List<Owner> collectAllOwners(TrieNode node) {
+			List<Owner> results = new ArrayList<>(node.owners);
+			for (TrieNode child : node.children.values()) {
+				results.addAll(collectAllOwners(child));
+			}
+			return results;
+		}
+	}
 }
