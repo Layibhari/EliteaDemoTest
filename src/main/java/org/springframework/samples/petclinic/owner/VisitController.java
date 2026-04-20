@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,9 +27,9 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * @author Juergen Hoeller
@@ -91,6 +92,11 @@ class VisitController {
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
+		// Validate that visit date is in the future (only if explicitly provided, not default)
+		if (visit.getDate() != null && visit.getDate().isBefore(LocalDate.now().plusDays(1))) {
+			result.rejectValue("date", "invalid", "Visit date must be in the future");
+		}
+
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}
