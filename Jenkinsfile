@@ -44,8 +44,17 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                sh './mvnw verify -DskipTests jacoco:report -B'
                 withSonarQubeEnv("${SONAR_SERVER_NAME}") {
-                    sh './mvnw sonar:sonar'
+                    sh './mvnw sonar:sonar -Dsonar.projectKey=spring-petclinic -B'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: false
                 }
             }
         }
