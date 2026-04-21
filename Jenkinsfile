@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker { 
-            image 'eclipse-temurin:21-jdk' 
-            args '-v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST=unix:///var/run/docker.sock --network spring-petclinic_devsecops-net'
-        }
-    }
+    agent any
 
     triggers {
         pollSCM('H/2 * * * *')
