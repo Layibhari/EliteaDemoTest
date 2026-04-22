@@ -1,15 +1,38 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    cluster: devsecops
+    replica: "0"
+
+rule_files:
+  - /etc/prometheus/rules/jenkins.rules.yml
+  - /etc/prometheus/rules/petclinic.rules.yml
 
 scrape_configs:
-  # Scrape Prometheus itself
+  # Prometheus self-scrape
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+        labels:
+          component: monitoring
 
-  # Scrape Jenkins (requires Prometheus plugin installed in Jenkins)
+  # Jenkins exposes /prometheus/ via the Prometheus metrics plugin
+  # (installed in jenkins/Dockerfile, configured in jenkins/casc.yaml)
   - job_name: 'jenkins'
     metrics_path: /prometheus/
     static_configs:
       - targets: ['jenkins:8080']
+        labels:
+          component: ci
+
+  # Spring PetClinic exposes /actuator/prometheus once
+  # micrometer-registry-prometheus is on the classpath.
+  # The target VM/host is templated by Ansible into
+  # prometheus/targets/petclinic.json at deploy time.
+  - job_name: 'petclinic'
+    metrics_path: /actuator/prometheus
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/targets/petclinic.json
+        refresh_interval: 30s

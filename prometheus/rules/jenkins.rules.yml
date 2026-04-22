@@ -1,0 +1,45 @@
+groups:
+  - name: jenkins.rules
+    rules:
+      - alert: JenkinsDown
+        expr: up{job="jenkins"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Jenkins is not being scraped"
+          description: "Prometheus has not been able to scrape Jenkins for 2 minutes. The CI pipeline cannot report metrics."
+
+      - alert: JenkinsBuildQueueBacklog
+        expr: jenkins_queue_size_value > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Jenkins build queue is backed up"
+          description: "More than 5 jobs have been waiting in the queue for at least 5 minutes. Consider adding executors."
+
+      - alert: JenkinsExecutorStarvation
+        expr: (jenkins_executor_in_use_value / clamp_min(jenkins_executor_count_value, 1)) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Jenkins executors are saturated"
+          description: "More than 90% of executors have been busy for 10 minutes."
+
+      - alert: JenkinsBuildFailureRateHigh
+        expr: |
+          sum(rate(jenkins_builds_failed_build_count[15m]))
+          /
+          clamp_min(
+            sum(rate(jenkins_builds_failed_build_count[15m]))
+            + sum(rate(jenkins_builds_success_build_count[15m])),
+            1
+          ) > 0.5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Jenkins build failures elevated"
+          description: "More than half of build outcomes in the last 15 minutes were failures. Check the last few pipeline runs."

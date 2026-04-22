@@ -1,0 +1,37 @@
+groups:
+  - name: petclinic.rules
+    rules:
+      - alert: PetclinicDown
+        expr: up{job="petclinic"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Spring PetClinic is unreachable"
+          description: "Prometheus could not scrape /actuator/prometheus for 2 minutes. The application may be down or the target file is misconfigured."
+
+      - alert: PetclinicHighErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{job="petclinic", status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(http_server_requests_seconds_count{job="petclinic"}[5m])), 1)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PetClinic 5xx rate above 5%"
+          description: "More than 5% of HTTP responses have been 5xx for the last 5 minutes."
+
+      - alert: PetclinicHighLatencyP95
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_server_requests_seconds_bucket{job="petclinic"}[5m]))
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PetClinic p95 latency above 1s"
+          description: "p95 request latency has exceeded 1 second for 10 minutes."
