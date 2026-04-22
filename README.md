@@ -48,6 +48,104 @@ There is no `Dockerfile` in this project. You can build a container image (if yo
 ./mvnw spring-boot:build-image
 ```
 
+## Grafana Monitoring for the DevSecOps Pipeline
+
+This repository includes a repo-managed Grafana setup for the DevSecOps stack in `docker-compose.devsecops.yml`. Grafana is provisioned from files so the Prometheus data source and Jenkins dashboard appear automatically when the container starts.
+
+### What is included
+
+- A `grafana` service on the existing `devsecops-net` network
+- Admin credentials configurable with `GRAFANA_ADMIN_USER` and `GRAFANA_ADMIN_PASSWORD`
+- A provisioned Prometheus data source pointing to `http://prometheus:9090`
+- A provisioned `Jenkins Overview` dashboard for Jenkins metrics exposed by the Jenkins Prometheus plugin
+
+### Start the monitoring stack
+
+Run the DevSecOps services:
+
+```bash
+docker compose -f docker-compose.devsecops.yml up -d prometheus grafana jenkins
+```
+
+Open the UIs:
+
+- Grafana: <http://localhost:3000>
+- Prometheus: <http://localhost:9090>
+- Jenkins: <http://localhost:8080>
+
+Default Grafana login:
+
+- Username: `admin`
+- Password: `admin`
+
+You can override the credentials with environment variables before starting the stack:
+
+```bash
+export GRAFANA_ADMIN_USER=admin
+export GRAFANA_ADMIN_PASSWORD=admin
+docker compose -f docker-compose.devsecops.yml up -d prometheus grafana jenkins
+```
+
+### Jenkins prerequisite
+
+Prometheus scrapes Jenkins at `/prometheus/`, so Jenkins must have the `Prometheus metrics` plugin installed and enabled before the dashboard will populate. The current Prometheus config for Jenkins is stored in [prometheus/prometheus.yml](/Users/jeromelim/Documents/GitHub/spring-petclinic/prometheus/prometheus.yml:1).
+
+### Provisioned Grafana files
+
+- Datasource config: [grafana/provisioning/datasources/prometheus.yml](/Users/jeromelim/Documents/GitHub/spring-petclinic/grafana/provisioning/datasources/prometheus.yml:1)
+- Dashboard provider: [grafana/provisioning/dashboards/dashboard.yml](/Users/jeromelim/Documents/GitHub/spring-petclinic/grafana/provisioning/dashboards/dashboard.yml:1)
+- Jenkins dashboard: [grafana/dashboards/jenkins-overview.json](/Users/jeromelim/Documents/GitHub/spring-petclinic/grafana/dashboards/jenkins-overview.json:1)
+
+### Dashboard coverage
+
+The provisioned Jenkins dashboard includes panels for:
+
+- Jenkins target availability
+- Build queue depth
+- Executor utilization
+- Build success rate
+- Successful vs failed build trends
+- Average build duration
+- Executor capacity
+- Node health
+
+### Validation steps
+
+1. Start the stack with Docker Compose.
+2. In Jenkins, install and configure the `Prometheus metrics` plugin if it is not already enabled.
+3. In Prometheus, open `Status` -> `Targets` and confirm the `jenkins` target is `UP`.
+4. In Grafana, confirm the `Prometheus` datasource already exists.
+5. Open the `Jenkins Overview` dashboard in the `DevSecOps` folder.
+6. Run at least one Jenkins pipeline so the dashboard shows live build data instead of empty historical panels.
+
+### Screenshot targets for the assignment
+
+Capture these screens after you have run a real Jenkins build:
+
+- Grafana home or datasource page showing the provisioned `Prometheus` datasource
+- Grafana `Jenkins Overview` dashboard with live metrics
+- Prometheus `Targets` page showing the `jenkins` target as `UP`
+
+### Troubleshooting
+
+If Grafana cannot connect to Prometheus:
+
+- Check that both `grafana` and `prometheus` containers are running
+- Confirm the Grafana datasource URL is `http://prometheus:9090`
+- Recreate the stack with `docker compose -f docker-compose.devsecops.yml up -d --force-recreate grafana prometheus`
+
+If the dashboard is empty:
+
+- Run a Jenkins job first so build counters and duration metrics exist
+- Confirm Jenkins exposes metrics at `http://localhost:8080/prometheus/`
+- Verify the Jenkins Prometheus plugin is installed and enabled
+
+If Prometheus shows the Jenkins target as down:
+
+- Confirm Jenkins is running on port `8080`
+- Confirm the scrape path ends with a trailing slash: `/prometheus/`
+- Check whether the Jenkins Prometheus plugin endpoint is disabled or protected by settings you have not configured in Prometheus
+
 ## In case you find a bug/suggested improvement for Spring Petclinic
 
 Our issue tracker is available [here](https://github.com/spring-projects/spring-petclinic/issues).
