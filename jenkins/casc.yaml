@@ -1,0 +1,37 @@
+jenkins:
+  systemMessage: "Spring PetClinic DevSecOps pipeline. Managed by Configuration-as-Code."
+  numExecutors: 2
+  mode: NORMAL
+  scmCheckoutRetryCount: 2
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+
+unclassified:
+  prometheusConfiguration:
+    path: "prometheus"
+    useAuthenticatedEndpoint: false
+    defaultNamespace: "jenkins"
+    collectingMetricsPeriodInSeconds: 15
+    countAbortedBuilds: true
+    countFailedBuilds: true
+    countNotBuiltBuilds: true
+    countSuccessfulBuilds: true
+    countUnstableBuilds: true
+    fetchTestResults: true
+    processingDisabledBuilds: false
+    appendParamLabel: false
+    appendStatusLabel: false
+    perBuildMetrics: false
+  location:
+    url: "http://jenkins:8080/"
+    adminAddress: "admin@petclinic.local"

@@ -1,0 +1,15 @@
+prometheus
+configuration-as-code
+blueocean
+sonar
+workflow-aggregator
+git
+pipeline-stage-view
+ansible
+html-publisher
+junit
+credentials-binding
+matrix-auth
+timestamper
+ws-cleanup
+build-timeout
