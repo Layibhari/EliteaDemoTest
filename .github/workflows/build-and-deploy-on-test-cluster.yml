@@ -25,7 +25,7 @@ jobs:
       CR_URL: ${{ vars.CR_URL }}
       CR_REPOSITORY: ${{ vars.CR_REPOSITORY }}
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
-      AXELIX_SBS_AUTH_JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
+      JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,4 +84,4 @@ jobs:
            helm upgrade --install petclinic . \
              --set image.ref=$CR_URL/$CR_REPOSITORY/$SPRING_PET_CLINIC \
              --set axelix.sbs.auth.jwt.algorithm=HMAC512 \
-             --set axelix.sbs.auth.jwt.signingKey=$AUTH_JWT_SIGNING_KEY
+             --set axelix.sbs.auth.jwt.signingKey=$JWT_SIGNING_KEY
