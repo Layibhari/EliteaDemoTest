@@ -17,8 +17,13 @@ services:
   # URL: http://localhost:8080
   # -------------------------------------------------------
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ./jenkins
+    image: petclinic/jenkins:devsecops
     container_name: jenkins
+    environment:
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:-admin}
+      CASC_JENKINS_CONFIG: /var/jenkins_conf/casc.yaml
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -58,7 +63,9 @@ services:
       - "9090:9090"
     volumes:
       - prometheus-data:/prometheus
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - ./prometheus/targets:/etc/prometheus/targets:ro
     networks:
       - devsecops-net
     restart: unless-stopped
