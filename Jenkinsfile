@@ -67,7 +67,12 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo "Deploying to Production VM via Ansible..."
+                sh '''
+                    apt-get update && apt-get install -y --no-install-recommends ansible sshpass openssh-client || true
+                    cd ansible
+                    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini deploy.yml \
+                      -e "jar_path=${WORKSPACE}/target"
+                '''
             }
         }
     }
