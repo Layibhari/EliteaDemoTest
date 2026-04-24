@@ -93,6 +93,19 @@ services:
       - devsecops-net
     restart: unless-stopped
 
+
+  petclinic-vm:
+    build:
+      context: ./petclinic-vm
+    image: petclinic/production-vm:latest
+    container_name: petclinic-vm
+    ports:
+      - "8081:8081"
+      - "2222:22"
+    networks:
+      - devsecops-net
+    restart: unless-stopped
+
   # -------------------------------------------------------
   # BURP SUITE - Security Analysis (Community Edition)
   # -------------------------------------------------------

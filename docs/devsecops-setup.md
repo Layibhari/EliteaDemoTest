@@ -26,6 +26,7 @@ Main URLs:
 - SonarQube: http://localhost:9000
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000
+- Production PetClinic VM container: http://localhost:8081
 - Burp Suite Community: VNC at localhost:5900
 
 ## Jenkins
@@ -36,17 +37,21 @@ Ansible, HTML Publisher, and Pipeline plugins. Configuration-as-Code is loaded
 from `jenkins/casc.yaml`.
 
 The `Jenkinsfile` polls SCM every two minutes, builds the Maven project, runs
-unit tests, sends analysis to SonarQube, waits for the quality gate, publishes
-a security evidence report, and can deploy to the production VM with Ansible.
+unit tests, sends analysis to SonarQube, waits for the quality gate, deploys
+to the production VM with Ansible when enabled, and publishes a security
+evidence report.
 
-For deployment, create an inventory file:
+For the local demonstration, `ansible/inventory.ini` already points to the
+`petclinic-vm` service from Docker Compose. For a separate VM, create a real
+inventory from the example:
 
 ```bash
 cp ansible/inventory.example.ini ansible/inventory.ini
 ```
 
 Edit `ansible/inventory.ini` with the VM IP, SSH user, and private key path.
-Then run the Jenkins build with `RUN_DEPLOY=true`.
+Then run the Jenkins build with `RUN_DEPLOY=true`. Jenkins deploys the jar with
+`ansible/deploy.yml`.
 
 ## SonarQube
 
@@ -77,22 +82,24 @@ PetClinic app through Burp's browser or proxy. Jenkins publishes
 
 ## Ansible deployment
 
-The playbook `ansible/deploy-petclinic.yml` copies the built jar to the VM,
-installs Java 21, creates a `petclinic` system user, installs a systemd unit,
-starts the app, and waits for `/actuator/health`.
+The playbook `ansible/deploy.yml` copies the built jar to the VM, installs
+Java 21 when needed, creates a `petclinic` system user, starts the app on port
+8081, and waits for `/actuator/health`. The Compose VM container intentionally
+does not run systemd, so the playbook manages the app process with a pid file.
 
 Manual test:
 
 ```bash
 ./mvnw clean package -DskipTests
-ansible-playbook -i ansible/inventory.ini ansible/deploy-petclinic.yml \
-  -e "petclinic_jar_path=target/spring-petclinic-4.0.0-SNAPSHOT.jar"
+ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+  -e "petclinic_jar_path=target/spring-petclinic-4.0.0-SNAPSHOT.jar" \
+  -e "petclinic_port=8081"
 ```
 
 After deployment, open:
 
 ```text
-http://<vm-ip>:8080
+http://localhost:8081
 ```
 
 ## Prometheus and Grafana

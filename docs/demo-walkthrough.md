@@ -16,7 +16,8 @@ Show the important files:
 - `Jenkinsfile`
 - `jenkins/Dockerfile`
 - `jenkins/plugins.txt`
-- `ansible/deploy-petclinic.yml`
+- `petclinic-vm/Dockerfile`
+- `ansible/deploy.yml`
 - `burpsuite/Dockerfile`
 - `prometheus/prometheus.yml`
 - `grafana/provisioning/datasources/prometheus.yml`
@@ -40,10 +41,11 @@ Open Jenkins at http://localhost:8080. Show the pipeline job and the
 - Unit Test
 - SonarQube Analysis
 - Quality Gate
-- Security Scan
 - Deploy
+- Security Scan
 
-Run the pipeline with `RUN_DEPLOY=true` after the VM inventory is configured.
+Run the pipeline with `RUN_DEPLOY=true`. The checked-in inventory targets the
+Compose production VM container for the class demo.
 
 ## 4. Show SonarQube
 
@@ -61,7 +63,7 @@ published `Security Report` HTML artifact.
 Open the production VM app:
 
 ```text
-http://<vm-ip>:8080
+http://localhost:8081
 ```
 
 Show the welcome screen before the code change.
@@ -81,7 +83,7 @@ testing, scanning, and deploying.
 
 ## 8. Show the updated app
 
-Refresh `http://<vm-ip>:8080` and show the changed welcome-page content.
+Refresh `http://localhost:8081` and show the changed welcome-page content.
 
 ## 9. Show Prometheus
 
@@ -112,5 +114,5 @@ curl -fs http://localhost:8080/prometheus/
 curl -fs http://localhost:9000
 curl -fs http://localhost:9090/-/ready
 curl -fs http://localhost:3000
-curl -fs http://<vm-ip>:8080
+curl -fs http://localhost:8081
 ```

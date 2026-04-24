@@ -1,18 +1,16 @@
 ---
 - name: Deploy Spring PetClinic to the production VM
-  hosts: petclinic
+  hosts: production
   become: true
   vars:
     petclinic_user: petclinic
     petclinic_group: petclinic
     petclinic_home: /opt/petclinic
-    petclinic_service_name: petclinic
-    petclinic_port: 8080
+    petclinic_port: 8081
     petclinic_jar_path: ../target/spring-petclinic-4.0.0-SNAPSHOT.jar
-    petclinic_app_url: "http://localhost:8080"
 
   tasks:
-    - name: Install Java runtime
+    - name: Install Java runtime on Debian hosts
       ansible.builtin.apt:
         name: openjdk-21-jre-headless
         state: present
@@ -48,25 +46,25 @@
         owner: "{{ petclinic_user }}"
         group: "{{ petclinic_group }}"
         mode: "0644"
-      notify: Restart petclinic
 
-    - name: Install systemd unit
-      ansible.builtin.template:
-        src: templates/petclinic.service.j2
-        dest: "/etc/systemd/system/{{ petclinic_service_name }}.service"
-        owner: root
-        group: root
-        mode: "0644"
-      notify:
-        - Reload systemd
-        - Restart petclinic
+    - name: Stop existing PetClinic process
+      ansible.builtin.shell: |
+        if [ -f "{{ petclinic_home }}/petclinic.pid" ]; then
+          kill "$(cat "{{ petclinic_home }}/petclinic.pid")" 2>/dev/null || true
+          rm -f "{{ petclinic_home }}/petclinic.pid"
+        fi
+      args:
+        executable: /bin/sh
+      changed_when: false
 
-    - name: Enable and start PetClinic
-      ansible.builtin.systemd:
-        name: "{{ petclinic_service_name }}"
-        enabled: true
-        state: started
-        daemon_reload: true
+    - name: Start PetClinic
+      ansible.builtin.shell: |
+        cd "{{ petclinic_home }}"
+        nohup java -jar spring-petclinic.jar --server.port={{ petclinic_port }} > petclinic.log 2>&1 &
+        echo $! > petclinic.pid
+      args:
+        executable: /bin/sh
+      become_user: "{{ petclinic_user }}"
 
     - name: Wait for PetClinic health endpoint
       ansible.builtin.uri:
@@ -77,13 +75,3 @@
       retries: 30
       delay: 3
       until: petclinic_health.status == 200
-
-  handlers:
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Restart petclinic
-      ansible.builtin.systemd:
-        name: "{{ petclinic_service_name }}"
-        state: restarted

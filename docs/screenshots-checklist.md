@@ -2,8 +2,8 @@
 
 Capture these for the written submission.
 
-- Production VM PetClinic welcome screen before the demo change
-- Production VM PetClinic welcome screen after the demo change
+- Production VM/container PetClinic welcome screen before the demo change
+- Production VM/container PetClinic welcome screen after the demo change
 - Jenkins pipeline run showing all stages
 - Jenkins console output showing Maven build and tests
 - Jenkins published Security Report artifact
