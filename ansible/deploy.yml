@@ -1,0 +1,77 @@
+---
+- name: Deploy Spring PetClinic to the production VM
+  hosts: production
+  become: true
+  vars:
+    petclinic_user: petclinic
+    petclinic_group: petclinic
+    petclinic_home: /opt/petclinic
+    petclinic_port: 8081
+    petclinic_jar_path: ../target/spring-petclinic-4.0.0-SNAPSHOT.jar
+
+  tasks:
+    - name: Install Java runtime on Debian hosts
+      ansible.builtin.apt:
+        name: openjdk-21-jre-headless
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Create PetClinic group
+      ansible.builtin.group:
+        name: "{{ petclinic_group }}"
+        system: true
+
+    - name: Create PetClinic user
+      ansible.builtin.user:
+        name: "{{ petclinic_user }}"
+        group: "{{ petclinic_group }}"
+        home: "{{ petclinic_home }}"
+        shell: /usr/sbin/nologin
+        system: true
+        create_home: false
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ petclinic_home }}"
+        state: directory
+        owner: "{{ petclinic_user }}"
+        group: "{{ petclinic_group }}"
+        mode: "0755"
+
+    - name: Copy PetClinic jar
+      ansible.builtin.copy:
+        src: "{{ petclinic_jar_path }}"
+        dest: "{{ petclinic_home }}/spring-petclinic.jar"
+        owner: "{{ petclinic_user }}"
+        group: "{{ petclinic_group }}"
+        mode: "0644"
+
+    - name: Stop existing PetClinic process
+      ansible.builtin.shell: |
+        if [ -f "{{ petclinic_home }}/petclinic.pid" ]; then
+          kill "$(cat "{{ petclinic_home }}/petclinic.pid")" 2>/dev/null || true
+          rm -f "{{ petclinic_home }}/petclinic.pid"
+        fi
+      args:
+        executable: /bin/sh
+      changed_when: false
+
+    - name: Start PetClinic
+      ansible.builtin.shell: |
+        cd "{{ petclinic_home }}"
+        nohup java -jar spring-petclinic.jar --server.port={{ petclinic_port }} > petclinic.log 2>&1 &
+        echo $! > petclinic.pid
+      args:
+        executable: /bin/sh
+      become_user: "{{ petclinic_user }}"
+
+    - name: Wait for PetClinic health endpoint
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ petclinic_port }}/actuator/health"
+        return_content: true
+        status_code: 200
+      register: petclinic_health
+      retries: 30
+      delay: 3
+      until: petclinic_health.status == 200

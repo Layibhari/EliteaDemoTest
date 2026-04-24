@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo openjdk-21-jre-headless curl && \
+    apt-get install -y openssh-server sudo openjdk-21-jre-headless curl python3 && \
     rm -rf /var/lib/apt/lists/*
 
 

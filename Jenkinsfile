@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'PETCLINIC_APP_URL', defaultValue: 'http://petclinic-vm:8081', description: 'URL Jenkins should use for security evidence and smoke checks')
+        string(name: 'ANSIBLE_INVENTORY', defaultValue: 'ansible/inventory.ini', description: 'Inventory file for the production VM')
+        booleanParam(name: 'RUN_DEPLOY', defaultValue: false, description: 'Run the Ansible deployment stage')
+    }
+
     triggers {
         pollSCM('H/2 * * * *')
     }
@@ -54,25 +60,42 @@ pipeline {
             }
         }
 
-        stage('Security Scan') {
-            steps {
-                echo "Running Security Analysis..."
+        stage('Deploy') {
+            when {
+                expression { return params.RUN_DEPLOY }
             }
-            post {
-                always {
-                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/burp-reports', reportFiles: 'report.html', reportName: 'Security Report'])
-                }
+            steps {
+                sh '''
+                    test -f "$ANSIBLE_INVENTORY" || {
+                        echo "Missing Ansible inventory: $ANSIBLE_INVENTORY"
+                        echo "Use ansible/inventory.ini for the compose VM, or copy ansible/inventory.example.ini for a real VM."
+                        exit 1
+                    }
+
+                    JAR_PATH="$(ls -1 target/spring-petclinic-*.jar | head -n 1)"
+                    test -n "$JAR_PATH" || {
+                        echo "No packaged PetClinic jar found under target/"
+                        exit 1
+                    }
+
+                    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i "$ANSIBLE_INVENTORY" ansible/deploy.yml \
+                        -e "petclinic_jar_path=$JAR_PATH" \
+                        -e "petclinic_port=8081"
+                '''
             }
         }
 
-        stage('Deploy') {
+        stage('Security Scan') {
             steps {
                 sh '''
-                    apt-get update && apt-get install -y --no-install-recommends ansible sshpass openssh-client || true
-                    cd ansible
-                    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini deploy.yml \
-                      -e "jar_path=${WORKSPACE}/target"
+                    chmod +x scripts/run-burp-report.sh
+                    scripts/run-burp-report.sh "$PETCLINIC_APP_URL"
                 '''
+            }
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/burp-reports', reportFiles: 'report.html', reportName: 'Security Report'])
+                }
             }
         }
     }

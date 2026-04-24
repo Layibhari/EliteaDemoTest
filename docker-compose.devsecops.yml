@@ -109,19 +109,16 @@ services:
   # -------------------------------------------------------
   # BURP SUITE - Security Analysis (Community Edition)
   # -------------------------------------------------------
-  # NOTE: Burp Suite does not have an official Docker image.
-  # The team member assigned to Burp Suite will handle this
-  # by either:
-  #   - Building a custom Dockerfile (JAR + VNC server)
-  #   - Running Burp Suite locally outside Docker
-  # Once a working approach is ready, uncomment and update
-  # the service definition below.
-  #
-  # burpsuite:
-  #   build: ./burpsuite
-  #   container_name: burpsuite
-  #   ports:
-  #     - "8081:8081"
-  #   networks:
-  #     - devsecops-net
-  #   restart: unless-stopped
+  # Burp Community is GUI-first, so this container exposes it over VNC.
+  # Use a VNC client against localhost:5900 during the demo/manual scan.
+  burpsuite:
+    build: ./burpsuite
+    image: petclinic/burpsuite-community:devsecops
+    container_name: burpsuite
+    ports:
+      - "5900:5900"
+    volumes:
+      - ./burpsuite/data:/data
+    networks:
+      - devsecops-net
+    restart: unless-stopped

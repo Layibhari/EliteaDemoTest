@@ -92,10 +92,10 @@ management.endpoints.web.exposure.include=health,info,prometheus,metrics
 ```
 
 The scrape job in `prometheus.yml` uses `file_sd_configs` against
-`prometheus/targets/petclinic.json`. That file is a placeholder with
-`petclinic:8080` for local compose runs. When Ansible deploys the app to a
-VM, the play should template the real host:port into that JSON. Prometheus
-re-reads it every 30 seconds, no restart needed.
+`prometheus/targets/petclinic.json`. For the class demo it points at the
+Compose production VM container, `petclinic-vm:8081`. If you deploy to a
+separate VM, update that JSON with the real host:port. Prometheus re-reads it
+every 30 seconds, no restart needed.
 
 ## Alerts
 
@@ -156,7 +156,7 @@ and recreate the container. Check the Jenkins log for `Loaded plugin
 PetClinic target shows `down` with `connection refused`. The host in
 `prometheus/targets/petclinic.json` is wrong, or the app isn't running on
 that host. Check from inside the prometheus container:
-`docker exec prometheus wget -qO- http://<host>:8080/actuator/prometheus`.
+`docker exec prometheus wget -qO- http://<host>:8081/actuator/prometheus`.
 
 `/actuator/prometheus` returns 404 on the app. The micrometer registry is
 missing from `pom.xml` or the build is stale. Rebuild the JAR.
