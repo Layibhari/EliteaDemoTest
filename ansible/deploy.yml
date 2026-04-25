@@ -64,7 +64,6 @@
         echo $! > petclinic.pid
       args:
         executable: /bin/sh
-      become_user: "{{ petclinic_user }}"
 
     - name: Wait for PetClinic health endpoint
       ansible.builtin.uri:
