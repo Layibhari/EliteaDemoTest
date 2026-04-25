@@ -72,7 +72,7 @@ pipeline {
                         exit 1
                     }
 
-                    JAR_PATH="$(ls -1 target/spring-petclinic-*.jar | head -n 1)"
+                    JAR_PATH="$(ls -1 "${WORKSPACE}"/target/spring-petclinic-*.jar | head -n 1)"
                     test -n "$JAR_PATH" || {
                         echo "No packaged PetClinic jar found under target/"
                         exit 1
