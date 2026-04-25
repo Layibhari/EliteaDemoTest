@@ -12,9 +12,9 @@ jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: true
-  crumbIssuer:
-    standard:
-      excludeClientIPFromCrumb: true
+#  crumbIssuer:
+#    standard:
+#      excludeClientIPFromCrumb: true
 
 unclassified:
   prometheusConfiguration:
