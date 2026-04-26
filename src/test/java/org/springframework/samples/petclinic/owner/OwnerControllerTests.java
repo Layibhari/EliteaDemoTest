@@ -248,4 +248,18 @@ class OwnerControllerTests {
 			.andExpect(flash().attributeExists("error"));
 	}
 
+	@Test
+	void processFindFormPageZeroShouldRedirectToPageOne() throws Exception {
+		mockMvc.perform(get("/owners").param("page", "0"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/owners?page=1"));
+	}
+
+	@Test
+	void processFindFormNegativePageShouldRedirectToPageOne() throws Exception {
+		mockMvc.perform(get("/owners").param("page", "-1"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/owners?page=1"));
+	}
+
 }

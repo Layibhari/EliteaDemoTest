@@ -97,4 +97,38 @@ class VetControllerTests {
 			.andExpect(jsonPath("$.vetList[0].id").value(1));
 	}
 
+	@Test
+	void showVetListHtmlPageZeroShouldRedirectToPageOne() throws Exception {
+		mockMvc.perform(get("/vets.html").param("page", "0"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
+	}
+
+	@Test
+	void showVetListHtmlNegativePageShouldRedirectToPageOne() throws Exception {
+		mockMvc.perform(get("/vets.html").param("page", "-1"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
+	}
+
+	@Test
+	void showVetListHtmlPageBeyondTotalShouldRedirectToLastPage() throws Exception {
+		// mock returns 2 vets with pageSize=5 → totalPages=1
+		// so page=999 should redirect to page=1 (the last valid page)
+		mockMvc.perform(get("/vets.html").param("page", "999"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
+	}
+
+	@Test
+	void showVetListHtmlValidPageShouldLoadCorrectly() throws Exception {
+		mockMvc.perform(get("/vets.html").param("page", "1"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("currentPage"))
+			.andExpect(model().attributeExists("totalPages"))
+			.andExpect(model().attributeExists("totalItems"))
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(view().name("vets/vetList"));
+	}
+
 }

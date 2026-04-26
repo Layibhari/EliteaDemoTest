@@ -45,9 +45,21 @@ class VetController {
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
-		Vets vets = new Vets();
+
+		// Guard: page must be >= 1 to prevent IllegalArgumentException
+		// in PageRequest.of(page - 1, pageSize) when page < 1
+		if (page < 1) {
+			return "redirect:/vets.html?page=1";
+		}
+
 		Page<Vet> paginated = findPaginated(page);
-		vets.getVetList().addAll(paginated.toList());
+
+		// Guard: redirect to last page if requested page exceeds total
+		int totalPages = paginated.getTotalPages();
+		if (totalPages > 0 && page > totalPages) {
+			return "redirect:/vets.html?page=" + totalPages;
+		}
+
 		return addPaginationModel(page, paginated, model);
 	}
 
