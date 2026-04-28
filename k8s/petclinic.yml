@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: petclinic
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 8080
@@ -30,12 +30,18 @@ spec:
     spec:
       containers:
         - name: workload
-          image: dsyer/petclinic
+          image: 708309164311.dkr.ecr.us-east-1.amazonaws.com/petclinic:latest
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: postgres
-            - name: SERVICE_BINDING_ROOT
-              value: /bindings
+              value: mysql
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://<RDS_ENDPOINT>:3306/petclinic"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "admin"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "<YOUR_PASSWORD>"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxMetaspaceSize=100M -XX:ReservedCodeCacheSize=100M -Xss512k -XX:MaxDirectMemorySize=10M -Xmx256m"
             - name: SPRING_APPLICATION_JSON
               value: |
                 {
@@ -52,10 +58,6 @@ spec:
             httpGet:
               path: /readyz
               port: http
-          volumeMounts:
-            - mountPath: /bindings/secret
-              name: binding
-              readOnly: true
       volumes:
         - name: binding
           projected:

@@ -46,3 +46,20 @@ out/
 _site/
 *.css
 !petclinic.css
+
+
+# Terraform
+infra/**/.terraform/
+infra/**/terraform.tfstate
+infra/**/terraform.tfstate.backup
+infra/**/.terraform.lock.hcl
+
+# Sensitive
+*.tfvars
+
+# Sensitive Kubernetes files
+k8s/db-actual.yml
+k8s/secrets.yml
+
+# Sensitive values
+k8s/monitoring/values-actual.ymlinfra/scripts/create-secrets.sh
