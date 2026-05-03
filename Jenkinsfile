@@ -1,7 +1,7 @@
-@Library('my-shared-library') _
+@Library('my-shared-lib') _
 
-deployPetclinic(
-    awsRegion: 'us-east-1', // Change to your target region
-    ecrRegistry: '200098097766.dkr.ecr.us-east-1.amazonaws.com', // Replace with your AWS Account ID
-    ecrRepo: 'spring-petclinic'
+petclinicPipeline(
+    awsCredentialsId: 'aws-ecr-creds', // Match the ID you created in Jenkins
+    ecrRepoName: 'spring-petclinic',
+    awsRegion: 'us-east-1'
 )
