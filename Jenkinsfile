@@ -9,11 +9,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/BadrEldinWael/spring-petclinic.git'
-            }
-        }
+       
 
         stage('Build Docker Image') {
             steps {
