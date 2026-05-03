@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@44.200.220.1 << EOF
+                    ssh -o StrictHostKeyChecking=no ubuntu@44.200.220.1 << EOF
                         docker stop petclinic || true
                         docker rm petclinic || true
                         aws ecr get-login-password --region $AWS_REGION | \
