@@ -1,4 +1,4 @@
-@Library('my-shared-lib') _
+@Library('my-shared-library') _
 
 petclinicPipeline(
     awsCredentialsId: 'aws-ecr-creds', // Match the ID you created in Jenkins
