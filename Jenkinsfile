@@ -48,7 +48,7 @@ pipeline {
 
                         docker pull 200098097766.dkr.ecr.us-east-1.amazonaws.com/spring-petclinic:latest
 
-                        docker run -d -p 8080:8080 --name petclinic \
+                        docker run -d -p 8081:8081 --name petclinic \
                         200098097766.dkr.ecr.us-east-1.amazonaws.com/spring-petclinic:latest
                     '
                     '''
