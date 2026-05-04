@@ -48,6 +48,10 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "owners")
 public class Owner extends Person {
 
+	@Column(nullable = false, unique = true)
+	@NotBlank
+	private String email;
+
 	@Column
 	@NotBlank
 	private String address;
@@ -65,6 +69,10 @@ public class Owner extends Person {
 	@JoinColumn(name = "owner_id")
 	@OrderBy("name")
 	private final List<Pet> pets = new ArrayList<>();
+
+	public String getEmail(){return this.email;}
+
+	public void setEmail(String email){ this.email = email;}
 
 	public String getAddress() {
 		return this.address;
