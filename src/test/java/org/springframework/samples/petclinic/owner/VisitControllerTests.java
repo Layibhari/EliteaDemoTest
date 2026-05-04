@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
@@ -89,6 +91,35 @@ class VisitControllerTests {
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void initNewVisitFormOwnerNotFound() {
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.empty());
+
+		Exception ex = assertThrows(ServletException.class, () -> {
+			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new",
+				TEST_OWNER_ID, TEST_PET_ID));
+		});
+
+		assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+		assertTrue(ex.getCause().getMessage().contains("Owner not found"));
+	}
+
+	@Test
+	void initNewVisitFormPetNotFound() throws Exception {
+		Owner owner = new Owner();
+		owner.setId(TEST_OWNER_ID);
+
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+
+		Exception ex = assertThrows(ServletException.class, () -> {
+			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new",
+				TEST_OWNER_ID, TEST_PET_ID));
+		});
+
+		assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+		assertTrue(ex.getCause().getMessage().contains("Pet with id"));
 	}
 
 }
