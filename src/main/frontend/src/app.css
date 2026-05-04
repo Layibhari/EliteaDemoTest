@@ -2,16 +2,18 @@
 
 @font-face {
   font-family: "Montserrat";
-  src: url("/fonts/montserrat-webfont.woff") format("woff"),
-       url("/fonts/montserrat-webfont.ttf") format("truetype");
+  src:
+    url("/fonts/montserrat-webfont.woff") format("woff"),
+    url("/fonts/montserrat-webfont.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Varela Round";
-  src: url("/fonts/varela_round-webfont.woff") format("woff"),
-       url("/fonts/varela_round-webfont.ttf") format("truetype");
+  src:
+    url("/fonts/varela_round-webfont.woff") format("woff"),
+    url("/fonts/varela_round-webfont.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -32,7 +34,9 @@ body {
   background-color: #f1f1f1;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: "Montserrat", sans-serif;
 }
 

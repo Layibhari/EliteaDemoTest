@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { Component } from "svelte";
 
-  let { href, icon, label, active = false }: {
+  let {
+    href,
+    icon,
+    label,
+    active = false,
+  }: {
     href: string;
     icon: Component;
     label: string;
