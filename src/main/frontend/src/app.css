@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-spring-green: #6db33f;
+  --color-spring-brown: #34302d;
+  --color-spring-light-gray: #f1f1f1;
+  --color-spring-dark: #34302d;
+  --color-spring-link: #5fa134;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-varela: "Varela Round", sans-serif;
+}
