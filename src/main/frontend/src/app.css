@@ -1,11 +1,50 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/montserrat-webfont.woff") format("woff"),
+       url("/fonts/montserrat-webfont.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Varela Round";
+  src: url("/fonts/varela_round-webfont.woff") format("woff"),
+       url("/fonts/varela_round-webfont.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme {
   --color-spring-green: #6db33f;
+  --color-spring-dark-green: #5fa134;
   --color-spring-brown: #34302d;
-  --color-spring-light-gray: #f1f1f1;
-  --color-spring-dark: #34302d;
-  --color-spring-link: #5fa134;
+  --color-spring-grey: #838789;
+  --color-spring-light-grey: #f1f1f1;
   --font-montserrat: "Montserrat", sans-serif;
   --font-varela: "Varela Round", sans-serif;
+}
+
+body {
+  font-family: "Varela Round", sans-serif;
+  color: #34302d;
+  background-color: #f1f1f1;
+}
+
+h1, h2, h3 {
+  font-family: "Montserrat", sans-serif;
+}
+
+a {
+  color: #5fa134;
+}
+
+a:hover {
+  color: #5fa134;
+}
+
+table > thead > tr > th {
+  background-color: #3d3734;
+  color: #f1f1f1;
 }
