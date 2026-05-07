@@ -34,6 +34,14 @@ pipeline {
                 sh 'docker --version || true'
     	    }
 	}
+	
+	stage('Debug Branch') {
+   	     steps {
+        	sh 'echo "BRANCH_NAME=$BRANCH_NAME"'
+        	sh 'git branch --show-current || true'
+        	sh 'git rev-parse --abbrev-ref HEAD'
+    	    }
+	}
 
         stage('Test') {
             when {
