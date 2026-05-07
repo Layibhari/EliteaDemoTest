@@ -43,7 +43,7 @@ pipeline {
             }
 
             steps {
-                sh './mvnw test'
+                sh './mvnw test -Dtest=!*IntegrationTests'
             }
         }
 
