@@ -26,6 +26,14 @@ pipeline {
                 }
             }
         }
+	
+	stage('Debug Docker') {
+    	    steps {
+                sh 'whoami'
+        	sh 'which docker || true'
+                sh 'docker --version || true'
+    	    }
+	}
 
         stage('Test') {
             when {
