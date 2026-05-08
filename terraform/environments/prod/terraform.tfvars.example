@@ -1,0 +1,33 @@
+###############################################################################
+# Cloud Clinic - prod environment example variable values
+#
+# Copy to terraform.tfvars (which is .gitignored) and adjust for your account.
+###############################################################################
+
+aws_region   = "us-west-2"
+project_name = "cloudclinic"
+environment  = "prod"
+owner        = "platform-team"
+
+# Network
+vpc_cidr             = "10.20.0.0/16"
+availability_zones   = ["us-west-2a", "us-west-2b"]
+public_subnet_cidrs  = ["10.20.0.0/24", "10.20.1.0/24"]
+private_subnet_cidrs = ["10.20.10.0/24", "10.20.11.0/24"]
+
+# Application
+container_port    = 8080
+health_check_path = "/actuator/health"
+task_cpu          = 512
+task_memory       = 1024
+desired_count     = 2
+
+# Ops
+log_retention_in_days   = 30
+ecr_max_image_count     = 20
+alb_deletion_protection = true
+
+environment_variables = {
+  SPRING_PROFILES_ACTIVE = "prod"
+  SERVER_PORT            = "8080"
+}

@@ -1,0 +1,5 @@
+# Bucket names are globally unique - append a random suffix or your AWS
+# account ID to avoid collisions.
+aws_region        = "us-west-2"
+project_name      = "cloudclinic"
+state_bucket_name = "cloudclinic-tfstate-123456789012"
