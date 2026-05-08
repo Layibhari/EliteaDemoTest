@@ -36,6 +36,15 @@ This Terraform stack is deliberately scoped to **infrastructure only**.
 
 GitHub Actions  ──build──▶  ECR  ──update service──▶  ECS Fargate
 ```
+With Gradle, the command is as follows:
+
+```bash
+./gradlew bootRun
+```
+
+You can then access the Petclinic at <http://localhost:8080/>.
+
+<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
 
 ### Networking
 
