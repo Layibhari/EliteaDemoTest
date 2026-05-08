@@ -1,247 +1,353 @@
-# Cloud Clinic — AWS Infrastructure (Terraform + ECS Fargate)
+# Cloud Clinic
 
-Production-style Terraform that provisions the AWS footprint for a
-containerized Spring Boot application ("Cloud Clinic", a customized Spring
-PetClinic) running on **ECS Fargate** behind an **Application Load
-Balancer**, with images stored in **ECR** and logs in **CloudWatch**.
-
-CI/CD (GitHub Actions, kept in a separate workflow) is responsible for
-building the Docker image, pushing it to ECR, and updating the ECS service.
-This Terraform stack is deliberately scoped to **infrastructure only**.
+Production-ready Spring Boot deployment on AWS ECS Fargate using Terraform and GitHub Actions CI/CD.
 
 ---
 
-## 1. Architecture overview
+# Live Application
 
-```
-                 Internet
-                    │
-                    ▼
-           ┌─────────────────┐
-           │ Application LB  │  public subnets · port 80
-           │   (ALB)         │
-           └────────┬────────┘
-                    │  HTTP → 8080 (target group / IP targets)
-                    ▼
-           ┌─────────────────┐
-           │  ECS Service    │  Fargate · private subnets
-           │  (rolling)      │
-           └────────┬────────┘
-                    │  pulls image                  │  awslogs
-                    ▼                               ▼
-              ┌──────────┐                   ┌────────────┐
-              │   ECR    │                   │ CloudWatch │
-              └──────────┘                   │   Logs     │
-                                             └────────────┘
-
-GitHub Actions  ──build──▶  ECR  ──update service──▶  ECS Fargate
-```
-With Gradle, the command is as follows:
-
-```bash
-./gradlew bootRun
-```
-
-You can then access the Petclinic at <http://localhost:8080/>.
-
-<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
-
-### Networking
-
-- 1 VPC (`/16`), DNS support + hostnames enabled.
-- 2 public subnets, 2 private subnets, each pair across distinct AZs.
-- 1 Internet Gateway attached to the VPC.
-- 1 NAT Gateway in the first public subnet (cost-optimized; see
-  *Limitations* for the HA tradeoff).
-- Public route table → IGW; private route table → NAT.
-
-### Compute / delivery path
-
-- **ALB** is internet-facing, listens on port 80, forwards to a
-  target group of type `ip` whose health check is
-  `GET /actuator/health` returning `200`.
-- **ECS cluster** with Container Insights enabled, Fargate capacity
-  providers (`FARGATE` default + `FARGATE_SPOT` available).
-- **ECS service** runs in **private subnets only**, has
-  `assign_public_ip = false`, and reaches the internet (ECR, CloudWatch)
-  via the NAT Gateway.
-- Deployment strategy is the ECS rolling update with
-  `minimum_healthy_percent=100`, `maximum_percent=200`, and a
-  **deployment circuit breaker with rollback enabled**.
-
-### Security
-
-- ALB SG: ingress `tcp/80` from `0.0.0.0/0`.
-- ECS SG: ingress on the container port restricted to **the ALB SG only**.
-- ECR scans images on push; encryption-at-rest with AES256.
-- S3 state bucket is private, versioned, and encrypted (state locking
-  is intentionally omitted to avoid DynamoDB cost — see *Limitations*).
-- Two distinct IAM roles for ECS:
-  - `task_execution_role` — ECS agent (ECR pulls, CloudWatch logs).
-  - `task_role` — used by the running container; starts empty
-    (least privilege).
+http://cloudclinic-prod-alb-1783386781.us-west-2.elb.amazonaws.com
 
 ---
 
-## 2. Repository layout
+# Project Overview
 
+Cloud Clinic is a containerized Spring Boot application based on the Spring PetClinic application, deployed on AWS using a modern cloud-native infrastructure stack.
+
+The solution provisions AWS infrastructure using Terraform and automates container deployment using GitHub Actions. The application runs on Amazon ECS Fargate behind an Application Load Balancer with centralized logging through CloudWatch.
+
+The implementation focuses on:
+
+- Infrastructure as Code
+- Automated CI/CD
+- Secure networking
+- Containerized deployments
+- Operational simplicity
+- Production-style AWS architecture
+
+---
+
+# Architecture Overview
+
+```text
+Developer
+   ↓
+GitHub Repository
+   ↓
+GitHub Actions CI/CD
+   ↓
+Docker Build
+   ↓
+Amazon ECR
+   ↓
+Amazon ECS Fargate
+   ↓
+Application Load Balancer
+   ↓
+End Users
 ```
-.
+
+---
+
+# AWS Services Used
+
+| Service | Purpose |
+|---|---|
+| Amazon ECS Fargate | Container orchestration |
+| Amazon ECR | Docker image registry |
+| Application Load Balancer | Traffic routing |
+| Amazon VPC | Network isolation |
+| CloudWatch Logs | Centralized logging |
+| IAM | Access control |
+| S3 | Terraform remote state |
+| GitHub Actions | CI/CD automation |
+
+---
+
+# Infrastructure Design
+
+## Networking
+
+The infrastructure is deployed inside a dedicated VPC with:
+
+- 2 public subnets across multiple Availability Zones
+- 2 private subnets across multiple Availability Zones
+- Internet Gateway for public traffic
+- NAT Gateway for outbound internet access from private ECS tasks
+
+### Public Subnets
+
+Used for:
+- Application Load Balancer
+- NAT Gateway
+
+### Private Subnets
+
+Used for:
+- ECS Fargate tasks
+
+This ensures containers are not directly exposed to the public internet.
+
+---
+
+# ECS Architecture
+
+The application runs on Amazon ECS Fargate using:
+
+- ECS Cluster
+- ECS Service
+- ECS Task Definition
+- Rolling deployment strategy
+
+The ECS service:
+
+- runs inside private subnets
+- uses Fargate launch type
+- deploys behind an ALB target group
+- uses CloudWatch logging
+
+Health checks are configured using:
+
+```text
+/actuator/health
+```
+
+---
+
+# Security Design
+
+Security considerations implemented include:
+
+- ECS tasks deployed in private subnets
+- Security groups restricting inbound traffic
+- ALB exposed publicly on port 80 only
+- ECS containers accessible only from the ALB security group
+- IAM least-privilege model
+- Encrypted Terraform remote state storage
+- ECR image scanning enabled
+
+---
+
+# CI/CD Pipeline
+
+Deployment automation is implemented using GitHub Actions.
+
+Pipeline flow:
+
+```text
+Push to GitHub
+    ↓
+GitHub Actions workflow triggered
+    ↓
+Docker image build
+    ↓
+Push image to Amazon ECR
+    ↓
+Update ECS task definition
+    ↓
+Deploy updated container to ECS
+```
+
+The deployment uses ECS rolling updates to minimize downtime during releases.
+
+---
+
+# Terraform Structure
+
+```text
+terraform/
+├── bootstrap/
+├── modules/
+│   ├── alb/
+│   ├── cloudwatch/
+│   ├── ecr/
+│   ├── ecs/
+│   ├── iam/
+│   ├── networking/
+│   ├── security-groups/
+│   └── vpc/
+└── environments/
+    └── prod/
+```
+
+The Terraform configuration is modularized to improve:
+
+- maintainability
+- reusability
+- readability
+- separation of concerns
+
+---
+
+# Repository Structure
+
+```text
+cloud-clinic/
+├── .github/workflows/
+├── terraform/
+├── src/
+├── Dockerfile
+├── .dockerignore
+├── pom.xml
 ├── README.md
-└── terraform/
-    ├── bootstrap/                          # S3 state bucket (run once)
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── outputs.tf
-    │   └── terraform.tfvars.example
-    ├── modules/
-    │   ├── vpc/                            # VPC + public/private subnets
-    │   ├── networking/                     # IGW, NAT, route tables, associations
-    │   ├── security-groups/                # ALB and ECS security groups
-    │   ├── alb/                            # ALB + target group + HTTP listener
-    │   ├── ecr/                            # ECR repository + lifecycle policy
-    │   ├── iam/                            # ECS task execution + task roles
-    │   ├── cloudwatch/                     # ECS log group
-    │   └── ecs/                            # cluster + task definition + service
-    └── environments/
-        └── prod/
-            ├── provider.tf                 # terraform/provider versions, default tags
-            ├── backend.tf                  # remote state (s3 + dynamodb)
-            ├── main.tf                     # composes the modules above
-            ├── variables.tf
-            ├── outputs.tf                  # values consumed by GitHub Actions
-            └── terraform.tfvars.example
+└── architecture-diagram.png
 ```
 
 ---
 
-## 3. Deployment steps
+# Deployment Workflow
 
-### Prerequisites
+## Infrastructure Provisioning
 
-- Terraform `>= 1.5`
-- AWS CLI configured (`aws sts get-caller-identity` should succeed)
-- An IAM principal with permissions to create VPC / ECS / ECR / IAM / S3 resources
+Terraform provisions:
 
-### 3.1 Bootstrap remote state (once per AWS account)
+- networking
+- ECS infrastructure
+- ALB
+- IAM roles
+- CloudWatch logs
+- ECR repositories
 
-```bash
-cd terraform/bootstrap
-cp terraform.tfvars.example terraform.tfvars
-# edit terraform.tfvars and set a globally unique state_bucket_name
+## Application Deployment
 
-terraform init
-terraform apply
-```
+GitHub Actions handles:
 
-This creates the S3 state bucket. State locking is not configured —
-serialize your `terraform apply` runs (single operator or single CI job
-at a time).
-
-### 3.2 Wire the backend into the prod environment
-
-Open `terraform/environments/prod/backend.tf` and replace the placeholder
-`bucket` value with what bootstrap created. Then:
-
-```bash
-cd terraform/environments/prod
-cp terraform.tfvars.example terraform.tfvars
-terraform init
-terraform plan
-terraform apply
-```
-
-### 3.3 Capture outputs for GitHub Actions
-
-```bash
-terraform output -json
-```
-
-Pipe these into GitHub Actions environment variables / repo variables:
-
-| Terraform output             | Suggested GitHub variable     |
-| ---------------------------- | ----------------------------- |
-| `aws_region`                 | `AWS_REGION`                  |
-| `ecr_repository_name`        | `ECR_REPOSITORY`              |
-| `ecr_repository_url`         | `ECR_REPOSITORY_URL`          |
-| `ecs_cluster_name`           | `ECS_CLUSTER`                 |
-| `ecs_service_name`           | `ECS_SERVICE`                 |
-| `ecs_task_definition_family` | `ECS_TASK_FAMILY`             |
-| `ecs_container_name`         | `ECS_CONTAINER_NAME`          |
-| `alb_dns_name`               | `ALB_DNS_NAME`                |
+- Docker image builds
+- image pushes to ECR
+- ECS service deployments
 
 ---
 
-## 4. ECS deployment behavior
+# Docker Configuration
 
-The first `terraform apply` provisions the cluster, task definition, and
-service using a **placeholder bootstrap image** (`public.ecr.aws/docker/library/nginx:alpine`)
-so the service object exists before any application image has been built.
+The application uses a multi-stage Docker build:
 
-Two important `lifecycle` choices on `aws_ecs_service`:
+- Maven build stage
+- lightweight runtime image
+- optimized container deployment
 
-- `ignore_changes = [task_definition, desired_count]` — once CI/CD owns
-  rollouts and scaling, Terraform must not roll the service back to the
-  bootstrap revision on the next `apply`.
-- `deployment_circuit_breaker { enable = true, rollback = true }` — a
-  failed rollout is automatically rolled back to the last known-good
-  revision.
+The application listens on:
 
-> **Note.** Until GitHub Actions publishes the real image, target group
-> health checks at `/actuator/health` will fail (the placeholder doesn't
-> serve that path). Tasks will keep restarting and the service will be
-> unhealthy. Ship the first real image as soon as `terraform apply`
-> finishes; this is expected and not a misconfiguration.
+```text
+Port 8080
+```
 
 ---
 
-## 5. GitHub Actions integration
+# Monitoring and Logging
 
-A typical workflow (kept in `.github/workflows/deploy.yml` of your app
-repo, **not** provisioned by this Terraform) does the following:
+Application logs are centralized using CloudWatch Logs.
 
-1. **Auth to AWS** with OIDC via `aws-actions/configure-aws-credentials`.
-2. **Login to ECR** with `aws-actions/amazon-ecr-login`.
-3. **Build & push** the Docker image, tagged with the commit SHA, to
-   `${ECR_REPOSITORY_URL}`.
-4. **Render a new task definition** — fetch the current task definition
-   for `${ECS_TASK_FAMILY}`, replace the image for container
-   `${ECS_CONTAINER_NAME}` using
-   `aws-actions/amazon-ecs-render-task-definition`.
-5. **Deploy** with `aws-actions/amazon-ecs-deploy-task-definition` to
-   `${ECS_CLUSTER}` / `${ECS_SERVICE}`, waiting for service stability.
+The ECS service is configured with:
 
-The IAM principal used by the workflow needs:
+- awslogs driver
+- centralized log groups
+- log retention policies
 
-- `ecr:GetAuthorizationToken`, `ecr:BatchCheckLayerAvailability`,
-  `ecr:PutImage`, `ecr:InitiateLayerUpload`, `ecr:UploadLayerPart`,
-  `ecr:CompleteLayerUpload` on the repo
-- `ecs:DescribeServices`, `ecs:DescribeTaskDefinition`,
-  `ecs:RegisterTaskDefinition`, `ecs:UpdateService` on the cluster/service
-- `iam:PassRole` on `task_execution_role` and `task_role`
-
-For OIDC, configure the role's trust policy to allow
-`token.actions.githubusercontent.com` for your specific repo and branches.
+ALB health checks monitor application availability continuously.
 
 ---
 
-## 6. Security considerations
+# Design Decisions
 
-- **No public ECS tasks.** Tasks run in private subnets with
-  `assign_public_ip = false`. All inbound traffic must traverse the ALB.
-- **Defense in depth on SGs.** ECS only accepts the container port from
-  the ALB SG (referenced by SG ID, not CIDR), which means even a
-  compromised peer in the VPC can't reach tasks directly.
-- **Image scanning.** ECR scans on push.
-- **State security.** Remote state bucket is private, versioned, and
-  encrypted. State locking is not configured (cost choice — see
-  *Limitations*); rely on serialized applies and S3 versioning for
-  recovery.
-- **Logs.** CloudWatch retention is bounded (default 30 days) so logs
-  don't accumulate indefinitely.
-- **Drop invalid headers.** `drop_invalid_header_fields = true` on the
-  ALB to reduce request smuggling risk.
-- **TLS.** Currently only HTTP/80 is configured (see *Limitations*).
+The solution was intentionally designed to balance simplicity, automation, and production-readiness.
 
+Key decisions include:
 
+- ECS Fargate was selected to eliminate EC2 instance management overhead.
+- GitHub Actions was used instead of CodePipeline/CodeBuild to simplify CI/CD and reduce complexity.
+- Terraform modules were separated by responsibility for improved maintainability.
+- Rolling deployments were selected over blue/green deployments to reduce infrastructure cost and operational complexity for the scope of the assessment.
+- ECS tasks run in private subnets for improved security.
+- CloudWatch Logs was selected for centralized operational visibility.
 
+---
+
+# Assumptions
+
+- Single production-style environment (`prod`)
+- HTTP used instead of HTTPS for assessment simplicity
+- Single NAT Gateway used to reduce infrastructure cost
+- GitHub repository secrets used for AWS authentication
+- Application scaling requirements are minimal for assessment scope
+
+---
+
+# Future Improvements
+
+Potential production enhancements include:
+
+- HTTPS using ACM certificates
+- Route53 custom domain integration
+- AWS WAF integration
+- ECS auto scaling policies
+- Terraform state locking using DynamoDB
+- GitHub Actions OIDC authentication
+- Blue/green ECS deployments
+- Observability with Prometheus and Grafana
+- Container vulnerability scanning enhancements
+
+---
+
+# Cost Optimization Notes
+
+The infrastructure was designed with cost-awareness in mind.
+
+Implemented optimizations include:
+
+- ECS Fargate serverless compute
+- Single NAT Gateway deployment
+- Bounded CloudWatch log retention
+- Minimal always-on infrastructure
+
+---
+
+# Terraform Remote State
+
+Terraform remote state is stored in Amazon S3.
+
+Features:
+
+- versioning enabled
+- encryption enabled
+- centralized state management
+
+---
+
+# Deployment Verification
+
+The application was successfully deployed and verified through:
+
+- ECS service stability checks
+- ALB accessibility
+- CloudWatch logging validation
+- GitHub Actions deployment pipeline execution
+
+---
+
+# Key Outputs
+
+Terraform outputs include:
+
+- ALB DNS name
+- ECS cluster name
+- ECS service name
+- ECR repository name
+- CloudWatch log group
+- VPC and subnet IDs
+
+These outputs are consumed by the GitHub Actions deployment workflow.
+
+---
+
+# Conclusion
+
+This project demonstrates a production-style AWS deployment workflow using:
+
+- Terraform Infrastructure as Code
+- Docker containerization
+- Amazon ECS Fargate
+- GitHub Actions CI/CD
+- AWS networking and security best practices
+
+The implementation emphasizes automation, modularity, maintainability, and operational simplicity while remaining aligned with real-world DevOps deployment practices.
