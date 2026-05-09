@@ -59,6 +59,6 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	 */
 	Optional<Owner> findById(Integer id);
 
-	Optional<Owner> findByEmail(String email);
+	Page<Owner> findByEmailStartingWith(String email, Pageable pageable);
 
 }
