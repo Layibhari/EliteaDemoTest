@@ -4,11 +4,6 @@ Production-ready Spring Boot deployment on AWS ECS Fargate using Terraform and G
 
 ---
 
-# Live Application
-
-http://cloudclinic-prod-alb-1783386781.us-west-2.elb.amazonaws.com
-
----
 
 # Project Overview
 
