@@ -88,6 +88,23 @@ class VetControllerTests {
 			.andExpect(view().name("vets/vetList"));
 
 	}
+	@Test
+	void shouldRedirectWhenPageLessThanOne() throws Exception {
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=0"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
+
+	}
+
+	@Test
+	void shouldRedirectWhenPageExceedsTotalPages() throws Exception {
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=999"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
+
+	}
 
 	@Test
 	void showResourcesVetList() throws Exception {
