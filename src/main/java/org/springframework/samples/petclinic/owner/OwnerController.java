@@ -72,6 +72,15 @@ class OwnerController {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	/**
+	 * Loads an existing {@link Owner} when {@code ownerId} is present in the URL, or
+	 * returns a new empty {@link Owner} for creation forms.
+	 * @param ownerId the owner identifier from the URL path, or {@code null} for new
+	 * owner forms
+	 * @return the existing {@link Owner} or a new empty instance
+	 * @throws IllegalArgumentException if {@code ownerId} is provided but no matching
+	 * owner exists
+	 */
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
 		return ownerId == null ? new Owner()
