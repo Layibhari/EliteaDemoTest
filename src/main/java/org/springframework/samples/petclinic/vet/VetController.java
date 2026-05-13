@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
+ * Handles HTTP requests for displaying {@link Vet} information, supporting both a
+ * paginated HTML list view and a JSON resource endpoint.
+ *
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @author Ken Krebs
@@ -37,6 +40,10 @@ class VetController {
 
 	private final VetRepository vetRepository;
 
+	/**
+	 * Creates a new {@code VetController} backed by the given vet repository.
+	 * @param vetRepository the repository used to retrieve {@link Vet} data
+	 */
 	public VetController(VetRepository vetRepository) {
 		this.vetRepository = vetRepository;
 	}
