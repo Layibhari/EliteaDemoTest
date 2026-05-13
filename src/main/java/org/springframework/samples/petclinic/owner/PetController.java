@@ -148,6 +148,16 @@ class PetController {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the pet creation form. Validates that the pet name is unique for the
+	 * owner and that the birth date is not in the future. Saves the pet on success or
+	 * returns the form view with errors.
+	 * @param owner the owner to whom the pet will be added
+	 * @param pet the new pet populated from the submitted form
+	 * @param result binding result containing any validation errors
+	 * @param redirectAttributes flash attributes for passing a success message
+	 * @return a redirect to the owner detail page on success, or the form view on error
+	 */
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
