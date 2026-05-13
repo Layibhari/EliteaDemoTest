@@ -90,6 +90,15 @@ class PetController {
 		return owner;
 	}
 
+	/**
+	 * Loads an existing {@link Pet} when {@code petId} is present in the URL, or returns
+	 * a new empty {@link Pet} for creation forms.
+	 * @param ownerId the identifier of the owning {@link Owner}
+	 * @param petId the pet identifier from the URL path, or {@code null} for new pet
+	 * forms
+	 * @return the existing {@link Pet} or a new empty instance
+	 * @throws IllegalArgumentException if the owner does not exist
+	 */
 	@ModelAttribute("pet")
 	public Pet findPet(@PathVariable("ownerId") int ownerId,
 			@PathVariable(name = "petId", required = false) Integer petId) {
