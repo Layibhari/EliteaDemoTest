@@ -135,6 +135,12 @@ class PetController {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	/**
+	 * Renders the pet creation form, adding a new unsaved {@link Pet} to the owner.
+	 * @param owner the owner to whom the new pet will belong
+	 * @param model the model map shared with the view
+	 * @return the logical view name for the create/update pet form
+	 */
 	@GetMapping("/pets/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
