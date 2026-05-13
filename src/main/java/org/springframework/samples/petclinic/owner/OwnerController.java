@@ -63,6 +63,10 @@ class OwnerController {
 		this.owners = owners;
 	}
 
+	/**
+	 * Prevents clients from directly setting entity identifiers through form binding.
+	 * @param dataBinder the binder to configure
+	 */
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id", "*.id");
