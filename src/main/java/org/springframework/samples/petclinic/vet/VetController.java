@@ -80,6 +80,12 @@ class VetController {
 		return "vets/vetList";
 	}
 
+	/**
+	 * Retrieves a page of vets for the given 1-based page number, using a fixed page
+	 * size of 5.
+	 * @param page the 1-based page number to retrieve
+	 * @return a {@link Page} of {@link Vet}s for the requested page
+	 */
 	private Page<Vet> findPaginated(int page) {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
