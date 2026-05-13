@@ -113,6 +113,11 @@ class PetController {
 		return owner.getPet(petId);
 	}
 
+	/**
+	 * Prevents clients from directly setting entity identifiers on {@link Owner} objects
+	 * through form binding.
+	 * @param dataBinder the binder to configure
+	 */
 	@InitBinder("owner")
 	public void initOwnerBinder(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id", "*.id");
