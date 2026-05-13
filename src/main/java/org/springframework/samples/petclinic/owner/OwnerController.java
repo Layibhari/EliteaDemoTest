@@ -192,6 +192,10 @@ class OwnerController {
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
 
+	/**
+	 * Renders the owner update form, pre-populated with the current owner data.
+	 * @return the logical view name for the create/update owner form
+	 */
 	@GetMapping("/owners/{ownerId}/edit")
 	public String initUpdateOwnerForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
