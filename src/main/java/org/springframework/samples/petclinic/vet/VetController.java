@@ -92,6 +92,10 @@ class VetController {
 		return vetRepository.findAll(pageable);
 	}
 
+	/**
+	 * Returns all veterinarians as a JSON response body.
+	 * @return a {@link Vets} wrapper containing all {@link Vet} instances
+	 */
 	@GetMapping({ "/vets" })
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
