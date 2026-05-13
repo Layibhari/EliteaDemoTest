@@ -164,6 +164,13 @@ class OwnerController {
 		return addPaginationModel(page, model, ownersResults);
 	}
 
+	/**
+	 * Adds pagination-related attributes to the model for the owner list view.
+	 * @param page the current 1-based page number
+	 * @param model the model to populate
+	 * @param paginated the paginated result containing owners for the current page
+	 * @return the logical view name for the owners list page
+	 */
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();
 		model.addAttribute("currentPage", page);
