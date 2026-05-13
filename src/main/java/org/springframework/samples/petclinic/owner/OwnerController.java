@@ -201,6 +201,16 @@ class OwnerController {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the owner update form. Saves the updated owner and redirects to the
+	 * owner detail page on success, or returns the form view if validation fails or the
+	 * owner ID in the form does not match the URL.
+	 * @param owner the updated owner data from the submitted form
+	 * @param result binding result containing any validation errors
+	 * @param ownerId the owner identifier from the URL path
+	 * @param redirectAttributes flash attributes for success or error messages
+	 * @return a redirect to the owner detail page, or the form view on error
+	 */
 	@PostMapping("/owners/{ownerId}/edit")
 	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
 			RedirectAttributes redirectAttributes) {
