@@ -181,6 +181,10 @@ class PetController {
 		return "redirect:/owners/{ownerId}";
 	}
 
+	/**
+	 * Renders the pet update form, pre-populated with the current pet data.
+	 * @return the logical view name for the create/update pet form
+	 */
 	@GetMapping("/pets/{petId}/edit")
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
