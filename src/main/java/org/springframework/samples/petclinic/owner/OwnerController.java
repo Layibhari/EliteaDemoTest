@@ -98,6 +98,14 @@ class OwnerController {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the owner creation form. Saves the owner and redirects to the owner
+	 * detail page on success, or returns the form view if validation fails.
+	 * @param owner the owner populated from the submitted form
+	 * @param result binding result containing any validation errors
+	 * @param redirectAttributes flash attributes for success or error messages
+	 * @return a redirect to the new owner's detail page, or the form view on error
+	 */
 	@PostMapping("/owners/new")
 	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
