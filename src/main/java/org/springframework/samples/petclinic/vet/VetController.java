@@ -48,6 +48,12 @@ class VetController {
 		this.vetRepository = vetRepository;
 	}
 
+	/**
+	 * Displays a paginated HTML list of all veterinarians.
+	 * @param page the 1-based page number to display; defaults to {@code 1}
+	 * @param model the model to populate with pagination and vet list attributes
+	 * @return the logical view name for the vet list page
+	 */
 	@GetMapping("/vets.html")
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
