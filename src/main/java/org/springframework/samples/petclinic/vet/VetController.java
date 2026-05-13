@@ -64,6 +64,13 @@ class VetController {
 		return addPaginationModel(page, paginated, model);
 	}
 
+	/**
+	 * Adds pagination-related attributes to the model for the vet list view.
+	 * @param page the current 1-based page number
+	 * @param paginated the paginated result containing vets for the current page
+	 * @param model the model to populate
+	 * @return the logical view name for the vet list page
+	 */
 	private String addPaginationModel(int page, Page<Vet> paginated, Model model) {
 		List<Vet> listVets = paginated.getContent();
 		model.addAttribute("currentPage", page);
