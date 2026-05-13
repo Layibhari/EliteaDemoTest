@@ -190,6 +190,16 @@ class PetController {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the pet update form. Validates that the updated name does not duplicate
+	 * another pet on the same owner and that the birth date is not in the future. Saves
+	 * the changes on success or returns the form view with errors.
+	 * @param owner the owner of the pet being updated
+	 * @param pet the pet with updated values from the submitted form
+	 * @param result binding result containing any validation errors
+	 * @param redirectAttributes flash attributes for passing a success message
+	 * @return a redirect to the owner detail page on success, or the form view on error
+	 */
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
