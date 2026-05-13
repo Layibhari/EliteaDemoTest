@@ -39,6 +39,9 @@ import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
+ * Handles HTTP requests for managing {@link Owner} data, including creating, searching,
+ * updating, and displaying owners and their associated pets.
+ *
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
@@ -52,6 +55,10 @@ class OwnerController {
 
 	private final OwnerRepository owners;
 
+	/**
+	 * Creates a new {@code OwnerController} backed by the given owner repository.
+	 * @param owners the repository used to load and persist {@link Owner} instances
+	 */
 	public OwnerController(OwnerRepository owners) {
 		this.owners = owners;
 	}
