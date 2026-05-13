@@ -66,6 +66,11 @@ class PetController {
 		this.types = types;
 	}
 
+	/**
+	 * Populates the model with all available pet types for use in pet creation and update
+	 * forms.
+	 * @return a collection of all known {@link PetType}s
+	 */
 	@ModelAttribute("types")
 	public Collection<PetType> populatePetTypes() {
 		return this.types.findPetTypes();
