@@ -38,6 +38,9 @@ import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
+ * Handles HTTP requests for managing {@link Pet}s belonging to a specific {@link Owner},
+ * including creating and updating pets under the {@code /owners/{ownerId}} base path.
+ *
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
@@ -53,6 +56,11 @@ class PetController {
 
 	private final PetTypeRepository types;
 
+	/**
+	 * Creates a new {@code PetController} backed by the given repositories.
+	 * @param owners the repository used to load and persist {@link Owner} instances
+	 * @param types the repository used to retrieve all available {@link PetType}s
+	 */
 	public PetController(OwnerRepository owners, PetTypeRepository types) {
 		this.owners = owners;
 		this.types = types;
