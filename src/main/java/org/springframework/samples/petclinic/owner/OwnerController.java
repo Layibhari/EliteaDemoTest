@@ -180,6 +180,12 @@ class OwnerController {
 		return "owners/ownersList";
 	}
 
+	/**
+	 * Retrieves a page of owners whose last name starts with the given value.
+	 * @param page the 1-based page number to retrieve
+	 * @param lastname the last name prefix to filter by
+	 * @return a {@link Page} of matching {@link Owner}s
+	 */
 	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
