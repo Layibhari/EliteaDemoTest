@@ -127,6 +127,16 @@ class OwnerController {
 		return "owners/findOwners";
 	}
 
+	/**
+	 * Searches owners by last name with pagination. Redirects to the owner detail page
+	 * when exactly one match is found, or shows a paginated list for multiple results.
+	 * @param page the 1-based page number requested
+	 * @param owner the search criteria holder; {@code lastName} is used as the filter
+	 * @param result binding result for registering field-level errors
+	 * @param model the model to populate with pagination attributes
+	 * @return a redirect to the owner detail page, the owners list view, or the search
+	 * form if no owners are found
+	 */
 	@GetMapping("/owners")
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
 			Model model) {
