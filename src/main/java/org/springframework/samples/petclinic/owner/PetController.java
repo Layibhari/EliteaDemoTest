@@ -123,6 +123,12 @@ class PetController {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	/**
+	 * Configures the data binder for {@link Pet} objects, registering
+	 * {@link PetValidator} for validation and preventing clients from setting entity
+	 * identifiers.
+	 * @param dataBinder the binder to configure
+	 */
 	@InitBinder("pet")
 	public void initPetBinder(WebDataBinder dataBinder) {
 		dataBinder.setValidator(new PetValidator());
