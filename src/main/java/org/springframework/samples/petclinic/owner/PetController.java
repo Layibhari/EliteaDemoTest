@@ -76,6 +76,12 @@ class PetController {
 		return this.types.findPetTypes();
 	}
 
+	/**
+	 * Loads the {@link Owner} with the given identifier for use in model binding.
+	 * @param ownerId the identifier of the owner from the URL path
+	 * @return the matching {@link Owner}
+	 * @throws IllegalArgumentException if no owner with the given identifier exists
+	 */
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
