@@ -16,7 +16,15 @@
 package org.springframework.samples.petclinic.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
+import org.springframework.boot.actuate.audit.listener.AuditListener;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,13 +36,35 @@ import jakarta.persistence.MappedSuperclass;
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
+ * @author Hardik Limbachiya
  */
 @MappedSuperclass
+@EntityListeners(AuditListener.class)
 public class BaseEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	
+	@CreatedDate
+	private LocalDate createdAt;
+	
+	@CreatedBy
+	@Column(updatable =  false)
+	private String createdBy;
+	
+    @LastModifiedBy
+    private String modifiedBy;
+    
+    
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
 
 	public Integer getId() {
 		return id;
@@ -47,5 +77,7 @@ public class BaseEntity implements Serializable {
 	public boolean isNew() {
 		return this.id == null;
 	}
+	
+	public LocalDate getCreatedAt() {return createdAt;}
 
 }
