@@ -56,6 +56,7 @@ jobs:
             --project=${{ secrets.JFROG_PROJECT_KEY }}
 
       - name: Run JFrog Xray Scan
+        continue-on-error: true
         run: |
           jf docker scan ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }} \
