@@ -41,9 +41,10 @@ jobs:
             --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
 
       - name: Build and deploy JAR to Artifactory
+        env:
+          JFROG_CLI_EXTRACTORS_REMOTE: setup-jfrog-cli-server/extractors
         run: |
-          jf mvn clean deploy -DskipTests \
-            -Dartifactory.resolve.repoKey=${{ secrets.JFROG_MAVEN_REPO }}-release
+          jf mvn clean deploy -DskipTests
 
       - name: Build Docker image
         run: |
