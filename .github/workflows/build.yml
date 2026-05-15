@@ -1,0 +1,57 @@
+name: Build and Push to JFrog
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Authenticate to JFrog via OIDC
+        uses: jfrog/setup-jfrog-cli@v4
+        with:
+          oidc-provider-name: github
+          oidc-audience: jfrog-github
+        env:
+          JF_URL: https://${{ secrets.JFROG_REGISTRY }}
+
+      - name: Configure JFrog Maven repos
+        run: |
+          jf mvn-config \
+            --repo-resolve-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
+            --repo-resolve-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot \
+            --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
+            --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
+
+      - name: Build and deploy JAR to Artifactory
+        run: |
+          jf mvn clean deploy -DskipTests
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          jf docker push ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
+            --project=${{ secrets.JFROG_PROJECT_KEY }}
+
+      - name: Run JFrog Xray Scan
+        run: |
+          jf docker scan ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
+            --project=${{ secrets.JFROG_PROJECT_KEY }}
