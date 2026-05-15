@@ -33,15 +33,13 @@ jobs:
       - name: Configure JFrog Maven repos
         run: |
           jf mvn-config \
+            --server-id-resolve=setup-jfrog-cli-server \
+            --server-id-deploy=setup-jfrog-cli-server \
             --repo-resolve-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-resolve-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot \
             --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
 
-      - name: Debug working directory
-        run: |
-          pwd
-          ls -la .jfrog/projects/
 
       - name: Build and deploy JAR to Artifactory
         run: |
