@@ -27,9 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * Controller responsible for handling veterinarian-related requests, including
- * displaying paginated veterinarian lists and exposing veterinarian data as a
- * resource response.
+ * Controller responsible for handling veterinarian-related requests, including displaying
+ * paginated veterinarian lists and exposing veterinarian data as a resource response.
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -43,7 +42,6 @@ class VetController {
 
 	/**
 	 * Creates a new controller for managing veterinarian-related requests.
-	 *
 	 * @param vetRepository the repository used to access veterinarian records
 	 */
 	public VetController(VetRepository vetRepository) {
@@ -52,10 +50,9 @@ class VetController {
 
 	/**
 	 * Displays a paginated list of veterinarians in the HTML view.
-	 *
 	 * @param page the page number of veterinarian records to display
-	 * @param model the model used to expose veterinarian records and pagination data
-	 * to the view
+	 * @param model the model used to expose veterinarian records and pagination data to
+	 * the view
 	 * @return the name of the veterinarian list view
 	 */
 	@GetMapping("/vets.html")
@@ -86,7 +83,6 @@ class VetController {
 	/**
 	 * Returns all veterinarians as a resource response for clients that consume
 	 * structured veterinarian data.
-	 *
 	 * @return a wrapper containing the full list of veterinarians
 	 */
 	@GetMapping({ "/vets" })

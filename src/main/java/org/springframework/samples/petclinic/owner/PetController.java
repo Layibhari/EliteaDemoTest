@@ -58,7 +58,6 @@ class PetController {
 
 	/**
 	 * Creates a new controller for managing pet-related requests.
-	 *
 	 * @param owners the repository used to access and persist owner records and their
 	 * pets
 	 * @param types the repository used to access available pet types
@@ -69,9 +68,7 @@ class PetController {
 	}
 
 	/**
-	 * Adds all available pet types to the model for use in pet creation and update
-	 * forms.
-	 *
+	 * Adds all available pet types to the model for use in pet creation and update forms.
 	 * @return a collection of available pet types
 	 */
 	@ModelAttribute("types")
@@ -81,7 +78,6 @@ class PetController {
 
 	/**
 	 * Finds the owner associated with the current request path.
-	 *
 	 * @param ownerId the identifier of the owner to retrieve
 	 * @return the owner matching the supplied identifier
 	 * @throws IllegalArgumentException if no owner exists for the supplied identifier
@@ -95,13 +91,12 @@ class PetController {
 	}
 
 	/**
-	 * Finds the pet associated with the current request path, or creates a new pet
-	 * when no pet identifier is supplied.
-	 *
+	 * Finds the pet associated with the current request path, or creates a new pet when
+	 * no pet identifier is supplied.
 	 * @param ownerId the identifier of the owner who owns the pet
 	 * @param petId the optional identifier of the pet to retrieve
-	 * @return the existing pet matching the supplied pet identifier, or a new pet
-	 * when {@code petId} is {@code null}
+	 * @return the existing pet matching the supplied pet identifier, or a new pet when
+	 * {@code petId} is {@code null}
 	 * @throws IllegalArgumentException if no owner exists for the supplied owner
 	 * identifier
 	 */
@@ -120,11 +115,10 @@ class PetController {
 	}
 
 	/**
-	 * Configures the owner binder to prevent clients from binding owner identifier
-	 * fields directly.
-	 *
-	 * @param dataBinder the binder used by Spring MVC to bind request parameters to
-	 * owner objects
+	 * Configures the owner binder to prevent clients from binding owner identifier fields
+	 * directly.
+	 * @param dataBinder the binder used by Spring MVC to bind request parameters to owner
+	 * objects
 	 */
 	@InitBinder("owner")
 	public void initOwnerBinder(WebDataBinder dataBinder) {
@@ -132,11 +126,10 @@ class PetController {
 	}
 
 	/**
-	 * Configures the pet binder with the pet validator and prevents clients from
-	 * binding pet identifier fields directly.
-	 *
-	 * @param dataBinder the binder used by Spring MVC to bind request parameters to
-	 * pet objects
+	 * Configures the pet binder with the pet validator and prevents clients from binding
+	 * pet identifier fields directly.
+	 * @param dataBinder the binder used by Spring MVC to bind request parameters to pet
+	 * objects
 	 */
 	@InitBinder("pet")
 	public void initPetBinder(WebDataBinder dataBinder) {
@@ -146,7 +139,6 @@ class PetController {
 
 	/**
 	 * Displays the form used to create a new pet for the specified owner.
-	 *
 	 * @param owner the owner to whom the new pet will belong
 	 * @param model the model used to expose form data to the view
 	 * @return the name of the pet creation form view
@@ -160,12 +152,10 @@ class PetController {
 
 	/**
 	 * Processes the submitted form for creating a new pet.
-	 *
 	 * @param owner the owner to whom the pet will be added
 	 * @param pet the pet populated from the submitted form data
 	 * @param result the binding result containing validation errors, if any
-	 * @param redirectAttributes attributes used to pass flash messages after a
-	 * redirect
+	 * @param redirectAttributes attributes used to pass flash messages after a redirect
 	 * @return the pet creation form view when validation fails, or a redirect to the
 	 * owner's details page when the pet is created successfully
 	 */
@@ -194,7 +184,6 @@ class PetController {
 
 	/**
 	 * Displays the form used to edit an existing pet.
-	 *
 	 * @return the name of the pet update form view
 	 */
 	@GetMapping("/pets/{petId}/edit")
@@ -204,12 +193,10 @@ class PetController {
 
 	/**
 	 * Processes the submitted form for updating an existing pet.
-	 *
 	 * @param owner the owner who owns the pet being updated
 	 * @param pet the pet populated from the submitted form data
 	 * @param result the binding result containing validation errors, if any
-	 * @param redirectAttributes attributes used to pass flash messages after a
-	 * redirect
+	 * @param redirectAttributes attributes used to pass flash messages after a redirect
 	 * @return the pet update form view when validation fails, or a redirect to the
 	 * owner's details page when the pet is updated successfully
 	 */
@@ -243,7 +230,6 @@ class PetController {
 
 	/**
 	 * Updates the pet details if it exists or adds a new pet to the owner.
-	 *
 	 * @param owner the owner of the pet
 	 * @param pet the pet containing the updated details
 	 */

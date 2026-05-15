@@ -36,8 +36,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Controller responsible for handling owner-related web requests, including
- * creating, searching, updating, and displaying owner records.
+ * Controller responsible for handling owner-related web requests, including creating,
+ * searching, updating, and displaying owner records.
  *
  * @author Juergen Hoeller
  * @author Ken Krebs
@@ -54,7 +54,6 @@ class OwnerController {
 
 	/**
 	 * Creates a new controller for managing owner-related requests.
-	 *
 	 * @param owners the repository used to access and persist owner records
 	 */
 	public OwnerController(OwnerRepository owners) {
@@ -64,9 +63,8 @@ class OwnerController {
 	/**
 	 * Configures the web data binder to prevent clients from binding owner identifier
 	 * fields directly.
-	 *
-	 * @param dataBinder the binder used by Spring MVC to bind request parameters to
-	 * model objects
+	 * @param dataBinder the binder used by Spring MVC to bind request parameters to model
+	 * objects
 	 */
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
@@ -76,12 +74,11 @@ class OwnerController {
 	/**
 	 * Finds the owner associated with the supplied owner identifier, or creates a new
 	 * owner when no identifier is supplied.
-	 *
 	 * @param ownerId the optional identifier of the owner to retrieve
 	 * @return the existing owner matching the identifier, or a new owner when
 	 * {@code ownerId} is {@code null}
-	 * @throws PetClinicException if an owner identifier is supplied but no matching
-	 * owner exists
+	 * @throws PetClinicException if an owner identifier is supplied but no matching owner
+	 * exists
 	 */
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
@@ -91,7 +88,6 @@ class OwnerController {
 
 	/**
 	 * Displays the form used to create a new owner.
-	 *
 	 * @return the name of the owner creation form view
 	 */
 	@GetMapping("/owners/new")
@@ -101,11 +97,9 @@ class OwnerController {
 
 	/**
 	 * Processes the submitted form for creating a new owner.
-	 *
 	 * @param owner the owner populated from the submitted form data
 	 * @param result the binding result containing validation errors, if any
-	 * @param redirectAttributes attributes used to pass flash messages after a
-	 * redirect
+	 * @param redirectAttributes attributes used to pass flash messages after a redirect
 	 * @return the owner creation form view if validation fails, or a redirect to the
 	 * newly created owner's details page if successful
 	 */
@@ -122,7 +116,6 @@ class OwnerController {
 
 	/**
 	 * Displays the form used to search for owners.
-	 *
 	 * @return the name of the owner search form view
 	 */
 	@GetMapping("/owners/find")
@@ -132,7 +125,6 @@ class OwnerController {
 
 	/**
 	 * Processes the owner search form and displays matching owner records.
-	 *
 	 * @param page the page number of results to display
 	 * @param owner the owner object containing the submitted search criteria
 	 * @param result the binding result used to report search errors
@@ -178,7 +170,6 @@ class OwnerController {
 
 	/**
 	 * Displays the form used to edit an existing owner.
-	 *
 	 * @return the name of the owner update form view
 	 */
 	@GetMapping("/owners/{ownerId}/edit")
@@ -188,12 +179,10 @@ class OwnerController {
 
 	/**
 	 * Processes the submitted form for updating an existing owner.
-	 *
 	 * @param owner the owner populated from the submitted form data
 	 * @param result the binding result containing validation errors, if any
 	 * @param ownerId the identifier of the owner being updated
-	 * @param redirectAttributes attributes used to pass flash messages after a
-	 * redirect
+	 * @param redirectAttributes attributes used to pass flash messages after a redirect
 	 * @return the owner update form view when validation fails, a redirect back to the
 	 * edit page when the owner identifier does not match, or a redirect to the owner
 	 * details page when the update succeeds
@@ -218,10 +207,8 @@ class OwnerController {
 
 	/**
 	 * Displays the details page for a specific owner.
-	 *
 	 * @param ownerId the identifier of the owner to display
-	 * @return a model and view containing the selected owner and the owner details
-	 * view
+	 * @return a model and view containing the selected owner and the owner details view
 	 * @throws PetClinicException if no owner exists for the supplied identifier
 	 */
 	@GetMapping("/owners/{ownerId}")
@@ -235,7 +222,6 @@ class OwnerController {
 
 	/**
 	 * Builds a PetClinicException for an owner that was not found.
-	 *
 	 * @param ownerId the owner identifier that was looked up
 	 * @return a PetClinicException with a descriptive message
 	 */
