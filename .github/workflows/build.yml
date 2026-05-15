@@ -42,7 +42,7 @@ jobs:
 
       - name: Build and deploy JAR to Artifactory
         env:
-          JFROG_CLI_EXTRACTORS_REMOTE: setup-jfrog-cli-server/extractors
+          JFROG_CLI_RELEASES_REPO: setup-jfrog-cli-server/extractors
         run: |
           jf mvn clean deploy -DskipTests
 
