@@ -33,6 +33,8 @@ jobs:
       - name: Configure JFrog Maven repos
         run: |
           jf mvn-config \
+            --server-id-resolve=setup-jfrog-cli-server \
+            --server-id-deploy=setup-jfrog-cli-server \
             --repo-resolve-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-resolve-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot \
             --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
@@ -42,7 +44,7 @@ jobs:
         env:
           JFROG_CLI_RELEASES_REPO: setup-jfrog-cli-server/extractors
         run: |
-          jf mvn clean deploy -DskipTests -e
+          jf mvn clean deploy -DskipTests
 
       - name: Build Docker image
         run: |
