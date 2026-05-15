@@ -38,9 +38,9 @@ jobs:
             --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
 
-      - name: Debug JFrog Maven config
+      - name: Debug Maven settings
         run: |
-          cat ${{ github.workspace }}/.jfrog/projects/maven.yaml
+          cat ~/.m2/settings.xml
 
       - name: Build and deploy JAR to Artifactory
         run: |
