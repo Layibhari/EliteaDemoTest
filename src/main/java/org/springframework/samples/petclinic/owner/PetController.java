@@ -65,24 +65,16 @@ class PetController {
 
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-		return owner;
+		return getRequiredOwner(ownerId);
 	}
 
 	@ModelAttribute("pet")
 	public Pet findPet(@PathVariable("ownerId") int ownerId,
 			@PathVariable(name = "petId", required = false) Integer petId) {
-
 		if (petId == null) {
 			return new Pet();
 		}
-
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-		return owner.getPet(petId);
+		return getRequiredOwner(ownerId).getPet(petId);
 	}
 
 	@InitBinder("owner")
@@ -106,13 +98,10 @@ class PetController {
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
-
-		if (StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
+		if (hasDuplicateNewPetName(owner, pet)) {
 			result.rejectValue("name", "duplicate", "already exists");
 		}
-
-		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+		if (hasBirthDateInFuture(pet)) {
 			result.rejectValue("birthDate", "typeMismatch.birthDate");
 		}
 
@@ -134,19 +123,10 @@ class PetController {
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
-
-		String petName = pet.getName();
-
-		// checking if the pet name already exists for the owner
-		if (StringUtils.hasText(petName)) {
-			Pet existingPet = owner.getPet(petName, false);
-			if (existingPet != null && !Objects.equals(existingPet.getId(), pet.getId())) {
-				result.rejectValue("name", "duplicate", "already exists");
-			}
+		if (hasDuplicateUpdatedPetName(owner, pet)) {
+			result.rejectValue("name", "duplicate", "already exists");
 		}
-
-		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+		if (hasBirthDateInFuture(pet)) {
 			result.rejectValue("birthDate", "typeMismatch.birthDate");
 		}
 
@@ -178,6 +158,28 @@ class PetController {
 			owner.addPet(pet);
 		}
 		this.owners.save(owner);
+	}
+
+	private Owner getRequiredOwner(int ownerId) {
+		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		return optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+	}
+
+	private boolean hasDuplicateNewPetName(Owner owner, Pet pet) {
+		return StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null;
+	}
+
+	private boolean hasDuplicateUpdatedPetName(Owner owner, Pet pet) {
+		if (!StringUtils.hasText(pet.getName())) {
+			return false;
+		}
+		Pet existingPet = owner.getPet(pet.getName(), false);
+		return existingPet != null && !Objects.equals(existingPet.getId(), pet.getId());
+	}
+
+	private boolean hasBirthDateInFuture(Pet pet) {
+		return pet.getBirthDate() != null && pet.getBirthDate().isAfter(LocalDate.now());
 	}
 
 }
