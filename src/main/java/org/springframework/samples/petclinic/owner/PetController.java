@@ -38,6 +38,9 @@ import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
+ * Controller responsible for handling pet-related requests for a specific owner,
+ * including creating, editing, validating, and saving pet records.
+ *
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
@@ -53,16 +56,36 @@ class PetController {
 
 	private final PetTypeRepository types;
 
+	/**
+	 * Creates a new controller for managing pet-related requests.
+	 *
+	 * @param owners the repository used to access and persist owner records and their
+	 * pets
+	 * @param types the repository used to access available pet types
+	 */
 	public PetController(OwnerRepository owners, PetTypeRepository types) {
 		this.owners = owners;
 		this.types = types;
 	}
 
+	/**
+	 * Adds all available pet types to the model for use in pet creation and update
+	 * forms.
+	 *
+	 * @return a collection of available pet types
+	 */
 	@ModelAttribute("types")
 	public Collection<PetType> populatePetTypes() {
 		return this.types.findPetTypes();
 	}
 
+	/**
+	 * Finds the owner associated with the current request path.
+	 *
+	 * @param ownerId the identifier of the owner to retrieve
+	 * @return the owner matching the supplied identifier
+	 * @throws IllegalArgumentException if no owner exists for the supplied identifier
+	 */
 	@ModelAttribute("owner")
 	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
@@ -71,6 +94,17 @@ class PetController {
 		return owner;
 	}
 
+	/**
+	 * Finds the pet associated with the current request path, or creates a new pet
+	 * when no pet identifier is supplied.
+	 *
+	 * @param ownerId the identifier of the owner who owns the pet
+	 * @param petId the optional identifier of the pet to retrieve
+	 * @return the existing pet matching the supplied pet identifier, or a new pet
+	 * when {@code petId} is {@code null}
+	 * @throws IllegalArgumentException if no owner exists for the supplied owner
+	 * identifier
+	 */
 	@ModelAttribute("pet")
 	public Pet findPet(@PathVariable("ownerId") int ownerId,
 			@PathVariable(name = "petId", required = false) Integer petId) {
@@ -85,17 +119,38 @@ class PetController {
 		return owner.getPet(petId);
 	}
 
+	/**
+	 * Configures the owner binder to prevent clients from binding owner identifier
+	 * fields directly.
+	 *
+	 * @param dataBinder the binder used by Spring MVC to bind request parameters to
+	 * owner objects
+	 */
 	@InitBinder("owner")
 	public void initOwnerBinder(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	/**
+	 * Configures the pet binder with the pet validator and prevents clients from
+	 * binding pet identifier fields directly.
+	 *
+	 * @param dataBinder the binder used by Spring MVC to bind request parameters to
+	 * pet objects
+	 */
 	@InitBinder("pet")
 	public void initPetBinder(WebDataBinder dataBinder) {
 		dataBinder.setValidator(new PetValidator());
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	/**
+	 * Displays the form used to create a new pet for the specified owner.
+	 *
+	 * @param owner the owner to whom the new pet will belong
+	 * @param model the model used to expose form data to the view
+	 * @return the name of the pet creation form view
+	 */
 	@GetMapping("/pets/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
@@ -103,6 +158,17 @@ class PetController {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the submitted form for creating a new pet.
+	 *
+	 * @param owner the owner to whom the pet will be added
+	 * @param pet the pet populated from the submitted form data
+	 * @param result the binding result containing validation errors, if any
+	 * @param redirectAttributes attributes used to pass flash messages after a
+	 * redirect
+	 * @return the pet creation form view when validation fails, or a redirect to the
+	 * owner's details page when the pet is created successfully
+	 */
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -126,11 +192,27 @@ class PetController {
 		return "redirect:/owners/{ownerId}";
 	}
 
+	/**
+	 * Displays the form used to edit an existing pet.
+	 *
+	 * @return the name of the pet update form view
+	 */
 	@GetMapping("/pets/{petId}/edit")
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	/**
+	 * Processes the submitted form for updating an existing pet.
+	 *
+	 * @param owner the owner who owns the pet being updated
+	 * @param pet the pet populated from the submitted form data
+	 * @param result the binding result containing validation errors, if any
+	 * @param redirectAttributes attributes used to pass flash messages after a
+	 * redirect
+	 * @return the pet update form view when validation fails, or a redirect to the
+	 * owner's details page when the pet is updated successfully
+	 */
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -161,8 +243,9 @@ class PetController {
 
 	/**
 	 * Updates the pet details if it exists or adds a new pet to the owner.
-	 * @param owner The owner of the pet
-	 * @param pet The pet with updated details
+	 *
+	 * @param owner the owner of the pet
+	 * @param pet the pet containing the updated details
 	 */
 	private void updatePetDetails(Owner owner, Pet pet) {
 		Integer id = pet.getId();
