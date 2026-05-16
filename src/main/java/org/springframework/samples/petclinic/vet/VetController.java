@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 class VetController {
 
+	private static final int PAGE_SIZE = 5;
+
 	private final VetRepository vetRepository;
 
 	public VetController(VetRepository vetRepository) {
@@ -45,9 +48,7 @@ class VetController {
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
-		Vets vets = new Vets();
 		Page<Vet> paginated = findPaginated(page);
-		vets.getVetList().addAll(paginated.toList());
 		return addPaginationModel(page, paginated, model);
 	}
 
@@ -61,8 +62,7 @@ class VetController {
 	}
 
 	private Page<Vet> findPaginated(int page) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE);
 		return vetRepository.findAll(pageable);
 	}
 
@@ -70,9 +70,13 @@ class VetController {
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for JSon/Object mapping
-		Vets vets = new Vets();
-		vets.getVetList().addAll(this.vetRepository.findAll());
-		return vets;
+		return asVets(this.vetRepository.findAll());
+	}
+
+	private Vets asVets(Collection<Vet> vets) {
+		Vets wrappedVets = new Vets();
+		wrappedVets.getVetList().addAll(vets);
+		return wrappedVets;
 	}
 
 }
