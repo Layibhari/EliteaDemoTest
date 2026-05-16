@@ -31,6 +31,13 @@ import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
+ * Handles visit-related web requests for a pet.
+ *
+ * <p>
+ * This class coordinates the new-visit flow by loading the relevant owner and pet,
+ * preparing a visit object for form binding, validating submitted visit data, and saving
+ * the visit through the owner repository.
+ *
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
@@ -43,34 +50,40 @@ class VisitController {
 
 	private final OwnerRepository owners;
 
+	/**
+	 * Creates a visit controller using the repository responsible for owner records.
+	 * @param owners repository used to load owners and save visit changes
+	 */
 	public VisitController(OwnerRepository owners) {
 		this.owners = owners;
 	}
 
+	/**
+	 * Prevents request parameters from directly binding entity identifiers.
+	 * @param dataBinder binder used to configure restricted fields
+	 */
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
 	/**
-	 * Called before each and every @RequestMapping annotated method. 2 goals: - Make sure
-	 * we always have fresh data - Since we do not use the session scope, make sure that
-	 * Pet object always has an id (Even though id is not part of the form fields)
-	 * @param petId
-	 * @return Pet
+	 * Loads the owner and pet for the current visit request and prepares a visit model.
+	 *
+	 * <p>
+	 * This method runs before the visit form handlers. It ensures that the model contains
+	 * fresh owner and pet data and creates a visit instance for form binding.
+	 * @param ownerId owner identifier from the request path
+	 * @param petId pet identifier from the request path
+	 * @param model model map used to expose owner and pet data to the view
+	 * @return a new visit associated with the selected pet
+	 * @throws IllegalArgumentException if the owner or pet cannot be found
 	 */
 	@ModelAttribute("visit")
 	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
 			Map<String, Object> model) {
-		Optional<Owner> optionalOwner = owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-
-		Pet pet = owner.getPet(petId);
-		if (pet == null) {
-			throw new IllegalArgumentException(
-					"Pet with id " + petId + " not found for owner with id " + ownerId + ".");
-		}
+		Owner owner = getRequiredOwner(ownerId);
+		Pet pet = getRequiredPet(owner, ownerId, petId);
 		model.put("pet", pet);
 		model.put("owner", owner);
 
@@ -79,15 +92,33 @@ class VisitController {
 		return visit;
 	}
 
-	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
-	// called
+	/**
+	 * Shows the form for booking a new visit for a pet.
+	 *
+	 * <p>
+	 * Spring MVC calls {@link #loadPetWithVisit(int, int, Map)} before this handler so
+	 * the view has access to the relevant owner, pet, and visit objects.
+	 * @return the visit creation form view
+	 */
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String initNewVisitForm() {
 		return "pets/createOrUpdateVisitForm";
 	}
 
-	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
-	// called
+	/**
+	 * Processes a submitted form for booking a new pet visit.
+	 *
+	 * <p>
+	 * If validation fails, the visit creation form is shown again. Otherwise, the visit
+	 * is added to the selected pet and the owner record is saved.
+	 * @param owner owner loaded for the current request
+	 * @param petId identifier of the pet receiving the visit
+	 * @param visit visit data submitted by the user
+	 * @param result validation result for the submitted visit
+	 * @param redirectAttributes flash attributes used after a successful redirect
+	 * @return the form view when validation fails, or a redirect to the owner details
+	 * page
+	 */
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
@@ -99,6 +130,20 @@ class VisitController {
 		this.owners.save(owner);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
 		return "redirect:/owners/{ownerId}";
+	}
+
+	private Owner getRequiredOwner(int ownerId) {
+		Optional<Owner> optionalOwner = owners.findById(ownerId);
+		return optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+	}
+
+	private Pet getRequiredPet(Owner owner, int ownerId, int petId) {
+		Pet pet = owner.getPet(petId);
+		if (pet != null) {
+			return pet;
+		}
+		throw new IllegalArgumentException("Pet with id " + petId + " not found for owner with id " + ownerId + ".");
 	}
 
 }
