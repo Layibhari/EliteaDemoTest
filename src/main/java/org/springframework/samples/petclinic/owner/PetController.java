@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -156,13 +155,7 @@ class PetController {
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
-		if (hasDuplicateNewPetName(owner, pet)) {
-			result.rejectValue("name", "duplicate", "already exists");
-		}
-		if (hasBirthDateInFuture(pet)) {
-			result.rejectValue("birthDate", "typeMismatch.birthDate");
-		}
-
+		validatePet(owner, pet, result, true);
 		if (result.hasErrors()) {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
@@ -198,13 +191,7 @@ class PetController {
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
-		if (hasDuplicateUpdatedPetName(owner, pet)) {
-			result.rejectValue("name", "duplicate", "already exists");
-		}
-		if (hasBirthDateInFuture(pet)) {
-			result.rejectValue("birthDate", "typeMismatch.birthDate");
-		}
-
+		validatePet(owner, pet, result, false);
 		if (result.hasErrors()) {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
@@ -241,20 +228,30 @@ class PetController {
 				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
 	}
 
-	private boolean hasDuplicateNewPetName(Owner owner, Pet pet) {
-		return StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null;
-	}
-
-	private boolean hasDuplicateUpdatedPetName(Owner owner, Pet pet) {
-		if (!StringUtils.hasText(pet.getName())) {
-			return false;
-		}
-		Pet existingPet = owner.getPet(pet.getName(), false);
-		return existingPet != null && !Objects.equals(existingPet.getId(), pet.getId());
+	private void validatePet(Owner owner, Pet pet, BindingResult result, boolean ignoreNewPets) {
+		rejectIfDuplicateName(owner, pet, result, ignoreNewPets);
+		rejectIfBirthDateInFuture(pet, result);
 	}
 
 	private boolean hasBirthDateInFuture(Pet pet) {
 		return pet.getBirthDate() != null && pet.getBirthDate().isAfter(LocalDate.now());
+	}
+
+	private void rejectIfDuplicateName(Owner owner, Pet pet, BindingResult result, boolean ignoreNewPets) {
+		if (isDuplicatePetName(owner, pet, ignoreNewPets)) {
+			result.rejectValue("name", "duplicate", "already exists");
+		}
+	}
+
+	private boolean isDuplicatePetName(Owner owner, Pet pet, boolean ignoreNewPets) {
+		Pet existingPet = owner.getPet(pet.getName(), ignoreNewPets);
+		return existingPet != null && (ignoreNewPets || !Objects.equals(existingPet.getId(), pet.getId()));
+	}
+
+	private void rejectIfBirthDateInFuture(Pet pet, BindingResult result) {
+		if (hasBirthDateInFuture(pet)) {
+			result.rejectValue("birthDate", "typeMismatch.birthDate");
+		}
 	}
 
 }
