@@ -116,11 +116,8 @@ public class Owner extends Person {
 	 */
 	public Pet getPet(Integer id) {
 		for (Pet pet : getPets()) {
-			if (!pet.isNew()) {
-				Integer compId = pet.getId();
-				if (Objects.equals(compId, id)) {
-					return pet;
-				}
+			if (hasMatchingPetId(pet, id)) {
+				return pet;
 			}
 		}
 		return null;
@@ -134,11 +131,8 @@ public class Owner extends Person {
 	 */
 	public Pet getPet(String name, boolean ignoreNew) {
 		for (Pet pet : getPets()) {
-			String compName = pet.getName();
-			if (compName != null && compName.equalsIgnoreCase(name)) {
-				if (!ignoreNew || !pet.isNew()) {
-					return pet;
-				}
+			if (hasMatchingPetName(pet, name) && shouldReturnPet(ignoreNew, pet)) {
+				return pet;
 			}
 		}
 		return null;
@@ -171,6 +165,19 @@ public class Owner extends Person {
 		Assert.notNull(pet, "Invalid Pet identifier!");
 
 		pet.addVisit(visit);
+	}
+
+	private boolean hasMatchingPetId(Pet pet, Integer id) {
+		return !pet.isNew() && Objects.equals(pet.getId(), id);
+	}
+
+	private boolean hasMatchingPetName(Pet pet, String name) {
+		String petName = pet.getName();
+		return petName != null && petName.equalsIgnoreCase(name);
+	}
+
+	private boolean shouldReturnPet(boolean ignoreNew, Pet pet) {
+		return !ignoreNew || !pet.isNew();
 	}
 
 }

@@ -94,28 +94,13 @@ class OwnerController {
 	@GetMapping("/owners")
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
 			Model model) {
-		// allow parameterless GET request for /owners to return all records
-		String lastName = owner.getLastName();
-		if (lastName == null) {
-			lastName = ""; // empty string signifies broadest possible search
-		}
-
-		// find owners by last name
-		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, normalizeLastName(owner));
 		if (ownersResults.isEmpty()) {
-			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
 			return "owners/findOwners";
 		}
-
-		if (ownersResults.getTotalElements() == 1) {
-			// 1 owner found
-			owner = ownersResults.iterator().next();
-			return "redirect:/owners/" + owner.getId();
-		}
-
-		// multiple owners found
-		return addPaginationModel(page, model, ownersResults);
+		return ownersResults.getTotalElements() == 1 ? redirectToSingleOwner(ownersResults)
+				: addPaginationModel(page, model, ownersResults);
 	}
 
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
@@ -166,11 +151,24 @@ class OwnerController {
 	@GetMapping("/owners/{ownerId}")
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-		mav.addObject(owner);
+		mav.addObject(getRequiredOwner(ownerId));
 		return mav;
+	}
+
+	private String normalizeLastName(Owner owner) {
+		String lastName = owner.getLastName();
+		return lastName == null ? "" : lastName;
+	}
+
+	private String redirectToSingleOwner(Page<Owner> ownersResults) {
+		Owner owner = ownersResults.iterator().next();
+		return "redirect:/owners/" + owner.getId();
+	}
+
+	private Owner getRequiredOwner(int ownerId) {
+		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		return optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
 	}
 
 }

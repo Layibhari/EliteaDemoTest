@@ -62,15 +62,8 @@ class VisitController {
 	@ModelAttribute("visit")
 	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
 			Map<String, Object> model) {
-		Optional<Owner> optionalOwner = owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-
-		Pet pet = owner.getPet(petId);
-		if (pet == null) {
-			throw new IllegalArgumentException(
-					"Pet with id " + petId + " not found for owner with id " + ownerId + ".");
-		}
+		Owner owner = getRequiredOwner(ownerId);
+		Pet pet = getRequiredPet(owner, ownerId, petId);
 		model.put("pet", pet);
 		model.put("owner", owner);
 
@@ -99,6 +92,20 @@ class VisitController {
 		this.owners.save(owner);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
 		return "redirect:/owners/{ownerId}";
+	}
+
+	private Owner getRequiredOwner(int ownerId) {
+		Optional<Owner> optionalOwner = owners.findById(ownerId);
+		return optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+	}
+
+	private Pet getRequiredPet(Owner owner, int ownerId, int petId) {
+		Pet pet = owner.getPet(petId);
+		if (pet != null) {
+			return pet;
+		}
+		throw new IllegalArgumentException("Pet with id " + petId + " not found for owner with id " + ownerId + ".");
 	}
 
 }
