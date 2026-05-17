@@ -53,11 +53,8 @@ class OwnerController {
 
 	private final OwnerRepository owners;
 
-	private final VetRepository vetRepository;
-
-	public OwnerController(OwnerRepository owners, VetRepository vetRepository) {
+	public OwnerController(OwnerRepository owners) {
 		this.owners = owners;
-		this.vetRepository = vetRepository;
 	}
 
 	@InitBinder
@@ -100,7 +97,9 @@ class OwnerController {
 			Model model) {
 		// allow parameterless GET request for /owners to return all records
 		// calculate the total number of pages
-		int totalPages = (vetRepository.findAll().size() / 5) + 1;
+		int totalPages = owners
+			.findByLastNameStartingWith(owner.getLastName() != null ? owner.getLastName() : "", Pageable.unpaged())
+			.getTotalPages();
 
 		// handling for the page<=0
 		if (page <= 0) {
