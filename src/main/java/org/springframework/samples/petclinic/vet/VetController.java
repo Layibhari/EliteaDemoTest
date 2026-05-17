@@ -46,6 +46,17 @@ class VetController {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
+		// calculate the total number of pages
+		int totalPages = (vetRepository.findAll().size() / 5) + 1;
+
+		// handling for the page<=0
+		if (page <= 0) {
+			page = 1;
+		}
+		// handling for the page>=totalPages
+		else if (page >= totalPages) {
+			page = totalPages;
+		}
 		Page<Vet> paginated = findPaginated(page);
 		vets.getVetList().addAll(paginated.toList());
 		return addPaginationModel(page, paginated, model);

@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -52,8 +53,11 @@ class OwnerController {
 
 	private final OwnerRepository owners;
 
-	public OwnerController(OwnerRepository owners) {
+	private final VetRepository vetRepository;
+
+	public OwnerController(OwnerRepository owners, VetRepository vetRepository) {
 		this.owners = owners;
+		this.vetRepository = vetRepository;
 	}
 
 	@InitBinder
@@ -95,6 +99,18 @@ class OwnerController {
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
 			Model model) {
 		// allow parameterless GET request for /owners to return all records
+		// calculate the total number of pages
+		int totalPages = (vetRepository.findAll().size() / 5) + 1;
+
+		// handling for the page<=0
+		if (page <= 0) {
+			page = 1;
+		}
+		// handling for the page>=totalPages
+		else if (page >= totalPages) {
+			page = totalPages;
+		}
+
 		String lastName = owner.getLastName();
 		if (lastName == null) {
 			lastName = ""; // empty string signifies broadest possible search
