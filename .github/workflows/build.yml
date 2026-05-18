@@ -61,3 +61,8 @@ jobs:
           jf docker scan ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }} \
             --fail=false
+
+      - name: Publish build info
+        run: |
+          jf rt build-publish ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }} \
+            --project=${{ secrets.JFROG_PROJECT_KEY }}
