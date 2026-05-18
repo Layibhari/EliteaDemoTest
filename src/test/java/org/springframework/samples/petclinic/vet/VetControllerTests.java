@@ -86,7 +86,13 @@ class VetControllerTests {
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("listVets"))
 			.andExpect(view().name("vets/vetList"));
+	}
 
+	@Test
+	void showVetListRedirectsInvalidPageToFirstPage() throws Exception {
+		mockMvc.perform(get("/vets.html?page=0"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/vets.html?page=1"));
 	}
 
 	@Test

@@ -100,6 +100,10 @@ class OwnerController {
 			lastName = ""; // empty string signifies broadest possible search
 		}
 
+		if (page < 1) {
+			return "redirect:/owners?page=1";
+		}
+
 		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		if (ownersResults.isEmpty()) {

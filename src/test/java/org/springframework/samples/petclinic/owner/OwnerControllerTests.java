@@ -229,6 +229,13 @@ class OwnerControllerTests {
 	}
 
 	@Test
+	void processFindFormRedirectsInvalidPageToFirstPage() throws Exception {
+		mockMvc.perform(get("/owners?page=0"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/owners?page=1"));
+	}
+
+	@Test
 	void processUpdateOwnerFormWithIdMismatch() throws Exception {
 		int pathOwnerId = 1;
 
