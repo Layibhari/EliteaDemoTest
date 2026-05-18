@@ -64,5 +64,5 @@ jobs:
 
       - name: Publish build info
         run: |
-          jf rt build-publish "${{ env.JFROG_CLI_BUILD_NAME }}" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
+          jf bp "${{ env.JFROG_CLI_BUILD_NAME }}" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }}
