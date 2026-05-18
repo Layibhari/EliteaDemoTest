@@ -63,6 +63,7 @@ jobs:
             --fail=false
 
       - name: Publish build info
+        continue-on-error: true
         run: |
           jf bs "${{ env.JFROG_CLI_BUILD_NAME }}" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }}
