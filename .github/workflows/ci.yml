@@ -2,9 +2,9 @@ name: Taller DevOps - Pipeline CI/CD
 
 on:
   push:
-    branches: [ "add-ci-pipeline", "feature/add-ci-pipeline" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "add-ci-pipeline", "feature/add-ci-pipeline" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
