@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   # =================================================================
-  # JOB 1: VALIDACIÓN Y CALIDAD (PASOS 1, 2 Y 3)
+  # JOB 1: VALIDACIÓN Y CALIDAD
   # =================================================================
   ci:
     name: Build, Security and Quality Analysis
@@ -29,6 +29,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    #  ESTE ES EL BLOQUE NUEVO QUE SACAMOS DE LA PÁGINA:
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
 
     - name: Cache Maven packages
       uses: actions/cache@v4
@@ -60,7 +68,7 @@ jobs:
         severity: 'CRITICAL,HIGH' 
 
   # =================================================================
-  # JOB 2: EMPAQUETADO DOCKER (PASO 4)
+  # JOB 2: EMPAQUETADO DOCKER
   # =================================================================
   docker:
     name: Build and Push Docker Image
