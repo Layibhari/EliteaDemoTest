@@ -19,7 +19,7 @@ metadata:
   labels:
     app: petclinic
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: petclinic
@@ -44,18 +44,46 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+
           livenessProbe:
             httpGet:
-              path: /livez
+              path: /actuator/health/liveness
               port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+
           readinessProbe:
             httpGet:
-              path: /readyz
+              path: /actuator/health/readiness
               port: http
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+
           volumeMounts:
             - mountPath: /bindings/secret
               name: binding
               readOnly: true
+
       volumes:
         - name: binding
           projected:
