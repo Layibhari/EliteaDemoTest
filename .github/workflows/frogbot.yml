@@ -24,7 +24,7 @@ jobs:
       JF_GIT_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
       JF_URL: ${{ secrets.JFROG_REGISTRY }}
       JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      JF_OIDC_PROVIDER_NAME: "github-frogbot"
+      JF_OIDC_PROVIDER_NAME: "github"
       FROGBOT_CMD: "scan-pull-request"
       JF_GIT_REPO: ${{ github.event.repository.name }}
       JF_GIT_OWNER: ${{ github.repository_owner }}
@@ -48,7 +48,7 @@ jobs:
       JF_GIT_BASE_BRANCH: ${{ github.ref_name }}
       JF_URL: ${{ secrets.JFROG_REGISTRY }}
       JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      JF_OIDC_PROVIDER_NAME: "github-frogbot"
+      JF_OIDC_PROVIDER_NAME: "github"
       FROGBOT_CMD: "scan-pull-request"
       JF_GIT_PROVIDER: 'github'
       JF_GIT_OWNER: ${{ github.repository_owner }}
