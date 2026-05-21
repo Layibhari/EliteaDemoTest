@@ -19,7 +19,7 @@ jobs:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
-      - uses: jfrog/frogbot@v3
+      - uses: jfrog/frogbot@5d9c42c30f1169d8be4ba5510b40e75ffcbbc2a9
         env:
           JF_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
           JF_GIT_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
@@ -39,7 +39,7 @@ jobs:
         with:
           ref: main
 
-      - uses: jfrog/frogbot@v3
+      - uses: jfrog/frogbot@5d9c42c30f1169d8be4ba5510b40e75ffcbbc2a9
         env:
           JF_GIT_BASE_BRANCH: ${{ github.ref_name }}
           JF_URL: ${{ secrets.JFROG_REGISTRY }}
