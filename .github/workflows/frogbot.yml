@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize]
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 permissions:
@@ -18,53 +18,34 @@ jobs:
   pr-security-scan:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
-    env:
-      JF_GIT_API_ENDPOINT: 'https://github.jfrog.info/api/v3' # for github SH only
-      JF_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
-      JF_GIT_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-      JF_URL: ${{ secrets.JFROG_REGISTRY }}
-      JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      JF_OIDC_PROVIDER_NAME: "github"
-      FROGBOT_CMD: "scan-pull-request"
-      JF_GIT_REPO: ${{ github.event.repository.name }}
-      JF_GIT_OWNER: ${{ github.repository_owner }}
-      JF_GIT_PROVIDER: 'github'
-      JFROG_CLI_LOG_LEVEL: "DEBUG"
-      CI: "TRUE"
     steps:
-      - name: Download Frogbot V3
-        run: |
-          curl -fSL \
-            -o frogbot \
-            "https://releases.jfrog.io/artifactory/frogbot/v3/3.0.0/frogbot-linux-amd64/frogbot"
-          chmod +x frogbot
-          ./frogbot scan-pull-request
+      - uses: jfrog/frogbot@v3
+        env:
+          JF_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
+          JF_GIT_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          JF_URL: ${{ secrets.JFROG_REGISTRY }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_OIDC_PROVIDER_NAME: "github"
+          FROGBOT_CMD: "scan-pull-request"
+          JF_GIT_REPO: ${{ github.event.repository.name }}
+          JF_GIT_OWNER: ${{ github.repository_owner }}
+          JF_GIT_PROVIDER: 'github'
 
   repository-scan:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest 
-    env:
-      JF_GIT_API_ENDPOINT: 'https://github.jfrog.info/api/v3' # for github SH only
-      JF_GIT_BASE_BRANCH: ${{ github.ref_name }}
-      JF_URL: ${{ secrets.JFROG_REGISTRY }}
-      JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      JF_OIDC_PROVIDER_NAME: "github"
-      FROGBOT_CMD: "scan-pull-request"
-      JF_GIT_PROVIDER: 'github'
-      JF_GIT_OWNER: ${{ github.repository_owner }}
-      JF_GIT_REPO: ${{ github.event.repository.name }}
-      JFROG_CLI_LOG_LEVEL: "DEBUG"
-      CI: "TRUE"
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
 
-      - name: Download and run Frogbot V3
-        run: |
-          curl -fSL \
-            -o frogbot \
-            "https://releases.jfrog.io/artifactory/frogbot/v3/3.0.0/frogbot-linux-amd64/frogbot"
-          chmod +x frogbot
-          ./frogbot scan-repository
+      - uses: jfrog/frogbot@v3
+        env:
+          JF_GIT_BASE_BRANCH: ${{ github.ref_name }}
+          JF_URL: ${{ secrets.JFROG_REGISTRY }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_OIDC_PROVIDER_NAME: "github"
+          FROGBOT_CMD: "scan-repository"
+          JF_GIT_PROVIDER: 'github'
+          JF_GIT_OWNER: ${{ github.repository_owner }}
+          JF_GIT_REPO: ${{ github.event.repository.name }}
