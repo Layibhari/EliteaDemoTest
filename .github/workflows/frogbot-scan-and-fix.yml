@@ -15,7 +15,7 @@ jobs:
 
       - uses: jfrog/setup-jfrog-cli@v4
         env:
-          JF_URL: ${{ secrets.JFROG_REGISTRY }}
+          JF_URL: https://${{ secrets.JFROG_REGISTRY }}
         with:
           oidc-provider-name: github-frogbot
 
