@@ -17,11 +17,11 @@ jobs:
         env:
           JF_URL: https://${{ secrets.JFROG_REGISTRY }}
         with:
-          oidc-provider-name: github-frogbot
+          oidc-provider-name: github
 
       - uses: jfrog/frogbot@5d9c42c30f1169d8be4ba5510b40e75ffcbbc2a9  # v2.21.2
         env:
           JF_URL: https://${{ secrets.JFROG_REGISTRY }}
-          JF_OIDC_PROVIDER_NAME: "github-frogbot"
+          JF_OIDC_PROVIDER_NAME: "github"
           FROGBOT_CMD: "scan-and-fix"
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
