@@ -1,19 +1,17 @@
-name: "Frogbot Scan Pull Request"
+name: "Frogbot Scan and Fix"
 on:
-  pull_request_target:
-    types: [ opened, synchronize ]
+  push:
+    branches: [ "main" ]
 permissions:
+  contents: write
   pull-requests: write
-  contents: read
+  security-events: write
   id-token: write
 jobs:
-  scan-pull-request:
+  create-fix-pull-requests:
     runs-on: ubuntu-latest
-    environment: frogbot
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: jfrog/setup-jfrog-cli@v4
         env:
@@ -25,5 +23,5 @@ jobs:
         env:
           JF_URL: ${{ secrets.JFROG_REGISTRY }}
           JF_OIDC_PROVIDER_NAME: "github-frogbot"
-          FROGBOT_CMD: "scan-pull-request"
+          FROGBOT_CMD: "scan-and-fix"
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
