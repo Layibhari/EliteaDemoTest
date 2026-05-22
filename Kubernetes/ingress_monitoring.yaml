@@ -1,0 +1,35 @@
+# ============================================================
+# Ingress 1 — Grafana and Prometheus
+# NO rewrite — they handle their own subpaths internally
+# ============================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring-ingress
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - host: monitoring.local
+      http:
+        paths:
+          # Grafana receives /graphs/... as-is
+          # GF_SERVER_SERVE_FROM_SUB_PATH handles it internally
+          - path: /graphs(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+          # Prometheus receives /metrics/... as-is
+          # --web.route-prefix=/metrics handles it internally
+          - path: /metrics(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: prometheus
+                port:
+                  number: 9090

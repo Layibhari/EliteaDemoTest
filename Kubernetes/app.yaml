@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+  namespace: petclinic
+  labels:
+    app: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic-container
+  template:
+    metadata:
+      labels:
+        app: petclinic-container
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080" 
+    spec:
+      containers:
+        - name: petclinic
+          image: dabija/petclininc:2.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health,info,prometheus"
+            - name: SPRING_PROFILES_ACTIVE
+              value: mysql
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql-svc:3306/petclinic-db
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: mysql-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: mysql-password
+            # ── LOGGING CONFIGURATION ────────────────────────────────────────
+            # By default Spring Boot only logs startup events and errors.
+            # These env vars enable request-level logging so every HTTP
+            # request appears in stdout and gets picked up by Promtail.
+ 
+            # Enable Tomcat access logs written to stdout (not a file)
+            - name: SERVER_TOMCAT_ACCESSLOG_ENABLED
+              value: "true"
+            - name: SERVER_TOMCAT_ACCESSLOG_DIRECTORY
+              value: /dev/stdout  # Write access log to stdout, not a file
+            # Log pattern: timestamp, method, URI, status, response time
+            - name: SERVER_TOMCAT_ACCESSLOG_PATTERN
+              value: "%t %a \"%r\" %s %D ms"
+
+            # Enable Spring Web request logging at DEBUG level
+            # This logs every request/response through the DispatcherServlet
+            - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+              value: "INFO"  # Set to DEBUG for even more verbose logging of request details
+ 
+            # Log SQL queries from Hibernate (useful for DB tracing in Grafana)
+            - name: LOGGING_LEVEL_ORG_HIBERNATE_SQL
+              value: "DEBUG"
+ 
+            # Structured JSON logging so Promtail's json pipeline stage
+            # can parse level, logger, and message fields automatically
+            - name: LOGGING_STRUCTURED_FORMAT_CONSOLE   
+
+            - name: SPRING_APPLICATION_JSON
+              value: '{"logging":{"structured":{"format":{"console":"ecs"}}}}'   
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          # startupProbe:
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: 8080
+          #   initialDelaySeconds: 110   # don't even start until 90s in
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5         # more generous timeout during startup
+          #   failureThreshold: 6       # 90s + (6 × 10s) = 150s total budget
+          # readinessProbe:
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: 8080
+          #   initialDelaySeconds: 120  # wait until after startup completes
+          #   periodSeconds: 10
+          #   timeoutSeconds: 3
+          #   failureThreshold: 3
+          # livenessProbe:
+          #   httpGet:    
+          #     path: /actuator/health
+          #     port: 8080
+          #   initialDelaySeconds: 140  # only check liveness after app is up
+          #   periodSeconds: 15
+          #   timeoutSeconds: 3
+          #   failureThreshold: 3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-svc
+  namespace: petclinic
+spec:
+  selector:
+    app: petclinic-container
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: petclinic-ingress
+  namespace: petclinic
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - host: petclinic.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: petclinic-svc
+                port:
+                  number: 80
