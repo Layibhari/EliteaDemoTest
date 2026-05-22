@@ -43,7 +43,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Tests
-        run: mvn test -Dmanagement.metrics.binders.processor.enabled=false
+        run: mvn test
+          -Dspring.profiles.active=test
+          -Dmanagement.metrics.binders.processor.enabled=false
+          -Dspring.autoconfigure.exclude=org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
 
       - name: Upload Test Results
         if: always()
@@ -95,7 +98,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_REGISTRY }}/mr:${{ github.sha }}
 
-  # ─── MAIN BRANCH JOB ───────────────────────────────────────────────────────
+  # ─── MAIN BRANCH JOB ────────────────────────────────────────────────────────
 
   docker-main:
     name: Build & Push Docker Image (Main)
