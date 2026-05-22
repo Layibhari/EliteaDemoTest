@@ -1,20 +1,14 @@
-name: "Frogbot Security Scan v2"
-
+name: "Frogbot Scan Repository"
 on:
-  pull_request_target: 
-    types: [opened, synchronize]
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
-
 permissions:
   pull-requests: write
   contents: write
   security-events: write
-
 jobs:
-  frogbot-scan:
+  scan-repository:
     runs-on: ubuntu-latest
     strategy:
       matrix:
