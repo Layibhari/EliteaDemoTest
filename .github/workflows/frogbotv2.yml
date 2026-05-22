@@ -27,3 +27,4 @@ jobs:
           JF_GIT_TOKEN: ${{ secrets.JF_GIT_TOKEN }}
           JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
           JF_RELEASES_REPO: ${{ secrets.JFROG_MAVEN_REPO }}-release
+          
