@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package org.springframework.samples.petclinic.owner;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.empty;
@@ -92,9 +92,7 @@ class OwnerControllerTests {
 
 		Owner george = george();
 		given(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class)))
-			.willReturn(new PageImpl<>(Lists.newArrayList(george)));
-
-		given(this.owners.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Lists.newArrayList(george)));
+			.willReturn(new PageImpl<>(List.of(george)));
 
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(george));
 		Visit visit = new Visit();
@@ -104,7 +102,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testInitCreationForm() throws Exception {
+	void initCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/new"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("owner"))
@@ -112,7 +110,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessCreationFormSuccess() throws Exception {
+	void processCreationFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/new").param("firstName", "Joe")
 				.param("lastName", "Bloggs")
@@ -123,7 +121,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessCreationFormHasErrors() throws Exception {
+	void processCreationFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
 			.andExpect(status().isOk())
@@ -134,7 +132,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testInitFindForm() throws Exception {
+	void initFindForm() throws Exception {
 		mockMvc.perform(get("/owners/find"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("owner"))
@@ -142,15 +140,15 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessFindFormSuccess() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList(george(), new Owner()));
+	void processFindFormSuccess() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george(), new Owner()));
 		when(this.owners.findByLastNameStartingWith(anyString(), any(Pageable.class))).thenReturn(tasks);
 		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
 	}
 
 	@Test
-	void testProcessFindFormByLastName() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList(george()));
+	void processFindFormByLastName() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george()));
 		when(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class))).thenReturn(tasks);
 		mockMvc.perform(get("/owners?page=1").param("lastName", "Franklin"))
 			.andExpect(status().is3xxRedirection())
@@ -158,8 +156,8 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessFindFormNoOwnersFound() throws Exception {
-		Page<Owner> tasks = new PageImpl<>(Lists.newArrayList());
+	void processFindFormNoOwnersFound() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of());
 		when(this.owners.findByLastNameStartingWith(eq("Unknown Surname"), any(Pageable.class))).thenReturn(tasks);
 		mockMvc.perform(get("/owners?page=1").param("lastName", "Unknown Surname"))
 			.andExpect(status().isOk())
@@ -170,7 +168,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testInitUpdateOwnerForm() throws Exception {
+	void initUpdateOwnerForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("owner"))
@@ -183,7 +181,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessUpdateOwnerFormSuccess() throws Exception {
+	void processUpdateOwnerFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
 				.param("lastName", "Bloggs")
@@ -195,14 +193,14 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testProcessUpdateOwnerFormUnchangedSuccess() throws Exception {
+	void processUpdateOwnerFormUnchangedSuccess() throws Exception {
 		mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
 	@Test
-	void testProcessUpdateOwnerFormHasErrors() throws Exception {
+	void processUpdateOwnerFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
 				.param("lastName", "Bloggs")
@@ -216,7 +214,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	void testShowOwner() throws Exception {
+	void showOwner() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
 			.andExpect(status().isOk())
 			.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
@@ -231,7 +229,7 @@ class OwnerControllerTests {
 	}
 
 	@Test
-	public void testProcessUpdateOwnerFormWithIdMismatch() throws Exception {
+	void processUpdateOwnerFormWithIdMismatch() throws Exception {
 		int pathOwnerId = 1;
 
 		Owner owner = new Owner();
