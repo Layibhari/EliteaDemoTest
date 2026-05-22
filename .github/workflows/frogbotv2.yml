@@ -9,7 +9,7 @@
 
 # Some projects require creating a frogbot-config.yml file. Read more about it here - https://docs.jfrog-applications.jfrog.io/jfrog-applications/frogbot/setup-frogbot/frogbot-configuration
 
-name: "Frogbot Scan and Fix"
+name: "Frogbot v2"
 on:
   push:
     branches: [ "main" ]
@@ -34,7 +34,7 @@ jobs:
 
           # [Mandatory]
           # JFrog platform URL
-          JF_URL: ${{ secrets.JF_URL }}
+          JF_URL: "https://${{ secrets.JF_URL }}"
 
           # [Mandatory if JF_USER and JF_PASSWORD are not provided]
           # JFrog access token with 'read' permissions on Xray service
@@ -50,13 +50,13 @@ jobs:
 
           # [Mandatory]
           # The GitHub token automatically generated for the job
-          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_GIT_TOKEN: ${{ secrets.JF_GIT_TOKEN }}
 
           # [Optional]
           # If the machine that runs Frogbot has no access to the internat, set the name of a remote repository
           # in Artifactory, which proxies https://releases.jfrog.io/artifactory
           # The 'frogbot' executable and other tools it needs will be downloaded through this repository.
-          # JF_RELEASES_REPO: ""
+          JF_RELEASES_REPO: ${{ secrets.JFROG_MAVEN_REPO }}
 
           # [Optional]
           # Frogbot will download the project dependencies, if they're not cached locally. To download the
