@@ -27,6 +27,9 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.Visit;
 
 /**
  * @author Michael Isvy Simple test to make sure that Bean Validation is working (useful
@@ -36,6 +39,9 @@ class ValidatorTests {
 
 	private Validator createValidator() {
 		LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("messages/messages");
+		localValidatorFactoryBean.setValidationMessageSource(messageSource);
 		localValidatorFactoryBean.afterPropertiesSet();
 		return localValidatorFactoryBean;
 	}
@@ -75,6 +81,113 @@ class ValidatorTests {
 		ConstraintViolation<Person> violation = getOnlyViolation(constraintViolations);
 		assertThat(violation.getPropertyPath()).hasToString("lastName");
 		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenAddressEmpty() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Owner owner = new Owner();
+		owner.setFirstName("George");
+		owner.setLastName("smith");
+		owner.setAddress("");
+		owner.setCity("london");
+		owner.setTelephone("1234567890");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		ConstraintViolation<Owner> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("address");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenCityEmpty() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Owner owner = new Owner();
+		owner.setFirstName("George");
+		owner.setLastName("smith");
+		owner.setAddress("110 W. Liberty St.");
+		owner.setCity("");
+		owner.setTelephone("1234567890");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		ConstraintViolation<Owner> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("city");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenTelephoneEmpty() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Owner owner = new Owner();
+		owner.setFirstName("George");
+		owner.setLastName("smith");
+		owner.setAddress("110 W. Liberty St.");
+		owner.setCity("london");
+		owner.setTelephone(null);
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		ConstraintViolation<Owner> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("telephone");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenTelephoneInvalidFormat() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Owner owner = new Owner();
+		owner.setFirstName("George");
+		owner.setLastName("smith");
+		owner.setAddress("110 W. Liberty St.");
+		owner.setCity("london");
+		owner.setTelephone("123");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Owner>> constraintViolations = validator.validate(owner);
+
+		ConstraintViolation<Owner> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("telephone");
+		assertThat(violation.getMessage()).isEqualTo("Telephone must be a 10-digit number");
+	}
+
+	@Test
+	void shouldNotValidateWhenVisitDescriptionEmpty() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Visit visit = new Visit();
+		visit.setDescription("");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Visit>> constraintViolations = validator.validate(visit);
+
+		ConstraintViolation<Visit> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("description");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+	@Test
+	void shouldNotValidateWhenVisitDateNull() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+
+		Visit visit = new Visit();
+		visit.setDescription("routine checkup");
+		visit.setDate(null);
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Visit>> constraintViolations = validator.validate(visit);
+
+		ConstraintViolation<Visit> violation = getOnlyViolation(constraintViolations);
+		assertThat(violation.getPropertyPath()).hasToString("date");
+		assertThat(violation.getMessage()).isEqualTo("must not be null");
 	}
 
 }

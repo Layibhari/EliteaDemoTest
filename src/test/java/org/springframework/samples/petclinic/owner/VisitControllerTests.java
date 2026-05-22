@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,9 +67,15 @@ class VisitControllerTests {
 
 	@Test
 	void initNewVisitForm() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
+		var result = mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
 			.andExpect(status().isOk())
-			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+			.andExpect(model().attributeExists("visit"))
+			.andExpect(model().attributeExists("pet"))
+			.andExpect(view().name("pets/createOrUpdateVisitForm"))
+			.andReturn();
+
+		Pet pet = (Pet) result.getModelAndView().getModel().get("pet");
+		assertThat(pet.getVisits()).isEmpty();
 	}
 
 	@Test
