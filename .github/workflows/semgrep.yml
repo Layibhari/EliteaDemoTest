@@ -2,8 +2,7 @@ name: Semgrep
 
 on:
   pull_request: {}
-  push:
-    branches: [ main ]
+  push: {}
   workflow_dispatch: {}
   schedule:
     - cron: '37 2 * * 1'
@@ -25,4 +24,3 @@ jobs:
 
       - name: Run Semgrep
         run: semgrep scan --config auto --config .semgrep.yml
-
