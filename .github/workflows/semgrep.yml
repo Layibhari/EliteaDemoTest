@@ -1,0 +1,28 @@
+name: Semgrep
+
+on:
+  pull_request: {}
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+  schedule:
+    - cron: '37 2 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep/scan
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    if: github.actor != 'dependabot[bot]'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: semgrep scan --config auto --config .semgrep.yml
+
