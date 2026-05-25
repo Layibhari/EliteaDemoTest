@@ -11,4 +11,4 @@ jobs:
          - name: checkout the code
            uses: actions/checkout@v4
          - name: build code
-           uses: mvn package               
+           uses: mvn package              
