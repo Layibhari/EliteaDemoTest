@@ -1,0 +1,114 @@
+name: Workflow for pull_request and main branch push
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  checkstyle:
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: maven:3.8.5-openjdk-17
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run checkstyle
+        run: mvn checkstyle:checkstyle
+
+      - name: Upload checkstyle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-report
+          path: target/site/checkstyle.html
+
+  test:
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: maven:3.8.5-openjdk-17
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: mvn test
+
+  build:
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: maven:3.8.5-openjdk-17
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: mvn clean package -DskipTests
+
+  pull_request_job:
+    if: github.event_name == 'pull_request'
+
+    needs:
+      - test
+      - build
+      - checkstyle
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login into DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MR_REPO }}:${{ github.sha }}
+
+  main_job:
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login into DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_REPO }}:${{ github.sha }}
