@@ -55,10 +55,17 @@ jobs:
           jf docker push ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }}
 
+      - name: Collect Build Dependencies
+        run: |
+          jf rt dl ${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
+            --build-name="${{ env.JFROG_CLI_BUILD_NAME }}"" \
+            --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
+
       - name: Publish build info
         run: |
-          jf rt build-publish "Build and Push to JFrog" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
-            --project=${{ secrets.JFROG_PROJECT_KEY }}
+          jf rt bp "Build and Push to JFrog" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
+            --project=${{ secrets.JFROG_PROJECT_KEY }} \
+            --collect-env
 
       - name: Run JFrog Xray Scan
         run: |
