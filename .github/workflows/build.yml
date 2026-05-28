@@ -39,6 +39,7 @@ jobs:
     if: github.event_name == 'pull_request'
 
     runs-on: ubuntu-latest
+    needs: checkstyle
 
     container:
       image: maven:3.8.5-openjdk-17
@@ -52,6 +53,8 @@ jobs:
 
   build:
     if: github.event_name == 'pull_request'
+
+    needs: test 
 
     runs-on: ubuntu-latest
 
