@@ -58,7 +58,7 @@ jobs:
       - name: Collect Build Dependencies
         run: |
           jf rt dl ${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
-            --build-name="${{ env.JFROG_CLI_BUILD_NAME }}"" \
+            --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
             --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
 
       - name: Publish build info
