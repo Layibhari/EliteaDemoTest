@@ -44,7 +44,9 @@ jobs:
         env:
           JFROG_CLI_RELEASES_REPO: setup-jfrog-cli-server/extractors
         run: |
-          jf mvn clean deploy -DskipTests
+          jf mvn clean deploy -DskipTests \
+            --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
+            --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
 
       - name: Build Docker image
         run: |
