@@ -40,6 +40,12 @@ jobs:
             --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
 
+#Install mvn
+
+      - name: Install JFrog Maven repos 
+        run: |
+          jf mvn clean install
+
       - name: Build and deploy JAR to Artifactory
         env:
           JFROG_CLI_RELEASES_REPO: setup-jfrog-cli-server/extractors
@@ -59,7 +65,7 @@ jobs:
 
  #       run: |
  #     - name: Collect Build Dependencies
- #         jf rt dl ${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
+ #         jf rt dl ${{ secrets.JFROG_MAVEN_REPO }}/petclinic:${{ github.sha }} \
  #           --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
  #           --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
 
@@ -74,6 +80,7 @@ jobs:
           jf rt bp "Build and Push to JFrog" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }} \
             --collect-env
+            --collect-git-info
 
       - name: Run JFrog Xray Scan
         run: |
