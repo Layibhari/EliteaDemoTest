@@ -60,7 +60,7 @@ jobs:
 
       - name: Publish build info
         run: |
-          jf rt bp "Build and Push to JFrog" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
+          jf rt bp "${{ env.JFROG_CLI_BUILD_NAME }}" ${{ env.JFROG_CLI_BUILD_NUMBER }} \
             --project=${{ vars.JFROG_PROJECT_KEY }} \
             --collect-env \
             --collect-git-info
