@@ -1,0 +1,22 @@
+### GET /hello — happy path: 200 OK with JSON greeting
+GET http://localhost:8080/hello
+Accept: application/json
+
+###
+
+### POST /hello — expect 405 Method Not Allowed
+POST http://localhost:8080/hello
+Content-Type: application/json
+
+###
+
+### PUT /hello — expect 405 Method Not Allowed
+PUT http://localhost:8080/hello
+Content-Type: application/json
+
+###
+
+### DELETE /hello — expect 405 Method Not Allowed
+DELETE http://localhost:8080/hello
+
+###
