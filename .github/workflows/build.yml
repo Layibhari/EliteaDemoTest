@@ -40,17 +40,12 @@ jobs:
             --repo-deploy-releases=${{ secrets.JFROG_MAVEN_REPO }}-release \
             --repo-deploy-snapshots=${{ secrets.JFROG_MAVEN_REPO }}-snapshot
 
-#Install mvn
 
-      - name: Install JFrog Maven repos 
-        run: |
-          jf mvn clean install
-
-      - name: Build and deploy JAR to Artifactory
+      - name: Build with Maven
         env:
           JFROG_CLI_RELEASES_REPO: setup-jfrog-cli-server/extractors
         run: |
-          jf mvn clean deploy -DskipTests \
+          jf mvn clean install -DskipTests \
             --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
             --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
 
@@ -62,18 +57,6 @@ jobs:
         run: |
           jf docker push ${{ secrets.JFROG_REGISTRY }}/${{ secrets.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} \
             --project=${{ secrets.JFROG_PROJECT_KEY }}
-
- #       run: |
- #     - name: Collect Build Dependencies
- #         jf rt dl ${{ secrets.JFROG_MAVEN_REPO }}/petclinic:${{ github.sha }} \
- #           --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
- #           --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
-
- #     - name: Collect Build Artifacts
- #       run: |
- #         jf rt u ${{ secrets.JFROG_DOCKER_REPO }} petclinic:${{ github.sha }} \
- #           --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
- #           --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
 
       - name: Publish build info
         run: |
