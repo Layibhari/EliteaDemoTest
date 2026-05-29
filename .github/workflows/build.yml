@@ -47,11 +47,12 @@ jobs:
         run: |
           jf mvn clean install -DskipTests \
             --build-name="${{ env.JFROG_CLI_BUILD_NAME }}" \
-            --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }}
+            --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} \
+            --project=${{ vars.JFROG_PROJECT_KEY }}
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ vars.JFROG_REGISTRY }}/${{ vars.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} .
+          docker build -t ${{ vars.JFROG_REGISTRY }}/${{ vars.JFROG_DOCKER_REPO }}/petclinic:${{ github.sha }} . 
 
       - name: Push Docker image
         run: |
