@@ -27,3 +27,10 @@ jobs:
               with:
                 name: spring-petclinic-jar
                 path: '**/target/*.jar'      
+
+            - name: Check test reports exist
+              run: ls -la **/target/surefire-reports/
+
+            - name: Show test failure details
+              run: cat **/target/surefire-reports/*.txt || echo "No txt files"
+              continue-on-error: true    
