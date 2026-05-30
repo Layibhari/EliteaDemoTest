@@ -3,6 +3,7 @@ on:
     pull_request:
         branches:
             - main
+    workflow_dispatch:        
 
 jobs:
     manual:
@@ -14,4 +15,4 @@ jobs:
                 distribution: 'temurin'
                 java-version: '21'
             - name: build package
-              run: mvn clean package                
+              run: '${{ vars.GOAL }}'                
