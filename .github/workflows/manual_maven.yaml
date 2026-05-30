@@ -15,4 +15,4 @@ jobs:
                 distribution: 'temurin'
                 java-version: '21'
             - name: build package
-              run: clean package               
+              run: mvn clean package               
