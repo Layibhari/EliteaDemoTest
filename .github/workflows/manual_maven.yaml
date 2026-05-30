@@ -3,6 +3,7 @@ on:
     pull_request:
         branches:
             - main
+    workflow_dispatch:        
             
 
 jobs:
@@ -14,5 +15,5 @@ jobs:
               with:
                 distribution: 'temurin'
                 java-version: '21'
-            - name: build with maven
-              run: mvn clean package               
+            - name: build package
+              run: mvn ${{ vars.GOAL    }}               
