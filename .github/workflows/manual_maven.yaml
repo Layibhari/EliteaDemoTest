@@ -3,7 +3,12 @@ on:
     pull_request:
         branches:
             - main
-    workflow_dispatch:        
+    workflow_dispatch:  
+    
+permissions:
+    contents: read
+    checks: write
+        
 
 jobs:
     manual:
@@ -13,7 +18,8 @@ jobs:
             - uses: actions/setup-java@v5
               with:
                 distribution: 'temurin'
-                java-version: '21'
+                java-version: '21
+                cache: maven
             - name: build package
               run: mvn ${{ vars.GOAL }}  
             - name: Publish Test Results
@@ -26,11 +32,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: spring-petclinic-jar
-                path: '**/target/*.jar'      
+                path: **/target/*.jar
+                     
 
-            - name: Check test reports exist
-              run: ls -la **/target/surefire-reports/
-
-            - name: Show test failure details
-              run: cat **/target/surefire-reports/*.txt || echo "No txt files"
-              continue-on-error: true    
+               
