@@ -15,4 +15,9 @@ jobs:
                 distribution: 'temurin'
                 java-version: '21'
             - name: build package
-              run: mvn clean package                
+              run: mvn ${{ vars.GOAL }}  
+            - name: Publish Test Results
+              uses: EnricoMi/publish-unit-test-result-action@v2             
+              with:
+                files: | 
+                  **/target?surface-reports/*.xml
