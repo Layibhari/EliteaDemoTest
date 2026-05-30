@@ -3,7 +3,7 @@ on:
     pull_request:
         branches:
             - main
-    workflow_dispatch:        
+            
 
 jobs:
     manual:
@@ -14,5 +14,5 @@ jobs:
               with:
                 distribution: 'temurin'
                 java-version: '21'
-            - name: build package
+            - name: build with maven
               run: mvn clean package               
