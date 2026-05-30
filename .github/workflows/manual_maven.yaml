@@ -34,5 +34,3 @@ jobs:
                 name: spring-petclinic-jar
                 path: **/target/*.jar
                      
-
-               
