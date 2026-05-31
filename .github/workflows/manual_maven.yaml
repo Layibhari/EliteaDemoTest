@@ -4,6 +4,11 @@ on:
         branches:
             - main
     workflow_dispatch:  
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: read    
   
 jobs:
     manual:
@@ -21,4 +26,4 @@ jobs:
               uses: EnricoMi/publish-unit-test-result-action@v2
               with:
                 files: | 
-                  **/target/surefire-reports/*.xml   
+                  **/target/surefire-reports/TEST-*.xml   
