@@ -4,14 +4,7 @@ on:
         branches:
             - main
     workflow_dispatch:  
-    
-permissions:
-    contents: read
-    checks: write
-    pull-requests: write
-    
-        
-
+  
 jobs:
     manual:
         runs-on: ubuntu-24.04
@@ -23,21 +16,4 @@ jobs:
                 java-version: '21'
                 cache: maven
             - name: build package
-              run: mvn ${{ vars.GOAL }}  
-            - name: Publish Test Results
-              uses: EnricoMi/publish-unit-test-result-action@v2             
-              with:
-                files: | 
-                  **/target/surefire-reports/TEST-*.xml
-
-            - name: Uploading packaged jar files
-              uses: actions/upload-artifact@v4
-              with:
-                name: spring-petclinic-jar
-<<<<<<< HEAD
-                path: '**/target/*.jar'
-                     
-=======
-                path: **/target/*.jar
-                     
->>>>>>> ca2863d3a8ee0aa47ed87692771c0c9a0841a785
+              run: mvn ${{ vars.GOAL }}
