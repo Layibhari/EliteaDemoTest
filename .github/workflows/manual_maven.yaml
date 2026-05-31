@@ -27,3 +27,9 @@ jobs:
               with:
                 files: | 
                   **/target/surefire-reports/TEST-*.xml   
+
+            - name: Uploading packaged jar files
+              uses: actions/upload-artifact@v4
+              with:
+                name: spring-petclinic-jar
+                path: '**/target/*.jar'      
