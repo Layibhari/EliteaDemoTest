@@ -17,12 +17,26 @@
       <tr th:each="vet : ${listVets}">
         <td th:text="${vet.firstName + ' ' + vet.lastName}"></td>
         <td>
-          <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}" /> <span
-            th:if="${vet.nrOfSpecialties == 0}" th:text="#{none}">none</span>
+          <span th:if="${vet.nrOfSpecialties == 0}" class="text-muted">General Practice</span>
+          <span th:unless="${vet.nrOfSpecialties == 0}">
+                    <span th:each="specialty : ${vet.specialties}"
+                          th:text="${specialty.name} + ' '"
+                          class="badge bg-info text-dark"></span>
+                </span>
         </td>
       </tr>
     </tbody>
   </table>
+  <div class="row mt-4 mb-4 p-3 bg-light rounded">
+    <div class="col-md-12">
+      <h5>Clinic Staff Summary</h5>
+      <ul class="list-unstyled">
+        <li><strong>General Practitioners:</strong> <span th:text="${generalPracticeCount}">0</span></li>
+        <li><strong>Specialists:</strong> <span th:text="${specialistCount}">0</span></li>
+        <li><strong>Total:</strong> <span th:text="${totalVets}">0</span></li>
+      </ul>
+    </div>
+  </div>
   <div th:if="${totalPages > 1}">
     <span th:text="#{pages}">Pages:</span>
     <span>[</span>
