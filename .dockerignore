@@ -1,0 +1,7 @@
+.git
+.github
+.devcontainer
+target/
+build/
+*.md
+k8s/
