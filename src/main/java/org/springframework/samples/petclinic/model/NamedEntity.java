@@ -34,18 +34,23 @@ public class NamedEntity extends BaseEntity {
 	@NotBlank
 	private String name;
 
-	public String getName() {
+	public String getSanitizedName() {
+		if (this.name == null) {
+			return "";}
 		return this.name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		if (name != null) {
+			this.name = name.trim();
+		} else {
+			this.name = null;
+		}
 	}
 
 	@Override
 	public String toString() {
-		String name = this.getName();
-		return name != null ? name : "<null>";
+		return "Entity Name: " + this.getSanitizedName();
 	}
 
 }
