@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 class VetController {
 
 	private final VetRepository vetRepository;
-	private VetRepository vets;
+
 
 	public VetController(VetRepository vetRepository) {
 		this.vetRepository = vetRepository;
@@ -50,7 +50,7 @@ class VetController {
 		Page<Vet> paginated = findPaginated(page);
 		vets.getVetList().addAll(paginated.toList());
 		Vets allVets = new Vets();
-		allVets.getVetList().addAll(this.vets.findAll());
+		allVets.getVetList().addAll(this.vetRepository.findAll());
 		model.addAttribute("generalPracticeCount", allVets.getGeneralPracticeCount());
 		model.addAttribute("specialistCount", allVets.getSpecialistCount());
 		model.addAttribute("totalVets", allVets.getGeneralPracticeCount() + allVets.getSpecialistCount());
