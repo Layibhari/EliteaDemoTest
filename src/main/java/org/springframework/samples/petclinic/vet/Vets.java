@@ -41,12 +41,14 @@ public class Vets {
 	}
 
 	public long getGeneralPracticeCount() {
-		if (this.vets == null) return 0;
+		if (this.vets == null)
+			return 0;
 		return this.vets.stream().filter(vet -> !vet.hasSpecialties()).count();
 	}
 
 	public long getSpecialistCount() {
-		if (this.vets == null) return 0;
+		if (this.vets == null)
+			return 0;
 		return this.vets.stream().filter(Vet::hasSpecialties).count();
 	}
 

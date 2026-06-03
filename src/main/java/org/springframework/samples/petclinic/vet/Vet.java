@@ -75,8 +75,6 @@ public class Vet extends Person {
 		return getSpecialtiesInternal() != null ? getSpecialtiesInternal().size() : 0;
 	}
 
-
-
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
 	}
