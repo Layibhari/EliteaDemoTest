@@ -61,16 +61,15 @@ public class Vet extends Person {
 
 	@XmlElement
 
-public List<Specialty> getSpecialties() {
-        List<Specialty> sortedSpecs = new ArrayList<>(getSpecialtiesInternal());
-        sortedSpecs.sort(Comparator.comparing(NamedEntity::getSanitizedName));
-        return Collections.unmodifiableList(sortedSpecs);
-    }
+	public List<Specialty> getSpecialties() {
+		List<Specialty> sortedSpecs = new ArrayList<>(getSpecialtiesInternal());
+		sortedSpecs.sort(Comparator.comparing(NamedEntity::getSanitizedName));
+		return Collections.unmodifiableList(sortedSpecs);
+	}
 
-    public boolean hasSpecialties() {
-        return getSpecialtiesInternal() != null && !getSpecialtiesInternal().isEmpty();
-    }
-	
+	public boolean hasSpecialties() {
+		return getSpecialtiesInternal() != null && !getSpecialtiesInternal().isEmpty();
+	}
 
 	public int getNrOfSpecialties() {
 		return getSpecialtiesInternal() != null ? getSpecialtiesInternal().size() : 0;
