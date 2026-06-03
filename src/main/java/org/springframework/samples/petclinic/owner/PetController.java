@@ -107,7 +107,8 @@ class PetController {
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		if (StringUtils.hasText(pet.getSanitizedName()) && pet.isNew() && owner.getPet(pet.getSanitizedName(), true) != null) {
+		if (StringUtils.hasText(pet.getSanitizedName()) && pet.isNew()
+				&& owner.getPet(pet.getSanitizedName(), true) != null) {
 			result.rejectValue("name", "duplicate", "already exists");
 		}
 

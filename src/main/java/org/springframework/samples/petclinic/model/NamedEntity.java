@@ -41,10 +41,15 @@ public class NamedEntity extends BaseEntity {
 		return this.name;
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
 	public void setName(String name) {
 		if (name != null) {
 			this.name = name.trim();
-		} else {
+		}
+		else {
 			this.name = null;
 		}
 	}
