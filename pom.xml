@@ -36,8 +36,6 @@
     <nohttp-checkstyle.version>0.0.11</nohttp-checkstyle.version>
     <spring-format.version>0.0.47</spring-format.version>
 
-    <!--For the frogbot PR demp-->
-     <postgresql.version>42.2.5</postgresql.version>
   </properties>
 
   <dependencies>
@@ -161,6 +159,11 @@
       <artifactId>testcontainers-mysql</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>2.14.1</version>
+</dependency>
   </dependencies>
 
   <build>
