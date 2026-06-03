@@ -17,6 +17,9 @@ jobs:
         branch: ["main"]
     steps:
       - uses: jfrog/frogbot@v2
+        with:
+          oidc-provider-name: github
+          version: latest
         env:
           JFROG_CLI_LOG_LEVEL: "DEBUG"
           JF_URL: https://${{ secrets.JFROG_REGISTRY }}
@@ -26,6 +29,3 @@ jobs:
           JF_FIXES_VULNERABILITY: "FALSE"
           JF_RELEASES_REPO: extractors
           JF_FAIL: false
-        with:
-          oidc-provider-name: github
-          oidc-audience: jfrog-github
