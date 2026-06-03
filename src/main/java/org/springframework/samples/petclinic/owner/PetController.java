@@ -107,7 +107,7 @@ class PetController {
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		if (StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
+		if (StringUtils.hasText(pet.getSanitizedName()) && pet.isNew() && owner.getPet(pet.getSanitizedName(), true) != null) {
 			result.rejectValue("name", "duplicate", "already exists");
 		}
 
@@ -135,7 +135,7 @@ class PetController {
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		String petName = pet.getName();
+		String petName = pet.getSanitizedName();
 
 		// checking if the pet name already exists for the owner
 		if (StringUtils.hasText(petName)) {
@@ -170,7 +170,7 @@ class PetController {
 		Pet existingPet = owner.getPet(id);
 		if (existingPet != null) {
 			// Update existing pet's properties
-			existingPet.setName(pet.getName());
+			existingPet.setName(pet.getSanitizedName());
 			existingPet.setBirthDate(pet.getBirthDate());
 			existingPet.setType(pet.getType());
 		}

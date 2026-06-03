@@ -59,7 +59,7 @@ public class Vet extends Person {
 	@XmlElement
 	public List<Specialty> getSpecialties() {
 		return getSpecialtiesInternal().stream()
-			.sorted(Comparator.comparing(NamedEntity::getName))
+			.sorted(Comparator.comparing(NamedEntity::getSanitizedName))
 			.collect(Collectors.toList());
 	}
 

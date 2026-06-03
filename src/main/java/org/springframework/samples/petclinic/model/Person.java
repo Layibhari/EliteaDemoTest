@@ -40,8 +40,8 @@ public class Person extends BaseEntity {
 	}
 
 	public void setFirstName(String firstName) {
-		if(firstName !=null){
-this.firstName = firstName.trim();
+		if(firstName !=  null){
+			this.firstName = firstName.trim();
 		}
 		else {
 			this.firstName = null;
@@ -61,7 +61,8 @@ this.firstName = firstName.trim();
 			this.lastName = null;
 		}
 	}
-public String toString(){
+	@Override
+	public String toString() {
 		return "Person: " + this.firstName + " " + this.lastName;
-}
+	}
 }

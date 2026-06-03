@@ -36,7 +36,8 @@ public class NamedEntity extends BaseEntity {
 
 	public String getSanitizedName() {
 		if (this.name == null) {
-			return "";}
+			return "";
+		}
 		return this.name;
 	}
 
