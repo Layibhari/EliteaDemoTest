@@ -2,7 +2,6 @@ name: "Frogbot Scan Repository"
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 permissions:
   id-token: write
   pull-requests: write
@@ -16,7 +15,7 @@ jobs:
       matrix:
         branch: ["main"]
     steps:
-      - uses: jfrog/frogbot@v2
+      - uses: jfrog/frogbot@v3
         env:
           JFROG_CLI_LOG_LEVEL: "DEBUG"
           JF_URL: https://${{ vars.JFROG_REGISTRY }}
@@ -25,6 +24,6 @@ jobs:
           JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
           JF_FIXES_VULNERABILITY: "FALSE"
           JF_RELEASES_REPO: extractors
-          JF_FAIL: false
+          JF_SKIP_AUTOFIX: false
         with:
           oidc-provider-name: github
