@@ -37,7 +37,6 @@ class VetController {
 
 	private final VetRepository vetRepository;
 
-
 	public VetController(VetRepository vetRepository) {
 		this.vetRepository = vetRepository;
 	}
