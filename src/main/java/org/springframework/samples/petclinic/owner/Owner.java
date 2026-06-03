@@ -31,8 +31,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object representing an owner.
@@ -125,7 +125,6 @@ public class Owner extends Person {
 		}
 		return null;
 	}
-
 
 	/**
 	 * Return the Pet with the given name, or null if none found for this Owner.

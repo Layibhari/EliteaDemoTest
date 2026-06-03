@@ -111,10 +111,7 @@ class PetController {
 			result.rejectValue("name", "duplicate", "already exists");
 		}
 
-		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
-			result.rejectValue("birthDate", "typeMismatch.birthDate");
-		}
+		validatePetBirthDate(pet, result);
 
 		if (result.hasErrors()) {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
@@ -145,10 +142,7 @@ class PetController {
 			}
 		}
 
-		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
-			result.rejectValue("birthDate", "typeMismatch.birthDate");
-		}
+		validatePetBirthDate(pet, result);
 
 		if (result.hasErrors()) {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
@@ -178,6 +172,18 @@ class PetController {
 			owner.addPet(pet);
 		}
 		this.owners.save(owner);
+	}
+
+	/**
+	 * Validates that the pet's birthdate is not in the future. If the date is invalid, an
+	 * error is added to the BindingResult.
+	 * @param pet the pet object to validate
+	 * @param result the BindingResult to hold validation errors
+	 */
+	private void validatePetBirthDate(Pet pet, BindingResult result) {
+		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(LocalDate.now())) {
+			result.rejectValue("birthDate", "typeMismatch.birthDate");
+		}
 	}
 
 }
