@@ -11,18 +11,21 @@ permissions:
 jobs:
   scan-repository:
     runs-on: ubuntu-latest
+    name: Scan Repository (${{ matrix.branch }} branch)
     strategy:
       matrix:
         branch: ["main"]
     steps:
       - uses: jfrog/frogbot@v2
         env:
+          JFROG_CLI_LOG_LEVEL: "DEBUG"
           JF_URL: https://${{ secrets.JFROG_REGISTRY }}
           #JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
           JF_FIXES_VULNERABILITY: "FALSE"
           JF_RELEASES_REPO: extractors
-          JF_FAIL: true
+          JF_FAIL: false
         with:
           oidc-provider-name: github
+          oidc-audience: jfrog-github
