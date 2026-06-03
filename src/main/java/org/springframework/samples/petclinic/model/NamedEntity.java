@@ -56,7 +56,7 @@ public class NamedEntity extends BaseEntity {
 
 	@Override
 	public String toString() {
-		return "Entity Name: " + this.getSanitizedName();
+		return this.getSanitizedName();
 	}
 
 }
