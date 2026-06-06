@@ -21,11 +21,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -99,6 +95,14 @@ class VisitController {
 		this.owners.save(owner);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
 		return "redirect:/owners/{ownerId}";
+	}
+
+	// Catch invalid requests, log the error, and safely redirect with a message
+	@ExceptionHandler(IllegalArgumentException.class)
+	public String handlePetNotFoundException(IllegalArgumentException ex, RedirectAttributes redirectAttributes) {
+		System.err.println("VisitController Warning: " + ex.getMessage());
+		redirectAttributes.addFlashAttribute("message", "Invalid Pet ID. Redirected safely.");
+		return "redirect:/owners/find";
 	}
 
 }
