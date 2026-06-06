@@ -44,12 +44,22 @@ public class PetTypeFormatter implements Formatter<PetType> {
 
 	@Override
 	public String print(PetType petType, Locale locale) {
+		if (petType == null || petType.getName() == null) {
+			return "";
+		}
 		String name = petType.getName();
 		return name != null ? name : "<null>";
 	}
 
 	@Override
 	public PetType parse(String text, Locale locale) throws ParseException {
+		if (text == null) {
+			throw new ParseException("Pet type cannot be null", 0);
+		}
+		if (text.trim().isEmpty()) {
+			throw new ParseException("Pet type cannot be empty or just whitespaces", 0);
+		}
+		text = text.trim();
 		Collection<PetType> findPetTypes = this.types.findPetTypes();
 		for (PetType type : findPetTypes) {
 			if (Objects.equals(type.getName(), text)) {

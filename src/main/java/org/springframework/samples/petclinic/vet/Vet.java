@@ -60,10 +60,10 @@ public class Vet extends Person {
 	}
 
 	@XmlElement
+
 	public List<Specialty> getSpecialties() {
 		List<Specialty> sortedSpecs = new ArrayList<>(getSpecialtiesInternal());
-
-		sortedSpecs.sort(Comparator.comparing(Specialty::getName));
+		sortedSpecs.sort(Comparator.comparing(NamedEntity::getSanitizedName));
 		return Collections.unmodifiableList(sortedSpecs);
 	}
 
