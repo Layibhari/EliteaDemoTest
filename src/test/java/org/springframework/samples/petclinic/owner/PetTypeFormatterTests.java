@@ -94,4 +94,18 @@ class PetTypeFormatterTests {
 		return petTypes;
 	}
 
+	@Test
+	void shouldThrowParseExceptionWhenTextIsNull() {
+		org.junit.jupiter.api.Assertions.assertThrows(java.text.ParseException.class, () -> {
+			petTypeFormatter.parse(null, java.util.Locale.ENGLISH);
+		});
+	}
+
+	@Test
+	void shouldThrowParseExceptionWhenTextIsEmpty() {
+		org.junit.jupiter.api.Assertions.assertThrows(java.text.ParseException.class, () -> {
+			petTypeFormatter.parse("   ", java.util.Locale.ENGLISH);
+		});
+	}
+
 }
