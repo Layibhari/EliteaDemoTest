@@ -223,6 +223,7 @@ class ClinicServiceTests {
 		int found = pet7.getVisits().size();
 		Visit visit = new Visit();
 		visit.setDescription("test");
+		visit.setCost(new java.math.BigDecimal("50.00"));
 
 		owner6.addVisit(pet7.getId(), visit);
 		this.owners.save(owner6);
