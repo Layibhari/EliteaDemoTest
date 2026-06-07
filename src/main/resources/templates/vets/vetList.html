@@ -11,6 +11,7 @@
       <tr>
         <th th:text="#{name}">Name</th>
         <th th:text="#{specialties}">Specialties</th>
+        <th th:text="#{vet.status}"></th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,10 @@
                           th:text="${specialty.name} + ' '"
                           class="badge bg-info text-dark"></span>
                 </span>
+        </td>
+        <td>
+          <span th:if="${vet.active}" class="badge bg-success" th:text="#{vet.active}"></span>
+          <span th:unless="${vet.active}" class="badge bg-danger" th:text="#{vet.onleave}"></span>
         </td>
       </tr>
     </tbody>

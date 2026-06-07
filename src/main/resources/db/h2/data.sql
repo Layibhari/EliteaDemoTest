@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 INSERT INTO vets
 VALUES (default, 'James', 'Carter');
 INSERT INTO vets
@@ -10,6 +11,14 @@ INSERT INTO vets
 VALUES (default, 'Henry', 'Stevens');
 INSERT INTO vets
 VALUES (default, 'Sharon', 'Jenkins');
+=======
+INSERT INTO vets VALUES (default, 'James', 'Carter',TRUE);
+INSERT INTO vets VALUES (default, 'Helen', 'Leary',TRUE);
+INSERT INTO vets VALUES (default, 'Linda', 'Douglas',FALSE);
+INSERT INTO vets VALUES (default, 'Rafael', 'Ortega',TRUE);
+INSERT INTO vets VALUES (default, 'Henry', 'Stevens',TRUE);
+INSERT INTO vets VALUES (default, 'Sharon', 'Jenkins',TRUE);
+>>>>>>> Stashed changes
 
 INSERT INTO specialties
 VALUES (default, 'radiology');
