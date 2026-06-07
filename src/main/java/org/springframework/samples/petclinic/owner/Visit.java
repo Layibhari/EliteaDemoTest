@@ -16,6 +16,10 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
@@ -42,6 +46,11 @@ public class Visit extends BaseEntity {
 	@NotBlank
 	private String description;
 
+	@Column(name = "cost")
+	@NotNull(message = "{visit.cost.notnull}")
+	@PositiveOrZero(message = "{visit.cost.positiveorzero}")
+	private BigDecimal cost;
+
 	/**
 	 * Creates a new instance of Visit for the current date
 	 */
@@ -63,6 +72,14 @@ public class Visit extends BaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public BigDecimal getCost() {
+		return this.cost;
+	}
+
+	public void setCost(BigDecimal cost) {
+		this.cost = cost;
 	}
 
 }
