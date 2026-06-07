@@ -1,15 +1,10 @@
-INSERT INTO vets
-VALUES (default, 'James', 'Carter');
-INSERT INTO vets
-VALUES (default, 'Helen', 'Leary');
-INSERT INTO vets
-VALUES (default, 'Linda', 'Douglas');
-INSERT INTO vets
-VALUES (default, 'Rafael', 'Ortega');
-INSERT INTO vets
-VALUES (default, 'Henry', 'Stevens');
-INSERT INTO vets
-VALUES (default, 'Sharon', 'Jenkins');
+INSERT INTO vets (first_name, last_name, active) VALUES ('James', 'Carter', TRUE);
+INSERT INTO vets (first_name, last_name, active) VALUES ('Helen', 'Leary', TRUE);
+INSERT INTO vets (first_name, last_name, active) VALUES ('Linda', 'Douglas', FALSE);
+INSERT INTO vets (first_name, last_name, active) VALUES ('Rafael', 'Ortega', TRUE);
+INSERT INTO vets (first_name, last_name, active) VALUES ('Henry', 'Stevens', TRUE);
+INSERT INTO vets (first_name, last_name, active) VALUES ('Sharon', 'Jenkins', TRUE);
+
 
 INSERT INTO specialties
 VALUES (default, 'radiology');
