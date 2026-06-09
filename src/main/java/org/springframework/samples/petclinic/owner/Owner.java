@@ -58,7 +58,7 @@ public class Owner extends Person {
 
 	@Column
 	@NotBlank
-	@Pattern(regexp = "\\d{10}", message = "{telephone.invalid}")
+	@Pattern(regexp = "[\\d\\s().\\-]{10,20}", message = "{telephone.invalid}")
 	private String telephone;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -87,7 +87,13 @@ public class Owner extends Person {
 	}
 
 	public void setTelephone(String telephone) {
-		this.telephone = telephone;
+		if (telephone != null) {
+			// Normalize: remove spaces, dashes, dots, parentheses before saving
+			this.telephone = telephone.replaceAll("[\\s().\\-]", "");
+		}
+		else {
+			this.telephone = null;
+		}
 	}
 
 	public List<Pet> getPets() {
