@@ -31,8 +31,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object representing an owner.
@@ -82,8 +82,18 @@ public class Owner extends Person {
 		this.city = city;
 	}
 
-	public String getTelephone() {
-		return this.telephone;
+	/**
+	 * Returns a display-friendly formatted version of the telephone number.
+	 * Adds dashes for readability (e.g. 6085551023 -> 608-555-1023).
+	 * @return formatted telephone string, or null if telephone is not set
+	 */
+	public String getFormattedTelephone() {
+		if (this.telephone == null || this.telephone.length() != 10) {
+			return this.telephone;
+		}
+		return this.telephone.substring(0, 3) + "-"
+			+ this.telephone.substring(3, 6) + "-"
+			+ this.telephone.substring(6);
 	}
 
 	public void setTelephone(String telephone) {
@@ -139,15 +149,11 @@ public class Owner extends Person {
 	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
 	 */
 	public Pet getPet(String name, boolean ignoreNew) {
-		for (Pet pet : getPets()) {
-			String compName = pet.getName();
-			if (compName != null && compName.equalsIgnoreCase(name)) {
-				if (!ignoreNew || !pet.isNew()) {
-					return pet;
-				}
-			}
-		}
-		return null;
+		return getPets().stream()
+			.filter(pet -> pet.getName() != null && pet.getName().equalsIgnoreCase(name))
+			.filter(pet -> !ignoreNew || !pet.isNew())
+			.findFirst()
+			.orElse(null);
 	}
 
 	@Override

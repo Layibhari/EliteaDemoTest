@@ -16,6 +16,10 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
@@ -42,6 +46,11 @@ public class Visit extends BaseEntity {
 	@NotBlank
 	private String description;
 
+	@Column(name = "cost")
+	@NotNull(message = "{visit.cost.notnull}")
+	@PositiveOrZero(message = "{visit.cost.positiveorzero}")
+	private BigDecimal cost;
+
 	/**
 	 * Creates a new instance of Visit for the current date
 	 */
@@ -61,6 +70,16 @@ public class Visit extends BaseEntity {
 		return this.description;
 	}
 
+	/**
+	 * Returns true if the description is considered valid:
+	 * not null, not empty, and not whitespace-only.
+	 * Used to verify description quality before saving.
+	 * @return true if description is non-blank after trimming
+	 */
+	public boolean hasValidDescription() {
+		return this.description != null && !this.description.trim().isEmpty();
+	}
+
 	public void setDescription(String description) {
 		if (description != null) {
 			// Trim whitespace before saving - rejects whitespace-only descriptions
@@ -69,6 +88,14 @@ public class Visit extends BaseEntity {
 		else {
 			this.description = null;
 		}
+	}
+
+	public BigDecimal getCost() {
+		return this.cost;
+	}
+
+	public void setCost(BigDecimal cost) {
+		this.cost = cost;
 	}
 
 }
