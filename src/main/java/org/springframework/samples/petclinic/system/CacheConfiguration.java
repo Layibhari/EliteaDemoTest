@@ -24,16 +24,23 @@ import org.springframework.context.annotation.Configuration;
 import javax.cache.configuration.MutableConfiguration;
 
 /**
- * Cache configuration intended for caches providing the JCache API. This configuration
- * creates the used cache for the application and enables statistics that become
- * accessible via JMX.
+ * Cache configuration class using JCache API.
+ *
+ * Enabled caching annotation scanning using @EnableCaching. Registers and customizes
+ * JCache Manager instance configuration.
  */
 @Configuration(proxyBeanMethods = false)
 @EnableCaching
 class CacheConfiguration {
 
+	/**
+	 * Configures custom cache attributes on application startup. Registers a cache named
+	 * "vets" with basic customization settings.
+	 * @return JCacheManagerCustomizer callback bean
+	 */
 	@Bean
 	public JCacheManagerCustomizer petclinicCacheConfigurationCustomizer() {
+		// Create the 'vets' cache with standard statistics-enabled configuration context
 		return cm -> cm.createCache("vets", cacheConfiguration());
 	}
 
@@ -45,8 +52,11 @@ class CacheConfiguration {
 	 * is only a very limited set of configuration options. The really relevant
 	 * configuration options (like the size limit) must be set via a configuration
 	 * mechanism that is provided by the selected JCache implementation.
+	 * </p>
+	 * @return JCache configuration parameters mapping
 	 */
 	private javax.cache.configuration.Configuration<Object, Object> cacheConfiguration() {
+		// Enable statistics rendering for standard JMX monitoring reporting tools
 		return new MutableConfiguration<>().setStatisticsEnabled(true);
 	}
 

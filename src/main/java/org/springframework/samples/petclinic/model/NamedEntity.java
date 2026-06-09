@@ -22,6 +22,8 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as
  * a base class for objects needing these properties.
+ * 
+ * Subclasses include Specialty and PetType, which both rely on name-based identification.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -30,21 +32,37 @@ import jakarta.validation.constraints.NotBlank;
 @MappedSuperclass
 public class NamedEntity extends BaseEntity {
 
+	/**
+	 * Name value for the entity. Can neither be null nor empty.
+	 */
 	@Column
 	@NotBlank
 	private String name;
 
+	/**
+	 * Gets the name of the entity.
+	 * @return the name string
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * Sets the name of the entity.
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * String representation of the NamedEntity, returning its name.
+	 * @return the entity name, or "<null>" if the name is not set
+	 */
 	@Override
 	public String toString() {
 		String name = this.getName();
+		// Return the name if it is not null, otherwise fallback to placeholder <null>
 		return name != null ? name : "<null>";
 	}
 

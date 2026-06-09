@@ -26,7 +26,10 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Simple JavaBean domain object representing a visit.
+ * Simple JavaBean domain object representing a pet clinic visit.
+ *
+ * Mapped to the "visits" table in the database. Extends BaseEntity to inherit the ID
+ * property.
  *
  * @author Ken Krebs
  * @author Dave Syer
@@ -35,32 +38,55 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "visits")
 public class Visit extends BaseEntity {
 
+	/**
+	 * Date when the visit occurred. Matches 'yyyy-MM-dd' format.
+	 */
 	@Column(name = "visit_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
 
+	/**
+	 * Textual description detailing the purpose or outcome of the visit.
+	 */
 	@NotBlank
 	private String description;
 
 	/**
-	 * Creates a new instance of Visit for tomorrow
+	 * Creates a new instance of Visit initialized to tomorrow's date by default.
 	 */
 	public Visit() {
+		// Default visit date is pre-populated as tomorrow's date
 		this.date = LocalDate.now().plusDays(1);
 	}
 
+	/**
+	 * Gets the date of the visit.
+	 * @return date of the visit
+	 */
 	public LocalDate getDate() {
 		return this.date;
 	}
 
+	/**
+	 * Sets the date of the visit.
+	 * @param date visit date to set
+	 */
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
+	/**
+	 * Gets the description of the visit.
+	 * @return visit description text
+	 */
 	public String getDescription() {
 		return this.description;
 	}
 
+	/**
+	 * Sets the description of the visit.
+	 * @param description visit description text
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}

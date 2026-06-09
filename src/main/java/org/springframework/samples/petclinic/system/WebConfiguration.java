@@ -32,6 +32,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 	@Bean
 	public LocaleResolver localeResolver() {
 		SessionLocaleResolver resolver = new SessionLocaleResolver();
+		// Set default locale fallback translation to English
 		resolver.setDefaultLocale(Locale.ENGLISH);
 		return resolver;
 	}
@@ -44,6 +45,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
 		LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
+		// Intercepts URL request queries specifying '?lang=...' parameter values
 		interceptor.setParamName("lang");
 		return interceptor;
 	}
@@ -54,6 +56,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		// Register the custom locale interceptor into Spring MVC framework
 		registry.addInterceptor(localeChangeInterceptor());
 	}
 

@@ -35,6 +35,9 @@ import jakarta.xml.bind.annotation.XmlElement;
 /**
  * Simple JavaBean domain object representing a veterinarian.
  *
+ * Configured as a JPA Entity mapped to the "vets" table. Extends Person to inherit name
+ * and contact fields.
+ *
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -44,11 +47,20 @@ import jakarta.xml.bind.annotation.XmlElement;
 @Table(name = "vets")
 public class Vet extends Person {
 
+	/**
+	 * Set of specialties associated with the veterinarian. Loaded EAGERly to fetch
+	 * associated details. Uses "vet_specialties" junction table to manage the
+	 * relationship.
+	 */
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
 			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
 	private Set<Specialty> specialties;
 
+	/**
+	 * Internal getter to safely retrieve or initialize the specialties set.
+	 * @return set of Specialties
+	 */
 	protected Set<Specialty> getSpecialtiesInternal() {
 		if (this.specialties == null) {
 			this.specialties = new HashSet<>();
@@ -56,6 +68,12 @@ public class Vet extends Person {
 		return this.specialties;
 	}
 
+	/**
+	 * Gets the sorted list of specialties associated with the vet. Annotated
+	 * with @XmlElement for XML serialization support. Sorted alphabetically by specialty
+	 * name.
+	 * @return sorted list of Specialty objects
+	 */
 	@XmlElement
 	public List<Specialty> getSpecialties() {
 		return getSpecialtiesInternal().stream()
@@ -63,10 +81,18 @@ public class Vet extends Person {
 			.collect(Collectors.toList());
 	}
 
+	/**
+	 * Gets the total count of specialties associated with the vet.
+	 * @return count number
+	 */
 	public int getNrOfSpecialties() {
 		return getSpecialtiesInternal().size();
 	}
 
+	/**
+	 * Appends a new specialty to the vet's credentials.
+	 * @param specialty Specialty object to add
+	 */
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
 	}

@@ -22,16 +22,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 /**
- * Repository class for <code>PetType</code> domain objects.
+ * Repository interface for <code>PetType</code> domain objects.
+ *
+ * Extends {@link JpaRepository} to inherit CRUD functionality. Used to retrieve support
+ * data categories (e.g. valid list of pet species).
  *
  * @author Patrick Baumgartner
  */
-
 public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
 
 	/**
-	 * Retrieve all {@link PetType}s from the data store.
-	 * @return a Collection of {@link PetType}s.
+	 * Retrieve all {@link PetType}s from the data store, sorted alphabetically by name.
+	 *
+	 * Runs a custom JPQL query ordering results before returning them to form builders.
+	 * @return a sorted List of {@link PetType}s.
 	 */
 	@Query("SELECT ptype FROM PetType ptype ORDER BY ptype.name")
 	List<PetType> findPetTypes();

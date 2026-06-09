@@ -21,7 +21,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * @author Juergen Hoeller Can be Cat, Dog, Hamster...
+ * Domain entity representing a type of pet (e.g. Cat, Dog, Hamster).
+ *
+ * Mapped to the "types" database table. Extends NamedEntity, meaning it inherits ID and
+ * name properties.
+ *
+ * @author Juergen Hoeller
  */
 @Entity
 @Table(name = "types")

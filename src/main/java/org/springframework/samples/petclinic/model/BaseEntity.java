@@ -26,25 +26,46 @@ import jakarta.persistence.MappedSuperclass;
  * Simple JavaBean domain object with an id property. Used as a base class for objects
  * needing this property.
  *
+ * Configured as a JPA MappedSuperclass, meaning its fields are mapped to the tables of
+ * subclasses.
+ *
  * @author Ken Krebs
  * @author Juergen Hoeller
  */
 @MappedSuperclass
 public class BaseEntity implements Serializable {
 
+	/**
+	 * Unique identifier for the entity. Annotated with @Id to declare it as primary key,
+	 * and set to auto-increment identity strategy.
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	/**
+	 * Gets the unique ID of the entity.
+	 * @return the entity id, or null if it's not persisted yet
+	 */
 	public Integer getId() {
 		return id;
 	}
 
+	/**
+	 * Sets the unique ID of the entity.
+	 * @param id the entity id to set
+	 */
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
+	/**
+	 * Checks if the entity is new and has not been persisted in the database yet.
+	 * @return true if the ID is null (not saved yet), false otherwise
+	 */
 	public boolean isNew() {
+		// If the ID is null, this instance represents a new record that has not yet been
+		// saved to DB
 		return this.id == null;
 	}
 

@@ -28,8 +28,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 class CrashController {
 
+	/**
+	 * Endpoint configured to throw a RuntimeException. Used to verify/test error page
+	 * routing, custom exception resolution, or global handler setups.
+	 * @return nothing, always raises RuntimeException
+	 * @throws RuntimeException intentional sample exception
+	 */
 	@GetMapping("/oups")
 	public String triggerException() {
+		// Intentionally throw RuntimeException to verify Spring MVC's default error page
+		// templates
 		throw new RuntimeException(
 				"Expected: controller used to showcase what " + "happens when an exception is thrown");
 	}

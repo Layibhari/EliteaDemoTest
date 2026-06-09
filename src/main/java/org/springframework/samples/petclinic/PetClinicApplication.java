@@ -23,13 +23,22 @@ import org.springframework.context.annotation.ImportRuntimeHints;
 /**
  * PetClinic Spring Boot Application.
  *
+ * This is the main entry point for the Spring Boot application. It bootstraps the
+ * application using SpringApplication.run.
+ *
  * @author Dave Syer
  */
 @SpringBootApplication
 @ImportRuntimeHints(PetClinicRuntimeHints.class)
 public class PetClinicApplication {
 
+	/**
+	 * Main method that drives the Spring Boot application execution.
+	 * @param args command-line arguments passed to the application
+	 */
 	public static void main(String[] args) {
+		// Run the Spring Boot application by starting the embedded web server and
+		// initializing Spring contexts
 		SpringApplication.run(PetClinicApplication.class, args);
 	}
 

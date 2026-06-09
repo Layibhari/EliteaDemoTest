@@ -21,7 +21,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * Models a {@link Vet Vet's} specialty (for example, dentistry).
+ * Models a {@link Vet Vet's} specialty (for example, radiology, dentistry, surgery).
+ *
+ * Configured as a JPA Entity mapped to the "specialties" table. Extends NamedEntity,
+ * inheriting name and ID fields.
  *
  * @author Juergen Hoeller
  */

@@ -37,6 +37,9 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Simple JavaBean domain object representing an owner.
  *
+ * Configured as a JPA Entity mapped to the "owners" table. Inherits basic personal
+ * details from Person class.
+ *
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -48,52 +51,100 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "owners")
 public class Owner extends Person {
 
+	/**
+	 * Street address of the owner. Cannot be empty.
+	 */
 	@Column
 	@NotBlank
 	private String address;
 
+	/**
+	 * City of residence of the owner. Cannot be empty.
+	 */
 	@Column
 	@NotBlank
 	private String city;
 
+	/**
+	 * Telephone number of the owner. Must be exactly 10 digits as specified by the
+	 * Pattern validator.
+	 */
 	@Column
 	@NotBlank
 	@Pattern(regexp = "\\d{10}", message = "{telephone.invalid}")
 	private String telephone;
 
+	/**
+	 * Bidirectional one-to-many relationship with Pets. Cascade ALL ensures that
+	 * saving/deleting owners cascades to their pets. Fetched EAGERly to ensure pet lists
+	 * are loaded alongside owner details. Pets are ordered lexicographically by name.
+	 */
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_id")
 	@OrderBy("name")
 	private final List<Pet> pets = new ArrayList<>();
 
+	/**
+	 * Gets the owner's street address.
+	 * @return address string
+	 */
 	public String getAddress() {
 		return this.address;
 	}
 
+	/**
+	 * Sets the owner's street address.
+	 * @param address street address
+	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	/**
+	 * Gets the owner's city of residence.
+	 * @return city string
+	 */
 	public String getCity() {
 		return this.city;
 	}
 
+	/**
+	 * Sets the owner's city of residence.
+	 * @param city city string
+	 */
 	public void setCity(String city) {
 		this.city = city;
 	}
 
+	/**
+	 * Gets the owner's telephone number.
+	 * @return telephone string
+	 */
 	public String getTelephone() {
 		return this.telephone;
 	}
 
+	/**
+	 * Sets the owner's telephone number.
+	 * @param telephone 10-digit telephone string
+	 */
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
 	}
 
+	/**
+	 * Gets the list of pets owned by this owner.
+	 * @return list of Pet objects
+	 */
 	public List<Pet> getPets() {
 		return this.pets;
 	}
 
+	/**
+	 * Adds a pet to the owner's pet list. Only adds the pet if the pet is new (i.e. not
+	 * yet saved/associated).
+	 * @param pet the pet to add
+	 */
 	public void addPet(Pet pet) {
 		if (pet.isNew()) {
 			getPets().add(pet);
@@ -115,7 +166,10 @@ public class Owner extends Person {
 	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
 	 */
 	public Pet getPet(Integer id) {
+		// Iterate through all associated pets
 		for (Pet pet : getPets()) {
+			// Compare IDs only if the pet is not new (meaning it has a valid database
+			// identifier)
 			if (!pet.isNew()) {
 				Integer compId = pet.getId();
 				if (Objects.equals(compId, id)) {
@@ -133,9 +187,12 @@ public class Owner extends Person {
 	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
 	 */
 	public Pet getPet(String name, boolean ignoreNew) {
+		// Iterate through all associated pets to match by name (case-insensitive)
 		for (Pet pet : getPets()) {
 			String compName = pet.getName();
 			if (compName != null && compName.equalsIgnoreCase(name)) {
+				// Return pet if ignoreNew is false or if the pet is already persisted in
+				// DB
 				if (!ignoreNew || !pet.isNew()) {
 					return pet;
 				}
@@ -144,6 +201,10 @@ public class Owner extends Person {
 		return null;
 	}
 
+	/**
+	 * Generates a string representation of the Owner object using ToStringCreator.
+	 * @return formatted string listing key owner properties
+	 */
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("id", this.getId())
@@ -163,13 +224,17 @@ public class Owner extends Person {
 	 */
 	public void addVisit(Integer petId, Visit visit) {
 
+		// Verify parameters are not null before proceeding
 		Assert.notNull(petId, "Pet identifier must not be null!");
 		Assert.notNull(visit, "Visit must not be null!");
 
+		// Find the target pet by identifier
 		Pet pet = getPet(petId);
 
+		// Ensure the pet belongs to this owner
 		Assert.notNull(pet, "Invalid Pet identifier!");
 
+		// Add the visit to the pet entity
 		pet.addVisit(visit);
 	}
 

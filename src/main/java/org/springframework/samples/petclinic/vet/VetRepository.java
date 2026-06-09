@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 
 /**
- * Repository class for <code>Vet</code> domain objects All method names are compliant
- * with Spring Data naming conventions so this interface can easily be extended for Spring
- * Data. See:
- * https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation
+ * Repository interface for <code>Vet</code> domain objects.
+ *
+ * Extends Spring Data {@link Repository} interface. Implements read-only transactions and
+ * caching layers to optimize retrieval performance of vets data.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -39,17 +39,24 @@ public interface VetRepository extends Repository<Vet, Integer> {
 
 	/**
 	 * Retrieve all <code>Vet</code>s from the data store.
+	 *
+	 * Runs within a read-only transaction and caches findings under the "vets" cache
+	 * name.
 	 * @return a <code>Collection</code> of <code>Vet</code>s
+	 * @throws DataAccessException if database retrieval fails
 	 */
 	@Transactional(readOnly = true)
 	@Cacheable("vets")
 	Collection<Vet> findAll() throws DataAccessException;
 
 	/**
-	 * Retrieve all <code>Vet</code>s from data store in Pages
-	 * @param pageable
-	 * @return
-	 * @throws DataAccessException
+	 * Retrieve all <code>Vet</code>s from the data store with pagination support.
+	 *
+	 * Runs within a read-only transaction and caches findings under the "vets" cache
+	 * name.
+	 * @param pageable requested page parameters (page number, page size, sort criteria)
+	 * @return a <code>Page</code> of <code>Vet</code>s
+	 * @throws DataAccessException if database retrieval fails
 	 */
 	@Transactional(readOnly = true)
 	@Cacheable("vets")

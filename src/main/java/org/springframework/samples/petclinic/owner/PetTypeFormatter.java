@@ -29,6 +29,9 @@ import java.util.Objects;
  * PropertyEditors. See the following links for more details: - The Spring ref doc:
  * https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#format
  *
+ * Auto-detected as a Spring @Component and automatically registered in Spring MVC
+ * formatter registry.
+ *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Michael Isvy
@@ -36,26 +39,51 @@ import java.util.Objects;
 @Component
 public class PetTypeFormatter implements Formatter<PetType> {
 
+	/**
+	 * Repository providing database access to look up valid pet types.
+	 */
 	private final PetTypeRepository types;
 
+	/**
+	 * Constructor injecting the repository dependency.
+	 * @param types repository for PetType entity
+	 */
 	public PetTypeFormatter(PetTypeRepository types) {
 		this.types = types;
 	}
 
+	/**
+	 * Prints a PetType object back as a string for display in UI forms.
+	 * @param petType target PetType to represent
+	 * @param locale requested local contextual information
+	 * @return the name of the pet type, or "<null>" if empty
+	 */
 	@Override
 	public String print(PetType petType, Locale locale) {
 		String name = petType.getName();
+		// Return name if present, otherwise fallback to empty description marker
 		return name != null ? name : "<null>";
 	}
 
+	/**
+	 * Parses a string input from UI form (representing pet type name) into a PetType
+	 * entity.
+	 * @param text text submitted from input selection
+	 * @param locale requested local contextual information
+	 * @return matching PetType entity from DB
+	 * @throws ParseException if no matching pet type with name exists
+	 */
 	@Override
 	public PetType parse(String text, Locale locale) throws ParseException {
+		// Fetch all valid pet types from repository
 		Collection<PetType> findPetTypes = this.types.findPetTypes();
+		// Iterate and compare names to find the matching entity
 		for (PetType type : findPetTypes) {
 			if (Objects.equals(type.getName(), text)) {
 				return type;
 			}
 		}
+		// Throw exception if the client provided an invalid type name
 		throw new ParseException("type not found: " + text, 0);
 	}
 

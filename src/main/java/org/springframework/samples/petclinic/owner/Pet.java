@@ -36,6 +36,9 @@ import jakarta.persistence.Table;
 /**
  * Simple business object representing a pet.
  *
+ * Configured as a JPA Entity mapped to the "pets" table. Extends NamedEntity, inheriting
+ * name and ID properties.
+ *
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -45,39 +48,75 @@ import jakarta.persistence.Table;
 @Table(name = "pets")
 public class Pet extends NamedEntity {
 
+	/**
+	 * The birth date of the pet. Formatted as yyyy-MM-dd.
+	 */
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthDate;
 
+	/**
+	 * The type of the pet (e.g. dog, cat). Many-to-one relationship mapped to the type_id
+	 * column.
+	 */
 	@ManyToOne
 	@JoinColumn(name = "type_id")
 	private PetType type;
 
+	/**
+	 * Set of visits associated with this pet. Cascade ALL ensures visits are
+	 * saved/deleted with the pet. Loaded EAGERly to fetch visit histories directly.
+	 * Ordered by visit date in ascending order.
+	 */
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pet_id")
 	@OrderBy("date ASC")
 	private final Set<Visit> visits = new LinkedHashSet<>();
 
+	/**
+	 * Sets the birth date of the pet.
+	 * @param birthDate birth date
+	 */
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
 
+	/**
+	 * Gets the birth date of the pet.
+	 * @return birth date
+	 */
 	public LocalDate getBirthDate() {
 		return this.birthDate;
 	}
 
+	/**
+	 * Gets the pet type.
+	 * @return PetType object
+	 */
 	public PetType getType() {
 		return this.type;
 	}
 
+	/**
+	 * Sets the pet type.
+	 * @param type PetType object to set
+	 */
 	public void setType(PetType type) {
 		this.type = type;
 	}
 
+	/**
+	 * Gets all visits recorded for this pet.
+	 * @return collection of Visit objects
+	 */
 	public Collection<Visit> getVisits() {
 		return this.visits;
 	}
 
+	/**
+	 * Adds a visit record to this pet's visit history.
+	 * @param visit Visit object to add
+	 */
 	public void addVisit(Visit visit) {
 		getVisits().add(visit);
 	}

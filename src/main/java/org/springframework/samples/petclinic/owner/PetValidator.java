@@ -22,8 +22,9 @@ import org.springframework.validation.Validator;
 /**
  * <code>Validator</code> for <code>Pet</code> forms.
  * <p>
- * We're not using Bean Validation annotations here because it is easier to define such
- * validation rule in Java.
+ * Custom Spring validator designed specifically for {@link Pet} entity validation rules.
+ * Bean Validation annotations are omitted here to handle business logic constraints
+ * programmatically.
  * </p>
  *
  * @author Ken Krebs
@@ -31,33 +32,46 @@ import org.springframework.validation.Validator;
  */
 public class PetValidator implements Validator {
 
+	/**
+	 * Error code key mapping to error message resource properties (typically resolves to
+	 * 'required').
+	 */
 	private static final String REQUIRED = "required";
 
+	/**
+	 * Validates a Pet target object for required fields and logical constraints.
+	 * @param obj target object to validate (must be an instance of Pet class)
+	 * @param errors binding registry capturing validation failure messages
+	 */
 	@Override
 	public void validate(Object obj, Errors errors) {
 		Pet pet = (Pet) obj;
 		String name = pet.getName();
-		// name validation
+
+		// Validate that the pet's name is not null, empty, or whitespace-only
 		if (!StringUtils.hasText(name)) {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
 
-		// type validation
+		// Validate that a newly registered pet must have an assigned pet type (species)
 		if (pet.isNew() && pet.getType() == null) {
 			errors.rejectValue("type", REQUIRED, REQUIRED);
 		}
 
-		// birth date validation
+		// Validate that the pet has a registered birthdate value
 		if (pet.getBirthDate() == null) {
 			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
 		}
 	}
 
 	/**
-	 * This Validator validates *just* Pet instances
+	 * Verifies if the validator supports the target class model.
+	 * @param clazz class context to test
+	 * @return true if the class is assignable from Pet, false otherwise
 	 */
 	@Override
 	public boolean supports(Class<?> clazz) {
+		// Validates *just* Pet instances or subclasses of Pet
 		return Pet.class.isAssignableFrom(clazz);
 	}
 

@@ -22,18 +22,29 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
- * Simple domain object representing a list of veterinarians. Mostly here to be used for
- * the 'vets' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
+ * Simple domain object representing a list of veterinarians.
+ *
+ * Annotated with @XmlRootElement to support XML serialization when marshalled by Spring
+ * MVC views.
  *
  * @author Arjen Poutsma
  */
 @XmlRootElement
 public class Vets {
 
+	/**
+	 * List of veterinarians.
+	 */
 	private List<Vet> vets;
 
+	/**
+	 * Gets the list of veterinarians. Initializes a new list if it is null (lazy
+	 * initialization). Annotated with @XmlElement for JAXB mapping.
+	 * @return list of Vet objects
+	 */
 	@XmlElement
 	public List<Vet> getVetList() {
+		// Lazily initialize the list if it hasn't been instantiated yet
 		if (vets == null) {
 			vets = new ArrayList<>();
 		}
