@@ -15,11 +15,14 @@
  */
 package org.springframework.samples.petclinic.vet;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import java.util.Comparator;
 
 import org.springframework.samples.petclinic.model.NamedEntity;
 import org.springframework.samples.petclinic.model.Person;
@@ -57,18 +60,33 @@ public class Vet extends Person {
 	}
 
 	@XmlElement
+
 	public List<Specialty> getSpecialties() {
-		return getSpecialtiesInternal().stream()
-			.sorted(Comparator.comparing(NamedEntity::getName))
-			.collect(Collectors.toList());
+		List<Specialty> sortedSpecs = new ArrayList<>(getSpecialtiesInternal());
+		sortedSpecs.sort(Comparator.comparing(NamedEntity::getSanitizedName));
+		return Collections.unmodifiableList(sortedSpecs);
+	}
+
+	public boolean hasSpecialties() {
+		return getSpecialtiesInternal() != null && !getSpecialtiesInternal().isEmpty();
 	}
 
 	public int getNrOfSpecialties() {
-		return getSpecialtiesInternal().size();
+		return getSpecialtiesInternal() != null ? getSpecialtiesInternal().size() : 0;
 	}
 
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
+	}
+
+	private boolean active = true;
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

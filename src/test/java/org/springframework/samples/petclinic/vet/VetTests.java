@@ -15,10 +15,11 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Dave Syer
@@ -36,6 +37,16 @@ class VetTests {
 		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
 		assertThat(other.getLastName()).isEqualTo(vet.getLastName());
 		assertThat(other.getId()).isEqualTo(vet.getId());
+	}
+
+	@Test
+	void testHasSpecialtiesAndCount() {
+		Vet vet = new Vet();
+		assertThat(vet.hasSpecialties()).isFalse();
+		Specialty s = new Specialty();
+		s.setName("dentistry");
+		vet.addSpecialty(s);
+		assertThat(vet.hasSpecialties()).isTrue();
 	}
 
 }

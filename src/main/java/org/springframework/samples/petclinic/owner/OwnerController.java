@@ -50,6 +50,14 @@ class OwnerController {
 
 	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
+	/**
+	 * Default number of owner records displayed per page. Extracting this magic number
+	 * into a named constant improves maintainability, allowing future application-wide
+	 * page size adjustments from a single location without altering the core search
+	 * logic.
+	 */
+	private static final int DEFAULT_PAGE_SIZE = 5;
+
 	private final OwnerRepository owners;
 
 	public OwnerController(OwnerRepository owners) {
@@ -91,6 +99,17 @@ class OwnerController {
 		return "owners/findOwners";
 	}
 
+	/**
+	 * Processes the form for finding owners. Sanitizes the user search input by trimming
+	 * leading and trailing whitespaces from the last name parameter to prevent accidental
+	 * "no results found" errors, ensuring application robustness and clean code
+	 * standards. Handles null inputs gracefully to avoid potential NullPointerExceptions.
+	 * @param page the current page number
+	 * @param owner the owner domain object backing the form
+	 * @param result the binding results for error handling
+	 * @param model the UI model
+	 * @return the view name or redirect URL
+	 */
 	@GetMapping("/owners")
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
 			Model model) {
@@ -99,7 +118,10 @@ class OwnerController {
 		if (lastName == null) {
 			lastName = ""; // empty string signifies broadest possible search
 		}
+		else {
+			lastName = lastName.trim(); // Sanitize input by stripping white spaces
 
+		}
 		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		if (ownersResults.isEmpty()) {
@@ -127,9 +149,15 @@ class OwnerController {
 		return "owners/ownersList";
 	}
 
+	/**
+	 * Fetches a paginated list of owners based on the sanitized last name. Utilizes the
+	 * centralized configuration constant for page size to build the page request.
+	 * @param page the current page number (1-indexed)
+	 * @param lastname the sanitized string to search for
+	 * @return a page of matching owners
+	 */
 	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		Pageable pageable = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
 
