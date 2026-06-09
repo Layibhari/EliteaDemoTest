@@ -70,6 +70,16 @@ public class Visit extends BaseEntity {
 		return this.description;
 	}
 
+	/**
+	 * Returns true if the description is considered valid:
+	 * not null, not empty, and not whitespace-only.
+	 * Used to verify description quality before saving.
+	 * @return true if description is non-blank after trimming
+	 */
+	public boolean hasValidDescription() {
+		return this.description != null && !this.description.trim().isEmpty();
+	}
+
 	public void setDescription(String description) {
 		if (description != null) {
 			// Trim whitespace before saving - rejects whitespace-only descriptions
