@@ -36,6 +36,8 @@ public class I18nPropertiesSyncTest {
 
 	private static final Pattern HAS_TH_TEXT_ATTRIBUTE = Pattern.compile("th:(u)?text\\s*=\\s*\"[^\"]+\"");
 
+	// This test case is for checking that there are no 
+	// hardcoded strings in HTML files.
 	@Test
 	void checkNonInternationalizedStrings() throws Exception {
 		Path root = Path.of("src/main");

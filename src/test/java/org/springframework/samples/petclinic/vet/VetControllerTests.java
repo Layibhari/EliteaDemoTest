@@ -79,6 +79,8 @@ class VetControllerTests {
 
 	}
 
+	// This test case is for testing the HTML view of the vets list, 
+	// while the next one is for testing the JSON response of the same endpoint.
 	@Test
 	void showVetListHtml() throws Exception {
 

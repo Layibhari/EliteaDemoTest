@@ -25,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class VetTests {
 
+	// This test case is for testing the serialization and 
+	// deserialization of the Vet class.
 	@Test
 	void serialization() {
 		Vet vet = new Vet();
