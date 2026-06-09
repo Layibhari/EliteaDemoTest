@@ -28,9 +28,12 @@ import org.springframework.context.annotation.ImportRuntimeHints;
 @SpringBootApplication
 @ImportRuntimeHints(PetClinicRuntimeHints.class)
 public class PetClinicApplication {
+// Application entry point that boots Spring Boot and imports runtime hints.
 
 	public static void main(String[] args) {
 		SpringApplication.run(PetClinicApplication.class, args);
 	}
 
 }
+
+

@@ -44,6 +44,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "pets")
 public class Pet extends NamedEntity {
+// Domain object representing a pet, including type, birth date, and visits.
 
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -83,3 +84,5 @@ public class Pet extends NamedEntity {
 	}
 
 }
+
+

@@ -26,5 +26,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "types")
 public class PetType extends NamedEntity {
+// Named domain type for pet categories like Cat, Dog, or Hamster.
 
 }
+
+

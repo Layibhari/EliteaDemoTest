@@ -36,6 +36,7 @@ import java.util.Collection;
  * @author Michael Isvy
  */
 public interface VetRepository extends Repository<Vet, Integer> {
+// Data access interface for Vet entities with caching support.
 
 	/**
 	 * Retrieve all <code>Vet</code>s from the data store.
@@ -56,3 +57,5 @@ public interface VetRepository extends Repository<Vet, Integer> {
 	Page<Vet> findAll(Pageable pageable) throws DataAccessException;
 
 }
+
+

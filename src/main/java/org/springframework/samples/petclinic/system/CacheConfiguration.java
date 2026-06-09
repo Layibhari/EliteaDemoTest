@@ -31,6 +31,7 @@ import javax.cache.configuration.MutableConfiguration;
 @Configuration(proxyBeanMethods = false)
 @EnableCaching
 class CacheConfiguration {
+// Configures the JCache cache used for vet lookups and enables statistics.
 
 	@Bean
 	public JCacheManagerCustomizer petclinicCacheConfigurationCustomizer() {
@@ -51,3 +52,5 @@ class CacheConfiguration {
 	}
 
 }
+
+

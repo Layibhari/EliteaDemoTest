@@ -31,6 +31,7 @@ import jakarta.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public class BaseEntity implements Serializable {
+// Base JPA mapped superclass providing an auto-generated identifier and new-entity detection.
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,3 +50,5 @@ public class BaseEntity implements Serializable {
 	}
 
 }
+
+

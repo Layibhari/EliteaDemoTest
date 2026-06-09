@@ -27,6 +27,7 @@ import jakarta.validation.constraints.Size;
  */
 @MappedSuperclass
 public class Person extends BaseEntity {
+// Mapped superclass for people with first and last name fields.
 
 	@Column(length = 30)
 	@Size(max = 30)
@@ -55,3 +56,5 @@ public class Person extends BaseEntity {
 	}
 
 }
+
+

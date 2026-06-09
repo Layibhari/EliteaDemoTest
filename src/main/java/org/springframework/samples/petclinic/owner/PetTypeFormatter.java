@@ -35,6 +35,7 @@ import java.util.Objects;
  */
 @Component
 public class PetTypeFormatter implements Formatter<PetType> {
+// Converts PetType values between strings and objects for form binding.
 
 	private final PetTypeRepository types;
 
@@ -60,3 +61,5 @@ public class PetTypeFormatter implements Formatter<PetType> {
 	}
 
 }
+
+

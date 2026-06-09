@@ -41,6 +41,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @Controller
 class VisitController {
+// Spring MVC controller that handles creating visits for a pet and validating visit dates.
 
 	private final OwnerRepository owners;
 
@@ -112,3 +113,5 @@ class VisitController {
 	}
 
 }
+
+

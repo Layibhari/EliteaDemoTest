@@ -34,6 +34,7 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "visits")
 public class Visit extends BaseEntity {
+// Domain object representing a scheduled visit for a pet.
 
 	@Column(name = "visit_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -66,3 +67,5 @@ public class Visit extends BaseEntity {
 	}
 
 }
+
+

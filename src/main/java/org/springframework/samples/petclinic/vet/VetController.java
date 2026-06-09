@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 class VetController {
+// Controller for listing veterinarians in web pages and exposing JSON endpoints.
 
 	private final VetRepository vetRepository;
 
@@ -76,3 +77,5 @@ class VetController {
 	}
 
 }
+
+

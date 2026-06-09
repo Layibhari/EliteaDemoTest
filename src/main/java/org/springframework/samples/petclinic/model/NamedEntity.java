@@ -29,6 +29,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 @MappedSuperclass
 public class NamedEntity extends BaseEntity {
+// Mapped superclass for entities with a validated name property.
 
 	@Column
 	@NotBlank
@@ -49,3 +50,5 @@ public class NamedEntity extends BaseEntity {
 	}
 
 }
+
+

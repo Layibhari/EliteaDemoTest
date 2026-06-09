@@ -47,6 +47,7 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "owners")
 public class Owner extends Person {
+// Domain object representing a pet owner with contact details and owned pets.
 
 	@Column
 	@NotBlank
@@ -174,3 +175,5 @@ public class Owner extends Person {
 	}
 
 }
+
+

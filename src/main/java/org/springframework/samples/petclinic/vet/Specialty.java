@@ -28,5 +28,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "specialties")
 public class Specialty extends NamedEntity {
+// Named entity representing a veterinary specialty such as surgery or dentistry.
 
 }
+
+

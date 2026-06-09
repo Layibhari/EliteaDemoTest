@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 class WelcomeController {
+// Renders the home page for the root URL.
 
 	@GetMapping("/")
 	public String welcome() {
@@ -28,3 +29,5 @@ class WelcomeController {
 	}
 
 }
+
+

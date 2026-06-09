@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 class CrashController {
+// Demo controller that throws an exception to demonstrate error handling.
 
 	@GetMapping("/oups")
 	public String triggerException() {
@@ -35,3 +36,5 @@ class CrashController {
 	}
 
 }
+
+

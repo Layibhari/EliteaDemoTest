@@ -29,6 +29,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
 
+// Spring Data repository for PetType entities and lookup of all pet types.
+
 	/**
 	 * Retrieve all {@link PetType}s from the data store.
 	 * @return a Collection of {@link PetType}s.
@@ -37,3 +39,5 @@ public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
 	List<PetType> findPetTypes();
 
 }
+
+

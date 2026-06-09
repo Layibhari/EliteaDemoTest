@@ -34,6 +34,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Wick Dynex
  */
 public interface OwnerRepository extends JpaRepository<Owner, Integer> {
+// Spring Data repository for Owner entities with paging and lookup by last name.
 
 	/**
 	 * Retrieve {@link Owner}s from the data store by last name, returning all owners
@@ -60,3 +61,5 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	Optional<Owner> findById(Integer id);
 
 }
+
+

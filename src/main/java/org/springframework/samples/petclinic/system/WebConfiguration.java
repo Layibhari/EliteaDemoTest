@@ -23,6 +23,7 @@ import java.util.Locale;
 @Configuration
 @SuppressWarnings("unused")
 public class WebConfiguration implements WebMvcConfigurer {
+// Sets up locale handling and language switching for the web application.
 
 	/**
 	 * Uses session storage to remember the user’s language setting across requests.
@@ -58,3 +59,5 @@ public class WebConfiguration implements WebMvcConfigurer {
 	}
 
 }
+
+

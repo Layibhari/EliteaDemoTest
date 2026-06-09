@@ -30,6 +30,7 @@ import org.springframework.validation.Validator;
  * @author Juergen Hoeller
  */
 public class PetValidator implements Validator {
+// Validates the Pet form data before it is saved to the repository.
 
 	private static final String REQUIRED = "required";
 
@@ -62,3 +63,5 @@ public class PetValidator implements Validator {
 	}
 
 }
+
+

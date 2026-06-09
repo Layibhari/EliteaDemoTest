@@ -43,6 +43,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 @Entity
 @Table(name = "vets")
 public class Vet extends Person {
+// Domain object for a veterinarian and their specialties.
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
@@ -72,3 +73,5 @@ public class Vet extends Person {
 	}
 
 }
+
+
