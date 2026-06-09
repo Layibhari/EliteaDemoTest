@@ -71,7 +71,13 @@ public class Visit extends BaseEntity {
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
+		if (description != null) {
+			// Trim whitespace before saving - rejects whitespace-only descriptions
+			this.description = description.trim();
+		}
+		else {
+			this.description = null;
+		}
 	}
 
 	public BigDecimal getCost() {
