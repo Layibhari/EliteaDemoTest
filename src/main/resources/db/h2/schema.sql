@@ -58,6 +58,8 @@ CREATE TABLE pets
   birth_date DATE,
   type_id    INTEGER NOT NULL,
   owner_id   INTEGER
+    microchip_id VARCHAR(50),
+
 );
 ALTER TABLE pets
   ADD CONSTRAINT fk_pets_owners FOREIGN KEY (owner_id) REFERENCES owners (id);
