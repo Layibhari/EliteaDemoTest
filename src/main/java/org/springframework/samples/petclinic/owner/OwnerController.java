@@ -96,12 +96,27 @@ class OwnerController {
 			Model model) {
 		// allow parameterless GET request for /owners to return all records
 		String lastName = owner.getLastName();
+		String telephone = owner.getTelephone();
 		if (lastName == null) {
 			lastName = ""; // empty string signifies broadest possible search
 		}
 
 		// find owners by last name
-		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+		Page<Owner> ownersResults;
+
+if (telephone != null && !telephone.isBlank()) {
+    ownersResults =
+        findPaginatedForOwnersTelephone(page, telephone);
+}
+else {
+    if (lastName == null) {
+        lastName = "";
+    }
+
+    ownersResults =
+        findPaginatedForOwnersLastName(page, lastName);
+}
+
 		if (ownersResults.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
@@ -117,6 +132,12 @@ class OwnerController {
 		// multiple owners found
 		return addPaginationModel(page, model, ownersResults);
 	}
+
+	private Page<Owner> findPaginatedForOwnersTelephone(int page, String telephone) {
+    int pageSize = 5;
+    Pageable pageable = PageRequest.of(page - 1, pageSize);
+    return owners.findByTelephone(telephone, pageable);
+}
 
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();

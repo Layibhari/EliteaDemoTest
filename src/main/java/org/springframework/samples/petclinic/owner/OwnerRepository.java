@@ -57,6 +57,9 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
 	 * input for id)
 	 */
+
+	Page<Owner> findByTelephone(String telephone, Pageable pageable);
 	Optional<Owner> findById(Integer id);
+	
 
 }
