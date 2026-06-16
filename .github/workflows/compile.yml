@@ -23,3 +23,4 @@ jobs:
           -w /workspace \
           java-builder:1.0 \
           mvn clean compile
+          
