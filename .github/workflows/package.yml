@@ -23,3 +23,6 @@ jobs:
           -w /workspace \
           java-builder:1.0 \
           mvn package -DskipTests
+      
+      - name: Show Target Directory
+        run: ls -la target
