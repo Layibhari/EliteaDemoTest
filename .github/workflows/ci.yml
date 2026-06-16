@@ -20,3 +20,8 @@ jobs:
   package:
     needs: test
     uses: ./.github/workflows/package.yml
+  
+  publish:
+    needs: package
+    uses: ./.github/workflows/publish.yml
+    

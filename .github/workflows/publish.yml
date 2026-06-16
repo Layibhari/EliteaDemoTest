@@ -1,0 +1,33 @@
+name: Publish Artifact
+
+on:
+  workflow_call:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
+      - name: Verify Artifact
+        run: ls -la target
+
+      - name: Upload JAR to JFrog
+        run: |
+          JAR_FILE=$(find target -name "*.jar" | head -1)
+
+          curl \
+            -H "Authorization: Bearer ${{ secrets.JFROG_TOKEN }}" \
+            -T "$JAR_FILE" \
+            "https://${{ secrets.JFROG_URL }}/artifactory/java-artifacts/spring-petclinic/${{ github.run_number }}/$(basename $JAR_FILE)"
