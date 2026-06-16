@@ -1,0 +1,22 @@
+name: Spring PetClinic CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/*'
+      - release/*
+
+jobs:
+
+  compile:
+    uses: ./.github/workflows/compile.yml
+
+  test:
+    needs: compile
+    uses: ./.github/workflows/test.yml
+
+  package:
+    needs: test
+    uses: ./.github/workflows/package.yml

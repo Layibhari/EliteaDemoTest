@@ -1,0 +1,25 @@
+name: Compile Template
+
+on:
+  workflow_call:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Builder Image
+        run: |
+          docker build \
+          -t java-builder:1.0 \
+          docker/java-builder
+
+      - name: Compile
+        run: |
+          docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          java-builder:1.0 \
+          mvn clean compile
