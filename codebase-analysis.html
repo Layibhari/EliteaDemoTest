@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring PetClinic — Codebase Analysis</title>
+<style>
+  :root { --bg:#fff; --fg:#1b1b1f; --muted:#5a6b7b; --accent:#6db33f; --accent2:#34302d;
+          --code-bg:#f4f6f8; --border:#e1e6ea; --warn:#b5651d; --danger:#c0392b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         color:var(--fg); background:var(--bg); }
+  header { background:linear-gradient(135deg,var(--accent2),#52504b); color:#fff;
+           padding:2.2rem 1.5rem; }
+  header h1 { margin:0 0 .3rem; font-size:1.8rem; }
+  header p { margin:0; color:#d8dcd6; }
+  .wrap { max-width:980px; margin:0 auto; padding:1.5rem; }
+  nav { position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border);
+        padding:.6rem 1.5rem; font-size:.86rem; z-index:10; }
+  nav a { color:var(--muted); text-decoration:none; margin-right:1rem; white-space:nowrap; }
+  nav a:hover { color:var(--accent); }
+  section { padding:1.4rem 0; border-bottom:1px solid var(--border); }
+  h2 { font-size:1.35rem; color:var(--accent2); border-left:4px solid var(--accent);
+       padding-left:.6rem; margin-top:0; }
+  h3 { font-size:1.05rem; color:var(--accent2); margin:1.2rem 0 .4rem; }
+  code { background:var(--code-bg); padding:.12em .4em; border-radius:4px;
+         font:.86em SFMono-Regular,Consolas,Menlo,monospace; }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+        padding:1rem; overflow-x:auto; font:.85rem SFMono-Regular,Consolas,Menlo,monospace; }
+  table { border-collapse:collapse; width:100%; margin:.6rem 0; font-size:.92rem; }
+  th,td { border:1px solid var(--border); padding:.55rem .7rem; text-align:left; vertical-align:top; }
+  th { background:var(--code-bg); }
+  ol.flow { counter-reset:step; list-style:none; padding-left:0; }
+  ol.flow > li { position:relative; padding:.5rem 0 .5rem 2.6rem; }
+  ol.flow > li::before { counter-increment:step; content:counter(step);
+      position:absolute; left:0; top:.4rem; width:1.8rem; height:1.8rem; border-radius:50%;
+      background:var(--accent); color:#fff; text-align:center; line-height:1.8rem; font-weight:700; }
+  .tag { display:inline-block; font-size:.7rem; font-weight:700; padding:.1rem .45rem;
+         border-radius:4px; color:#fff; vertical-align:middle; }
+  .t-sec { background:var(--danger); } .t-val { background:var(--warn); }
+  .t-err { background:#8e44ad; } .t-cfg { background:#2980b9; } .t-test { background:#16a085; }
+  .risk { border:1px solid var(--border); border-left:4px solid var(--warn); border-radius:6px;
+          padding:.7rem .9rem; margin:.7rem 0; }
+  .risk.sev-high { border-left-color:var(--danger); }
+  .risk h4 { margin:0 0 .3rem; font-size:.98rem; }
+  .muted { color:var(--muted); }
+  footer { padding:1.5rem; text-align:center; color:var(--muted); font-size:.82rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Spring PetClinic — Codebase Analysis</h1>
+  <p>Spring Boot 4.0 · Java 17 · Thymeleaf MVC · Spring Data JPA &nbsp;|&nbsp; Generated 2026-06-16</p>
+</header>
+
+<nav>
+  <a href="#summary">Summary</a>
+  <a href="#modules">Modules</a>
+  <a href="#flow">Visit Flow</a>
+  <a href="#build">Build &amp; DB</a>
+  <a href="#risks">Risks</a>
+</nav>
+
+<div class="wrap">
+
+<section id="summary">
+  <h2>1. What it does &amp; who uses it</h2>
+  <p><strong>Spring PetClinic</strong> is a server-rendered web application for running a veterinary
+  clinic. It manages pet <strong>owners</strong>, their <strong>pets</strong> (types, birth dates),
+  the <strong>visits</strong> booked for those pets, and the clinic's <strong>veterinarians</strong>
+  and their specialties. The UI is produced server-side with Thymeleaf over plain Spring MVC — there
+  is <em>no REST/JSON API</em>; all interaction is HTML form-driven.</p>
+  <p><strong>Users:</strong> clinic front-desk / administrative staff who register owners, add pets,
+  book visits, and look up vets. As the canonical Spring Boot reference app, a second audience is
+  developers learning Spring Boot / Data JPA / Thymeleaf. There is
+  <strong>no login or role system</strong> — every visitor has full access.</p>
+</section>
+
+<section id="modules">
+  <h2>2. Main modules / packages</h2>
+  <p class="muted">All under <code>src/main/java/org/springframework/samples/petclinic/</code>,
+  organized <strong>package-by-feature</strong> (entities + controller + repository colocated).</p>
+  <table>
+    <thead><tr><th>Package</th><th>Responsibility &amp; key files</th></tr></thead>
+    <tbody>
+      <tr><td><code>model/</code></td>
+        <td>Shared JPA mapped-superclasses: <code>BaseEntity.java</code> (id, <code>isNew()</code>),
+        <code>NamedEntity.java</code> (adds <code>name</code>), <code>Person.java</code>
+        (validated <code>firstName</code>/<code>lastName</code>).</td></tr>
+      <tr><td><code>owner/</code></td>
+        <td>Core domain. Entities <code>Owner.java</code>, <code>Pet.java</code>,
+        <code>PetType.java</code>, <code>Visit.java</code>; controllers
+        <code>OwnerController.java</code>, <code>PetController.java</code>,
+        <code>VisitController.java</code>; repos <code>OwnerRepository.java</code>,
+        <code>PetTypeRepository.java</code>; web helpers <code>PetValidator.java</code>,
+        <code>PetTypeFormatter.java</code>.</td></tr>
+      <tr><td><code>vet/</code></td>
+        <td>Veterinarian listing. <code>Vet.java</code>, <code>Specialty.java</code>,
+        <code>Vets.java</code> (JAXB XML wrapper), <code>VetController.java</code>,
+        <code>VetRepository.java</code>.</td></tr>
+      <tr><td><code>system/</code></td>
+        <td>Cross-cutting. <code>CacheConfiguration.java</code> (JCache/Caffeine),
+        <code>WebConfiguration.java</code>, <code>WelcomeController.java</code> (home),
+        <code>CrashController.java</code> (intentional error demo at <code>/oups</code>).</td></tr>
+      <tr><td><em>(root)</em></td>
+        <td><code>PetClinicApplication.java</code> — <code>main()</code> entry point;
+        <code>PetClinicRuntimeHints.java</code> — GraalVM native-image hints.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Resources: <code>templates/</code> (Thymeleaf), <code>db/{h2,mysql,postgres}/</code>
+  (schema + seed SQL), <code>messages/messages*.properties</code> (i18n).</p>
+</section>
+
+<section id="flow">
+  <h2>3. Execution flow — adding a new visit</h2>
+  <p><code>POST /owners/{ownerId}/pets/{petId}/visits/new</code></p>
+  <ol class="flow">
+    <li><strong>DispatcherServlet</strong> routes the request to
+        <code>owner/VisitController.java</code>.</li>
+    <li><strong>@ModelAttribute pre-handlers run first.</strong>
+        <code>VisitController.loadPetWithVisit(ownerId, petId, model)</code>
+        (<code>VisitController.java:63-81</code>) calls
+        <code>OwnerRepository.findById(ownerId)</code> (<code>OwnerRepository.java:60</code>),
+        resolves the pet via <code>Owner.getPet(petId)</code> (<code>Owner.java:117</code>),
+        constructs a <code>new Visit()</code> (<code>Visit.java:48</code>, date defaults to tomorrow),
+        attaches it with <code>Pet.addVisit(visit)</code> (<code>Pet.java:81</code>), and exposes it
+        as model attribute <code>"visit"</code>. <code>minVisitDate()</code>
+        (<code>VisitController.java:83-86</code>) supplies tomorrow for the form.</li>
+    <li><strong>@InitBinder</strong> <code>setAllowedFields</code>
+        (<code>VisitController.java:51-54</code>) disallows binding <code>id</code>/<code>*.id</code>;
+        form fields bind onto the <code>Visit</code>.</li>
+    <li><strong>Handler</strong>
+        <code>VisitController.processNewVisitForm(...)</code> (<code>VisitController.java:97-112</code>):
+        <code>@Valid</code> applies <code>@NotBlank description</code> (<code>Visit.java:42</code>);
+        a manual future-date check (<code>VisitController.java:100-102</code>) rejects non-future
+        dates. On error → view <code>pets/createOrUpdateVisitForm</code>.</li>
+    <li><strong>Persist.</strong> On success, <code>Owner.addVisit(petId, visit)</code>
+        (<code>Owner.java:164-174</code>) re-resolves the pet and adds the visit, then
+        <code>OwnerRepository.save(owner)</code> (<code>VisitController.java:109</code>).</li>
+    <li><strong>Cascade INSERT.</strong> <code>save</code> cascades
+        <code>Owner.pets</code> → <code>Pet.visits</code> (both <code>CascadeType.ALL</code>,
+        <code>Pet.java:56-59</code>); Hibernate inserts into the <code>visits</code> table.</li>
+    <li>Adds flash message <em>"Your visit has been booked"</em> and returns
+        <code>redirect:/owners/{ownerId}</code>.</li>
+  </ol>
+</section>
+
+<section id="build">
+  <h2>4. Build / test commands &amp; default database</h2>
+  <h3>Build &amp; test (Maven and Gradle both supported)</h3>
+<pre>./gradlew bootRun        # ./mvnw spring-boot:run    → http://localhost:8080
+./gradlew build          # ./mvnw verify             full build + tests
+./gradlew test           # ./mvnw test               all tests
+./gradlew test --tests OwnerControllerTests          # single class (Gradle)
+./mvnw test -Dtest=OwnerControllerTests              # single class (Maven)
+./mvnw package -P css                                # recompile SCSS→CSS (Maven only)</pre>
+  <p><code>spring-javaformat</code> + <code>nohttp</code>/checkstyle run at Maven's
+  <code>validate</code> phase / Gradle <code>checkstyle*</code> tasks and
+  <strong>fail the build</strong> on violation. Auto-fix with
+  <code>./mvnw spring-javaformat:apply</code> or <code>./gradlew format</code>.</p>
+  <h3>Default database</h3>
+  <p>In-memory <strong>H2</strong>, configured in <code>application.properties:1-4</code>:
+  <code>database=h2</code> selects <code>db/h2/schema.sql</code> + <code>db/h2/data.sql</code>, run at
+  startup. <code>spring.jpa.hibernate.ddl-auto=none</code> (schema comes from SQL scripts, not
+  Hibernate) and <code>open-in-view=false</code>. Switch with
+  <code>spring.profiles.active=mysql</code> or <code>=postgres</code>
+  (<code>application-mysql.properties</code> / <code>application-postgres.properties</code>);
+  <code>docker compose up mysql|postgres</code> starts a matching DB.</p>
+</section>
+
+<section id="risks">
+  <h2>5. Risks, gaps &amp; weak spots</h2>
+
+  <h3>Security</h3>
+  <div class="risk sev-high"><h4><span class="tag t-sec">SECURITY</span> Actuator fully exposed</h4>
+    <code>application.properties:21</code> — <code>management.endpoints.web.exposure.include=*</code>.
+    The in-file comment itself warns "Don't do this in production." Exposes
+    <code>/actuator/env</code>, <code>/actuator/heapdump</code>, etc. to anonymous callers.</div>
+  <div class="risk sev-high"><h4><span class="tag t-sec">SECURITY</span> No authn/authz &amp; no CSRF</h4>
+    No Spring Security on the classpath: every owner/pet/visit edit endpoint is open and the POST
+    forms in <code>OwnerController</code>, <code>VisitController</code>, <code>PetController</code>
+    have <strong>no CSRF protection</strong>.</div>
+  <div class="risk"><h4><span class="tag t-sec">SECURITY</span> Intentional crash endpoint</h4>
+    <code>system/CrashController.java:31-35</code> (<code>/oups</code>) throws an unhandled
+    <code>RuntimeException</code> by design — fine as a demo, should not ship in production.</div>
+
+  <h3>Validation gaps</h3>
+  <div class="risk"><h4><span class="tag t-val">VALIDATION</span> Pet birth date unchecked</h4>
+    <code>owner/PetValidator.java:51-53</code> only rejects <code>null</code>;
+    <code>Pet.birthDate</code> (<code>Pet.java:48-50</code>) has no constraint, so future or
+    implausibly old dates are accepted.</div>
+  <div class="risk"><h4><span class="tag t-val">VALIDATION</span> Visit-date rule lives in the controller</h4>
+    <code>Visit.date</code> (<code>Visit.java:38-40</code>) has no <code>@Future</code>; the rule is
+    hand-coded in <code>VisitController.java:100-102</code> and duplicated against
+    <code>minVisitDate()</code> (<code>VisitController.java:83-86</code>). Any other save path bypasses
+    it.</div>
+  <div class="risk"><h4><span class="tag t-val">VALIDATION</span> Brittle phone pattern</h4>
+    <code>Owner.telephone</code> uses <code>@Pattern("\\d{10}")</code> (<code>Owner.java:61</code>) —
+    exactly 10 digits, no country codes or formatting.</div>
+
+  <h3>Error handling</h3>
+  <div class="risk"><h4><span class="tag t-err">ERROR HANDLING</span> Missing entity → 500, not 404</h4>
+    <code>OwnerController.findOwner</code> (<code>OwnerController.java:65-70</code>),
+    <code>showOwner</code> (<code>:170</code>) and
+    <code>VisitController.loadPetWithVisit</code> (<code>:67</code>, <code>:72</code>) throw
+    <code>IllegalArgumentException</code> for unknown IDs, surfacing as a generic 500 page rather than
+    a 404.</div>
+
+  <h3>Configuration / data integrity</h3>
+  <div class="risk"><h4><span class="tag t-cfg">CONFIG</span> Eager collections</h4>
+    <code>Owner.pets</code> (<code>Owner.java:64</code>) and <code>Pet.visits</code>
+    (<code>Pet.java:56</code>) are <code>FetchType.EAGER</code> with <code>open-in-view=false</code>;
+    over-fetch / N+1 risk as data grows (partly mitigated by
+    <code>default_batch_fetch_size=16</code>).</div>
+  <div class="risk"><h4><span class="tag t-cfg">CONFIG</span> Redundant repository method</h4>
+    <code>OwnerRepository.findById</code> (<code>OwnerRepository.java:60</code>) re-declares a method
+    <code>JpaRepository</code> already provides.</div>
+
+  <h3>Test coverage</h3>
+  <div class="risk"><h4><span class="tag t-test">TESTS</span> Untested = exactly the gaps above</h4>
+    Web-slice tests exist (<code>OwnerControllerTests</code>, <code>VisitControllerTests</code>,
+    <code>PetControllerTests</code>, <code>VetControllerTests</code>;
+    <code>service/ClinicServiceTests</code> for persistence), but there is no test asserting an
+    invalid <code>Pet.birthDate</code> is rejected (nothing rejects it) nor that not-found IDs return
+    a 404.</div>
+</section>
+
+</div>
+<footer>Spring PetClinic codebase analysis · branch <code>feature/visit-date-validation</code></footer>
+</body>
+</html>
