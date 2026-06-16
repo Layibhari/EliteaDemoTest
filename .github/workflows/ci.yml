@@ -24,4 +24,4 @@ jobs:
   publish:
     needs: package
     uses: ./.github/workflows/publish.yml
-    
+    secrets: inherit
