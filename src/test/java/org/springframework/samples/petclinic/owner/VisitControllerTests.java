@@ -101,7 +101,33 @@ class VisitControllerTests {
 				.param("date", LocalDate.now().toString())
 				.param("description", "Visit Description"))
 			.andExpect(model().attributeHasFieldErrors("visit", "date"))
-			.andExpect(model().attributeHasFieldErrorCode("visit", "date", "typeMismatch.visitDate"))
+			.andExpect(model().attributeHasFieldErrorCode("visit", "date", "Future"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void processNewVisitFormHasErrorsWhenDateIsEmpty() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "George")
+				.param("date", "")
+				.param("description", "Visit Description"))
+			.andExpect(model().attributeHasFieldErrors("visit", "date"))
+			.andExpect(model().attributeHasFieldErrorCode("visit", "date", "NotNull"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void processNewVisitFormHasErrorsWhenDateIsInvalid() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "George")
+				.param("date", "not-a-date")
+				.param("description", "Visit Description"))
+			.andExpect(model().attributeHasFieldErrors("visit", "date"))
+			.andExpect(model().attributeHasFieldErrorCode("visit", "date", "typeMismatch"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
 	}
