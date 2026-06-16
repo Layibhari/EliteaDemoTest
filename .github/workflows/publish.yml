@@ -28,6 +28,6 @@ jobs:
           JAR_FILE=$(find target -name "*.jar" | head -1)
 
           curl \
-            -H "Authorization: Bearer ${{ secrets.JFROG_TOKEN }}" \
+            -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_PASSWORD }}" \
             -T "$JAR_FILE" \
             "https://${{ secrets.JFROG_URL }}/artifactory/java-artifacts/spring-petclinic/${{ github.run_number }}/$(basename $JAR_FILE)"
