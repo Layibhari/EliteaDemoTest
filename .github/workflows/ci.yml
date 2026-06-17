@@ -38,6 +38,7 @@ jobs:
       - name: Run Build in Container
         run: |
           docker run --rm \
+            --entrypoint "" \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/java-builder:1.0 \
@@ -67,6 +68,7 @@ jobs:
       - name: Run Build in Container
         run: |
           docker run --rm \
+            --entrypoint "" \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/python-builder:1.0 \
@@ -96,6 +98,7 @@ jobs:
       - name: Run Build in Container
         run: |
           docker run --rm \
+            --entrypoint "" \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/go-builder:1.0 \
