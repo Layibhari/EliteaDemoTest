@@ -1,5 +1,5 @@
 FROM python:3.12
 
-RUN pip install --upgrade pip
+COPY pip.conf /etc/pip.conf
 
 WORKDIR /workspace
