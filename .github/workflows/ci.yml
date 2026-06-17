@@ -7,88 +7,67 @@ on:
       - feature/*
 
 jobs:
-
   detect:
     runs-on: ubuntu-latest
-
     outputs:
       language: ${{ steps.detect.outputs.language }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Detect Project Type
         id: detect
         run: bash scripts/detect.sh
 
   build-java:
     needs: detect
-
     if: needs.detect.outputs.language == 'java'
-
     runs-on: ubuntu-latest
-
     container:
       image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
-
+      credentials:
+        username: ${{ secrets.JFROG_USERNAME }}
+        password: ${{ secrets.JFROG_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Build Java
         run: mvn clean package -DskipTests
 
   build-python:
     needs: detect
-
     if: needs.detect.outputs.language == 'python'
-
     runs-on: ubuntu-latest
-
     container:
       image: trial2zs76n.jfrog.io/docker-local/python-builder:1.0
-
+      credentials:
+        username: ${{ secrets.JFROG_USERNAME }}
+        password: ${{ secrets.JFROG_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-
+        run: pip install -r requirements.txt
       - name: Build Python Package
-        run: |
-          python -m build || true
+        run: python -m build || true
 
   build-go:
     needs: detect
-
     if: needs.detect.outputs.language == 'go'
-
     runs-on: ubuntu-latest
-
     container:
       image: trial2zs76n.jfrog.io/docker-local/go-builder:1.0
-
+      credentials:
+        username: ${{ secrets.JFROG_USERNAME }}
+        password: ${{ secrets.JFROG_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Download Dependencies
         run: go mod download
-
       - name: Build Go Binary
         run: |
           mkdir -p dist
           go build -o dist/app .
 
   publish:
-    needs:
-      - detect
-      - build-java
-      - build-python
-      - build-go
-
+    needs: [detect, build-java, build-python, build-go]
     if: always()
-
     uses: ./.github/workflows/publish.yml
-
     secrets: inherit
