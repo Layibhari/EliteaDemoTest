@@ -1,0 +1,20 @@
+name: Execute Security Scan
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-security:
+    uses: ./.github/workflows/security.yml
+    with:
+      fail_on_severity: 'high'
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      CMDB_API_KEY: ${{ secrets.CMDB_API_KEY }}
