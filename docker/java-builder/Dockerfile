@@ -12,7 +12,3 @@ RUN wget https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 COPY settings.xml /root/.m2/settings.xml
 
 WORKDIR /workspace
-
-# Add this line to keep the container running
-# Add this as the last line in your Dockerfile
-ENTRYPOINT ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
