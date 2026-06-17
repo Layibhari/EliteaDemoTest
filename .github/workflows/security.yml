@@ -75,8 +75,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          # Run Snyk SCA check and output JSON report
-          snyk test --json > snyk-sca.json || true
+          # Run Snyk SCA check on all projects and output JSON report
+          snyk test --all-projects --json > snyk-sca.json || true
 
       - name: Run Snyk SAST Scan (Static Application Security Testing)
         env:
@@ -84,6 +84,13 @@ jobs:
         run: |
           # Run Snyk Code check and output JSON report
           snyk code test --json > snyk-sast.json || true
+
+      - name: Publish and Monitor Snapshot in Snyk Projects Dashboard
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          # Send project snapshot to Snyk dashboard for active monitoring
+          snyk monitor --all-projects || true
 
       - name: Resolve and Execute Parsing Script
         env:
