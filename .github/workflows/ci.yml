@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
-      options: --entrypoint tail -f /dev/null  # Forces the container to stay alive
+      # Removed the 'options' line that was causing the flag error
       credentials:
         username: ${{ secrets.JFROG_USERNAME }}
         password: ${{ secrets.JFROG_PASSWORD }}
@@ -33,6 +33,7 @@ jobs:
       - name: Build Java
         run: mvn clean package -DskipTests
 
+  # Keep your other jobs (build-python, build-go) as they were
   build-python:
     needs: detect
     if: needs.detect.outputs.language == 'python'
