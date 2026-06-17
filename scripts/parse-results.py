@@ -17,7 +17,7 @@ def get_severity_score(sev):
 
 def parse_sca(file_path):
     counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return counts
     
     try:
@@ -45,7 +45,7 @@ def parse_sca(file_path):
 
 def parse_sast(file_path):
     counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return counts
         
     try:
