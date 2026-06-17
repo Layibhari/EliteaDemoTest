@@ -66,4 +66,4 @@ jobs:
   publish:
     needs: build
     uses: ./.github/workflows/publish.yml
-    secrets: inherit
+    secrets: inherit 
