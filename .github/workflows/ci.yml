@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
+      options: --entrypoint tail -f /dev/null  # Forces the container to stay alive
       credentials:
         username: ${{ secrets.JFROG_USERNAME }}
         password: ${{ secrets.JFROG_PASSWORD }}
