@@ -15,92 +15,80 @@ jobs:
       language: ${{ steps.detect.outputs.language }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - id: detect
+      - name: Detect Project Type
+        id: detect
         run: bash scripts/detect.sh
 
   build-java:
     needs: detect
+
     if: needs.detect.outputs.language == 'java'
 
     runs-on: ubuntu-latest
 
+    container:
+      image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to JFrog
-        run: |
-          echo "${{ secrets.JFROG_PASSWORD }}" | docker login trial2zs76n.jfrog.io \
-            -u "${{ secrets.JFROG_USER }}" \
-            --password-stdin
-
       - name: Build Java
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            trial2zs76n.jfrog.io/docker-local/java-builder:1.0 \
-            mvn clean package -DskipTests
+        run: mvn clean package -DskipTests
 
   build-python:
     needs: detect
+
     if: needs.detect.outputs.language == 'python'
 
     runs-on: ubuntu-latest
 
+    container:
+      image: trial2zs76n.jfrog.io/docker-local/python-builder:1.0
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to JFrog
+      - name: Install Dependencies
         run: |
-          echo "${{ secrets.JFROG_PASSWORD }}" | docker login trial2zs76n.jfrog.io \
-            -u "${{ secrets.JFROG_USER }}" \
-            --password-stdin
+          pip install -r requirements.txt
 
-      - name: Build Python
+      - name: Build Python Package
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            trial2zs76n.jfrog.io/docker-local/python-builder:1.0 \
-            sh -c "pip install -r requirements.txt && python -m build || true"
+          python -m build || true
 
   build-go:
     needs: detect
+
     if: needs.detect.outputs.language == 'go'
 
     runs-on: ubuntu-latest
 
+    container:
+      image: trial2zs76n.jfrog.io/docker-local/go-builder:1.0
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to JFrog
-        run: |
-          echo "${{ secrets.JFROG_PASSWORD }}" | docker login trial2zs76n.jfrog.io \
-            -u "${{ secrets.JFROG_USER }}" \
-            --password-stdin
+      - name: Download Dependencies
+        run: go mod download
 
-      - name: Build Go
+      - name: Build Go Binary
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            trial2zs76n.jfrog.io/docker-local/go-builder:1.0 \
-            sh -c "mkdir -p dist && go mod download && go build -o dist/app ."
+          mkdir -p dist
+          go build -o dist/app .
 
   publish:
     needs:
+      - detect
       - build-java
       - build-python
       - build-go
 
-    if: |
-      needs.build-java.result == 'success' ||
-      needs.build-python.result == 'success' ||
-      needs.build-go.result == 'success'
+    if: always()
 
     uses: ./.github/workflows/publish.yml
 
     secrets: inherit
-    
