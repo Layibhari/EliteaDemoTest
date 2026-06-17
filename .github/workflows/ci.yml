@@ -175,11 +175,20 @@ jobs:
           path: dist/app
           retention-days: 1
 
+  security-scan:
+    uses: ./.github/workflows/security.yml
+    with:
+      fail_on_severity: 'high'
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      CMDB_API_KEY: ${{ secrets.CMDB_API_KEY }}
+
   publish:
-    needs: [detect, build-java, build-python, build-go]
+    needs: [detect, build-java, build-python, build-go, security-scan]
     if: |
       always() &&
       needs.detect.result == 'success' &&
+      needs.security-scan.result == 'success' &&
       !contains(needs.build-java.result, 'failure') &&
       !contains(needs.build-python.result, 'failure') &&
       !contains(needs.build-go.result, 'failure') &&
