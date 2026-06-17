@@ -35,11 +35,36 @@ jobs:
             -u "${{ secrets.JFROG_USERNAME }}" \
             --password-stdin
 
+      - name: Create Authenticated Maven settings.xml
+        run: |
+          mkdir -p .github/maven
+          cat << 'EOF' > .github/maven/settings.xml
+          <settings>
+            <servers>
+              <server>
+                <id>artifactory</id>
+                <username>${env.JFROG_USERNAME}</username>
+                <password>${env.JFROG_PASSWORD}</password>
+              </server>
+            </servers>
+            <mirrors>
+              <mirror>
+                <id>artifactory</id>
+                <mirrorOf>*</mirrorOf>
+                <url>https://trial2zs76n.jfrog.io/artifactory/maven-central</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
       - name: Run Build in Container
         run: |
           docker run --rm \
             --entrypoint "" \
+            -e JFROG_USERNAME="${{ secrets.JFROG_USERNAME }}" \
+            -e JFROG_PASSWORD="${{ secrets.JFROG_PASSWORD }}" \
             -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}/.github/maven/settings.xml:/root/.m2/settings.xml \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/java-builder:1.0 \
             mvn clean package -DskipTests
@@ -65,11 +90,20 @@ jobs:
             -u "${{ secrets.JFROG_USERNAME }}" \
             --password-stdin
 
+      - name: Create Authenticated pip.conf
+        run: |
+          mkdir -p .github/pip
+          cat << EOF > .github/pip/pip.conf
+          [global]
+          index-url=https://${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_PASSWORD }}@trial2zs76n.jfrog.io/artifactory/api/pypi/pypi/simple
+          EOF
+
       - name: Run Build in Container
         run: |
           docker run --rm \
             --entrypoint "" \
             -v ${{ github.workspace }}:/workspace \
+            -v ${{ github.workspace }}/.github/pip/pip.conf:/etc/pip.conf \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/python-builder:1.0 \
             bash -c "if [ -f requirements.txt ]; then pip install --root-user-action=ignore -r requirements.txt; fi && python -m build"
@@ -99,6 +133,7 @@ jobs:
         run: |
           docker run --rm \
             --entrypoint "" \
+            -e GOPROXY="https://${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_PASSWORD }}@trial2zs76n.jfrog.io/artifactory/api/go/go-virtual" \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/go-builder:1.0 \
