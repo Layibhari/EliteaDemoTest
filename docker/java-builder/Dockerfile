@@ -14,4 +14,5 @@ COPY settings.xml /root/.m2/settings.xml
 WORKDIR /workspace
 
 # Add this line to keep the container running
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+# Add this as the last line in your Dockerfile
+ENTRYPOINT ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
