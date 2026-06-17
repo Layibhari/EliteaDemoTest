@@ -47,13 +47,42 @@ jobs:
                 <password>${env.JFROG_PASSWORD}</password>
               </server>
             </servers>
-            <mirrors>
-              <mirror>
-                <id>artifactory</id>
-                <mirrorOf>*</mirrorOf>
-                <url>https://trial2zs76n.jfrog.io/artifactory/maven-central</url>
-              </mirror>
-            </mirrors>
+            <profiles>
+              <profile>
+                <id>artifactory-profile</id>
+                <repositories>
+                  <repository>
+                    <id>artifactory</id>
+                    <url>https://trial2zs76n.jfrog.io/artifactory/maven-central</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </repository>
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                  </repository>
+                </repositories>
+                <pluginRepositories>
+                  <pluginRepository>
+                    <id>artifactory</id>
+                    <url>https://trial2zs76n.jfrog.io/artifactory/maven-central</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </pluginRepository>
+                  <pluginRepository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                  </pluginRepository>
+                </pluginRepositories>
+              </profile>
+            </profiles>
+            <activeProfiles>
+              <activeProfile>artifactory-profile</activeProfile>
+            </activeProfiles>
           </settings>
           EOF
 
@@ -67,7 +96,7 @@ jobs:
             -v ${{ github.workspace }}/.github/maven/settings.xml:/root/.m2/settings.xml \
             -w /workspace \
             trial2zs76n.jfrog.io/docker-local/java-builder:1.0 \
-            mvn clean package -DskipTests
+            mvn clean package -U -DskipTests
 
       - name: Upload Java Artifact
         uses: actions/upload-artifact@v4
