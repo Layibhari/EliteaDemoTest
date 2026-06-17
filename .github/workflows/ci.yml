@@ -31,6 +31,9 @@ jobs:
 
     container:
       image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
+      credentials:
+        username: ${{ secrets.JFROG_USER }}
+        password: ${{ secrets.JFROG_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +50,9 @@ jobs:
 
     container:
       image: trial2zs76n.jfrog.io/docker-local/python-builder:1.0
+      credentials:
+        username: ${{ secrets.JFROG_USER }}
+        password: ${{ secrets.JFROG_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +74,9 @@ jobs:
 
     container:
       image: trial2zs76n.jfrog.io/docker-local/go-builder:1.0
-
+      credentials:
+        username: ${{ secrets.JFROG_USER }}
+        password: ${{ secrets.JFROG_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -87,8 +95,11 @@ jobs:
       - build-python
       - build-go
 
-    if: always()
-
+    if: |
+      needs.build-java.result == 'success' ||
+      needs.build-python.result == 'success' ||
+      needs.build-go.result == 'success'
+      
     uses: ./.github/workflows/publish.yml
 
     secrets: inherit
