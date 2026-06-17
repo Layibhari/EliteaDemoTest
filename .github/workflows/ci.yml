@@ -22,16 +22,20 @@ jobs:
     needs: detect
     if: needs.detect.outputs.language == 'java'
     runs-on: ubuntu-latest
-    container:
-      image: trial2zs76n.jfrog.io/docker-local/java-builder:1.0
-      # Removed the 'options' line that was causing the flag error
-      credentials:
-        username: ${{ secrets.JFROG_USERNAME }}
-        password: ${{ secrets.JFROG_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Build Java
-        run: mvn clean package -DskipTests
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Artifactory
+        run: echo ${{ secrets.JFROG_PASSWORD }} | docker login trial2zs76n.jfrog.io -u ${{ secrets.JFROG_USERNAME }} --password-stdin
+
+      - name: Run Build in Container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            trial2zs76n.jfrog.io/docker-local/java-builder:1.0 \
+            mvn clean package -DskipTests
 
   # Keep your other jobs (build-python, build-go) as they were
   build-python:
