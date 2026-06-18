@@ -176,6 +176,13 @@ jobs:
           retention-days: 1
 
   security-scan:
+    needs: [detect, build-java, build-python, build-go]
+    if: |
+      always() &&
+      needs.detect.result == 'success' &&
+      ((needs.detect.outputs.language == 'java' && needs.build-java.result == 'success') ||
+       (needs.detect.outputs.language == 'python' && needs.build-python.result == 'success') ||
+       (needs.detect.outputs.language == 'go' && needs.build-go.result == 'success'))
     uses: ./.github/workflows/security.yml
     with:
       fail_on_severity: 'high'
@@ -184,17 +191,11 @@ jobs:
       CMDB_API_KEY: ${{ secrets.CMDB_API_KEY }}
 
   publish:
-    needs: [detect, build-java, build-python, build-go, security-scan]
+    needs: [detect, security-scan]
     if: |
       always() &&
       needs.detect.result == 'success' &&
-      needs.security-scan.result == 'success' &&
-      !contains(needs.build-java.result, 'failure') &&
-      !contains(needs.build-python.result, 'failure') &&
-      !contains(needs.build-go.result, 'failure') &&
-      !contains(needs.build-java.result, 'cancelled') &&
-      !contains(needs.build-python.result, 'cancelled') &&
-      !contains(needs.build-go.result, 'cancelled')
+      needs.security-scan.result == 'success'
     uses: ./.github/workflows/publish.yml
     with:
       language: ${{ needs.detect.outputs.language }}
