@@ -20,8 +20,8 @@ package org.springframework.samples.petclinic.owner;
  */
 public class OwnerNotFoundException extends RuntimeException {
 
-    public OwnerNotFoundException(Integer id) {
-        super("Owner not found with id: " + id + ". Please ensure the ID is correct ");
-    }
+	public OwnerNotFoundException(final Integer id) {
+		super("Owner not found with id: " + id + ". Please ensure the ID is correct ");
+	}
 
 }
