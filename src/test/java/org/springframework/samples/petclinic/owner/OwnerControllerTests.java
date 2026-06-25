@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Test class for {@link OwnerController}
@@ -226,6 +227,16 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner",
 					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
 			.andExpect(view().name("owners/ownerDetails"));
+	}
+
+	@Test
+	void showOwnerNotFoundHandled() throws Exception {
+		when(this.owners.findById(TEST_OWNER_ID)).thenReturn(Optional.empty());
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+			.andExpect(status().isNotFound())
+			.andExpect(view().name("error"))
+			.andExpect(model().attribute("status", 404))
+			.andExpect(model().attribute("message", containsString("Owner not found")));
 	}
 
 	@Test
