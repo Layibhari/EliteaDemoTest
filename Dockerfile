@@ -1,6 +1,6 @@
 FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
-COPY . .
+COPY forked_code/ .
 RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:17-jre

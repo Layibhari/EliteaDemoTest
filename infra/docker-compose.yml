@@ -2,9 +2,12 @@ services:
   app:
     build:
       context: ..
+      dockerfile: Dockerfile
     container_name: petclinic-app
     ports:
       - "8080:8080"
+    networks:
+      - miniproject-net
 
   jenkins:
     image: jenkins/jenkins:lts-jdk17
@@ -13,12 +16,16 @@ services:
       - "8081:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
+    networks:
+      - miniproject-net
 
   sonarqube:
     image: sonarqube:community
     container_name: sonarqube
     ports:
       - "9000:9000"
+    networks:
+      - miniproject-net
 
   prometheus:
     image: prom/prometheus
@@ -27,6 +34,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - miniproject-net
 
   grafana:
     image: grafana/grafana
@@ -35,6 +44,8 @@ services:
       - "3000:3000"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - miniproject-net
 
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
@@ -42,6 +53,12 @@ services:
     command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.disablekey=true
     ports:
       - "8090:8090"
+    networks:
+      - miniproject-net
+
+networks:
+  miniproject-net:
+    name: miniproject-net
 
 volumes:
   jenkins_home:
