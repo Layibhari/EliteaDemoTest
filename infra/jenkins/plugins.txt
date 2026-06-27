@@ -1,0 +1,8 @@
+workflow-aggregator
+git
+blueocean
+sonar
+htmlpublisher
+prometheus
+ssh-agent
+junit

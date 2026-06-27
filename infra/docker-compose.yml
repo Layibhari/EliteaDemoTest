@@ -10,12 +10,15 @@ services:
       - miniproject-net
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: ./jenkins
     container_name: jenkins
+    user: root
     ports:
       - "8081:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - miniproject-net
 
