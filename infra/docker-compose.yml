@@ -46,6 +46,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - miniproject-net
@@ -65,3 +66,4 @@ networks:
 
 volumes:
   jenkins_home:
+  grafana_data:
