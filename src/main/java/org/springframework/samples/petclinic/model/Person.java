@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -31,11 +32,15 @@ public class Person extends BaseEntity {
 	@Column(length = 30)
 	@Size(max = 30)
 	@NotBlank
+	@Pattern(regexp = "^\\p{L}[\\p{L}0-9'\\s-]*$",
+			message = "Name must start with a letter and may contain letters, numbers, spaces, apostrophes, or hyphens")
 	private String firstName;
 
 	@Column(length = 30)
 	@Size(max = 30)
 	@NotBlank
+	@Pattern(regexp = "^\\p{L}[\\p{L}0-9'\\s-]*$",
+			message = "Name must start with a letter and may contain letters, numbers, spaces, apostrophes, or hyphens")
 	private String lastName;
 
 	public String getFirstName() {
