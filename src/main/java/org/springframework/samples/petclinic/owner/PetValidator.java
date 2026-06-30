@@ -37,17 +37,34 @@ public class PetValidator implements Validator {
 	public void validate(Object obj, Errors errors) {
 		Pet pet = (Pet) obj;
 		String name = pet.getName();
-		// name validation
+
+		// Required
 		if (!StringUtils.hasText(name)) {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
+		else {
 
-		// type validation
+			// Maximum length
+			if (name.length() > 255) {
+				errors.rejectValue("name", "length",
+					"Name cannot exceed 255 characters");
+			}
+
+			// Must contain at least one alphabetic character
+			boolean hasLetter = name.chars().anyMatch(Character::isLetter);
+
+			if (!hasLetter) {
+				errors.rejectValue("name", "invalidName",
+					"Name must contain at least one alphabetic character");
+			}
+		}
+
+		// Type validation
 		if (pet.isNew() && pet.getType() == null) {
 			errors.rejectValue("type", REQUIRED, REQUIRED);
 		}
 
-		// birth date validation
+		// Birth date validation
 		if (pet.getBirthDate() == null) {
 			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
 		}

@@ -18,6 +18,8 @@ package org.springframework.samples.petclinic.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Simple JavaBean domain object representing an person.
@@ -28,11 +30,15 @@ import jakarta.validation.constraints.NotBlank;
 public class Person extends BaseEntity {
 
 	@Column
-	@NotBlank
+	@NotBlank(message = "Firstame is required")
+	@Size(max = 255,message = "Name cannot exceed 225 characters")
+	@Pattern( regexp = ".*[A-Za-z].*",message = "Name must contain atleast one alphabetic character")
 	private String firstName;
 
 	@Column
-	@NotBlank
+	@NotBlank(message = "Lastname is required")
+	@Size(max = 255,message = "Name cannot exceed 225 characters")
+	@Pattern( regexp = ".*[A-Za-z].*",message = "Name must contain atleast one alphabetic character")
 	private String lastName;
 
 	public String getFirstName() {
