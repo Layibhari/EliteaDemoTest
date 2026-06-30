@@ -41,6 +41,9 @@ public class PetValidator implements Validator {
 		if (!StringUtils.hasText(name)) {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
+		else if (!name.matches(".*[a-zA-Z].*")) {
+			errors.rejectValue("name", "invalid", "Name must contain at least one letter");
+		}
 
 		// type validation
 		if (pet.isNew() && pet.getType() == null) {
