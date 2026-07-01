@@ -49,3 +49,17 @@ ENV ZAP_PORT=8090
 ENV IS_CONTAINERIZED=true
 
 HEALTHCHECK CMD curl --silent --output /dev/null --fail http://localhost:$ZAP_PORT/ || exit 1
+
+# Copy your automation config
+COPY policies/scan-config.yml /zap/scan-config.yml
+
+# make sure the config file is there
+RUN cat /zap/scan-config.yml
+
+# Ensure reports directory exists
+RUN mkdir -p /zap/reports
+
+# Make sure ZAP can write reports and Jenkins can read them
+RUN chmod -R a+rwx /zap/reports
+
+ENTRYPOINT ["zap.sh", "-cmd", "-autorun", "/zap/scan-config.yml"]

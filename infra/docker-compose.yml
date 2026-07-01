@@ -54,12 +54,15 @@ services:
 
   zap:
     build:
-      context: ./zap
+      context: ./zap/
     #image: ghcr.io/zaproxy/zaproxy:stable
-    #container_name: zap
+    container_name: zap
     #command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.disablekey=true
     volumes:
       - zap_reports:/zap/reports
+      #- type: bind
+      #  source: ./zap/reports
+      #  target: /zap/reports
     ports:
       - "8090:8090"
     networks:

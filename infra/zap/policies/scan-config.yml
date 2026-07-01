@@ -2,7 +2,7 @@ env:
   contexts:
     - name: petclinic
       urls:
-        - http://app:8080/
+        - http://petclinic-app:8080/
 
 jobs:
   - type: spider
