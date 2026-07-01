@@ -15,7 +15,7 @@ pipeline {
                 }
             }
         }
-        
+
         ///////////////////////////////////
         // probably run other modules here?
         ///////////////////////////////////
@@ -23,7 +23,7 @@ pipeline {
         stage("Run ZAP Scans") {
             steps {
                 script {
-                    load 'groovy/zap.groovy'
+                    load 'groovy/zap-analysis.groovy'
                 }
             }
         }
