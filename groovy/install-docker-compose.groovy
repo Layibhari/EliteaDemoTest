@@ -1,4 +1,4 @@
-def installDockerComposeStage = {
+def installDockerCompose() {
 
     stage('Install Docker Compose v2') {
         script {
@@ -31,4 +31,4 @@ def installDockerComposeStage = {
 
 }
 
-return installDockerComposeStage
+return installDockerCompose
