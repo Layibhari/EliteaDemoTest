@@ -31,4 +31,4 @@ def installDockerCompose() {
 
 }
 
-return installDockerCompose
+return installDockerCompose()

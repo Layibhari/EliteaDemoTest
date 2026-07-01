@@ -13,4 +13,4 @@ def runZAP() {
 }
 
 
-return runZAP
+return runZAP()

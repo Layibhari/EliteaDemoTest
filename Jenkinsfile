@@ -4,24 +4,21 @@ pipeline {
         stage("Install Docker Compose") {
             steps {
                 script {
-                    def runStage = load 'groovy/install-docker-compose.groovy'
-                    runStage()
+                    load 'groovy/install-docker-compose.groovy'
                 }
             }
         }
         stage("Clone Repo") {
             steps {
                 script {
-                    def runStage = load 'groovy/clone-repo.groovy'
-                    runStage()
+                    load 'groovy/clone-repo.groovy'
                 }
             }
         }
         stage("Run ZAP Scans") {
             steps {
                 script {
-                    def runStage = load 'groovy/zap.groovy'
-                    runStage()
+                    load 'groovy/zap.groovy'
                 }
             }
         }

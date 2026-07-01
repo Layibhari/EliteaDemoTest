@@ -3,4 +3,4 @@ def cloneRepo() {
         url: 'https://github.com/siddvoh/spring-petclinic-dev-pipeline.git'
 }
 
-return cloneRepo
+return cloneRepo()
