@@ -15,13 +15,27 @@ pipeline {
                 }
             }
         }
+        
         ///////////////////////////////////
         // probably run other modules here?
         ///////////////////////////////////
+
         stage("Run ZAP Scans") {
             steps {
                 script {
                     load 'groovy/zap.groovy'
+                }
+            }
+        }
+
+        ///////////////////////////////////
+        // probably deploy to production here?
+        ///////////////////////////////////
+
+        stage("Run ZAP Monitoring") { //maybe by ssh into production VM?
+            steps {
+                script {
+                    load 'groovy/zap-monitoring.groovy'
                 }
             }
         }

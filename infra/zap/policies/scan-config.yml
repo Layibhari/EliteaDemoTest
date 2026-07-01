@@ -10,10 +10,16 @@ jobs:
       context: petclinic
       maxDuration: 60
 
+  - type: ajaxSpider
+    parameters:
+      context: petclinic
+      maxDuration: 60
+
   - type: activeScan
     parameters:
       context: petclinic
       maxRuleDurationInMins: 2
+      maxScanDurationInMins: 10
 
   - type: report
     parameters:
