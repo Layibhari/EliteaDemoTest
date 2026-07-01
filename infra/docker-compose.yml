@@ -18,7 +18,7 @@ services:
       - "8081:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - zap-reports:/zap/reports
+      - zap_reports:/zap/reports
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - miniproject-net
