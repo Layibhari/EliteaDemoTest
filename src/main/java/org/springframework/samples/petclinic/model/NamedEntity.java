@@ -18,6 +18,8 @@ package org.springframework.samples.petclinic.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as
@@ -31,7 +33,9 @@ import jakarta.validation.constraints.NotBlank;
 public class NamedEntity extends BaseEntity {
 
 	@Column
-	@NotBlank
+	@NotBlank(message = "Name is required")
+	@Size(max = 255, message = "Name cannot exceed 255 characters")
+	@Pattern(regexp = ".*[a-zA-Z].*", message = "Name must contain at least one letter")
 	private String name;
 
 	public String getName() {

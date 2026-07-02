@@ -19,6 +19,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * Simple JavaBean domain object representing an person.
@@ -31,11 +32,13 @@ public class Person extends BaseEntity {
 	@Column(length = 30)
 	@Size(max = 30)
 	@NotBlank
+	@Pattern(regexp = ".*[a-zA-Z].*", message = "First name must contain at least one letter")
 	private String firstName;
 
 	@Column(length = 30)
 	@Size(max = 30)
 	@NotBlank
+	@Pattern(regexp = ".*[a-zA-Z].*", message = "Last name must contain at least one letter")
 	private String lastName;
 
 	public String getFirstName() {
