@@ -20,42 +20,34 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * <code>Validator</code> for <code>Pet</code> forms.
+ * <code>Validator</code> for <code>Owner</code> forms.
  * <p>
  * We're not using Bean Validation annotations here because it is easier to define such
  * validation rule in Java.
  * </p>
  *
- * @author Ken Krebs
- * @author Juergen Hoeller
+ * @author Deep Swarup
  */
-public class PetValidator implements Validator {
+public class OwnerValidator implements Validator {
 
 	private static final String REQUIRED = "required";
 
 	@Override
 	public void validate(Object obj, Errors errors) {
-		Pet pet = (Pet) obj;
-		String name = pet.getName();
-		// name validation
+		Owner owner = (Owner) obj;
+		validNameValue(owner.getFirstName(), "firstName", errors);
+		validNameValue(owner.getLastName(), "lastName", errors);
+	}
+
+	private void validNameValue (String name, String field, Errors errors) {
 		if (!StringUtils.hasText(name)) {
-			errors.rejectValue("name", REQUIRED, REQUIRED);
+			errors.rejectValue(field, REQUIRED, REQUIRED);
 		} else if (!StringUtils.hasLength(name)) {
-			errors.rejectValue("name", "length", "length must be greater than 0");
+			errors.rejectValue(field, "length", "length must be greater than 0");
 		} else if (!name.matches(".*[a-zA-Z].*")) {
-			errors.rejectValue("name", "pattern", "must contain at least one letter");
+			errors.rejectValue(field, "pattern", "must contain at least one letter");
 		} else if (name.length() > 30) {
-			errors.rejectValue("name", "length", "length must be less than 30");
-		}
-
-		// type validation
-		if (pet.isNew() && pet.getType() == null) {
-			errors.rejectValue("type", REQUIRED, REQUIRED);
-		}
-
-		// birth date validation
-		if (pet.getBirthDate() == null) {
-			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
+			errors.rejectValue(field, "length", "length must be less than 30");
 		}
 	}
 
@@ -64,7 +56,7 @@ public class PetValidator implements Validator {
 	 */
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return Pet.class.isAssignableFrom(clazz);
+		return Owner.class.isAssignableFrom(clazz);
 	}
 
 }
