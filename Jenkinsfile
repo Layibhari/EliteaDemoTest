@@ -64,6 +64,12 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy') {
+            steps {
+                sh './devops/scripts/09-deploy-app.sh'
+            }
+        }
     }
 
     post {
