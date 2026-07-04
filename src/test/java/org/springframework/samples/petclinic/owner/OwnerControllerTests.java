@@ -132,6 +132,62 @@ class OwnerControllerTests {
 	}
 
 	@Test
+	void processCreationFormWithNumericFirstName() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "123")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1316761638"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "firstName"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void processCreationFormWithSpecialCharacterFirstName() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "@@@@")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1316761638"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "firstName"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void processCreationFormWithNumericLastName() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe")
+				.param("lastName", "123")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1316761638"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void processUpdateOwnerFormWithInvalidFirstName() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "@@@@")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1616291589"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "firstName"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
 	void initFindForm() throws Exception {
 		mockMvc.perform(get("/owners/find"))
 			.andExpect(status().isOk())
