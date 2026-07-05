@@ -58,20 +58,17 @@
       </td>
       <td valign="top">
         <table class="table-condensed">
-          <thead>
-            <tr>
-              <th th:text="#{visitDate}">Visit Date</th>
-              <th th:text="#{description}">Description</th>
-            </tr>
-          </thead>
-          <tr th:each="visit : ${pet.visits}">
-            <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
-            <td th:text="${visit?.description}"></td>
-          </tr>
           <tr>
-            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}" th:text="#{editPet}">Edit Pet</a></td>
-            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}" th:text="#{addVisit}">Add Visit</a></td>
-          </tr>
+            <!-- The inline style adds a 15-pixel blank space to the right of the cell -->
+            <style> .spaced-cell { padding-right: 15px; } </style>
+        
+            <td class="spaced-cell"><a th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}" th:text="#{editPet}">Edit Pet</a></td>
+            <td class="spaced-cell"><a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}" th:text="#{addVisit}">Add Visit</a></td>
+            <td>
+                <a th:href="@{/owners/{ownerId}/pets/{petId}/visits(ownerId=${owner.id},petId=${pet.id})}">All Visits</a>
+            </td>
+        </tr>
+        
         </table>
       </td>
     </tr>

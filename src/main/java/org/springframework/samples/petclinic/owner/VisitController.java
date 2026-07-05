@@ -92,6 +92,17 @@ class VisitController {
 		return "pets/createOrUpdateVisitForm";
 	}
 
+	@GetMapping("/owners/{ownerId}/pets/{petId}/visits")
+	public String showAllVisits(@PathVariable int ownerId, @PathVariable int petId, Map<String, Object> model) {
+		Owner owner = this.owners.findById(ownerId)
+			.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId));
+		Pet pet = owner.getPet(petId);
+		model.put("pet", pet);
+		model.put("owner", owner);
+		model.put("visits", pet.getVisits());
+		return "pets/allVisits";
+	}
+
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
 	// called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
