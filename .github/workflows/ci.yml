@@ -8,6 +8,8 @@ on:
       - 'pom.xml'
       - '.mvn/**'
       - 'mvnw'
+      - 'Dockerfile'
+      - '.dockerignore'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
