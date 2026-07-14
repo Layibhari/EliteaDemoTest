@@ -1,0 +1,49 @@
+# Ignore rules specific to Dockerfile.runtime
+# This file is used INSTEAD of .dockerignore when building Dockerfile.runtime
+# via `docker/build-push-action` with `file: Dockerfile.runtime`.
+#
+# The runtime image expects target/*.jar to be present in the build context
+# (downloaded from the workflow artifact). We must NOT exclude target/.
+
+# Version control (still exclude)
+.git
+.gitignore
+.gitattributes
+
+# IDE (still exclude)
+.idea
+.vscode
+*.iml
+
+# CI/CD (still exclude — not needed at runtime)
+.github/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Source code (not needed at runtime — only the built JAR)
+src/
+pom.xml
+
+# Local dev
+.devcontainer/
+docker-compose.yml
+
+# Docker files themselves (not needed inside the image)
+Dockerfile
+Dockerfile.runtime
+.dockerignore
+Dockerfile.runtime.dockerignore
+
+# Documentation
+*.md
+docs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local secrets
+.env
+*.pem
+*.key
