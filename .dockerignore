@@ -1,0 +1,36 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Maven build output
+target/
+
+# Test output
+build/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation and non-code
+*.md
+docs/
+
+# CI/CD config
+.github/
+.mvn/wrapper/maven-wrapper.jar
+
+# Devcontainer (not needed in Docker build)
+.devcontainer/
+
+# Local secrets (belt and braces — never commit these anyway)
+.env
+*.pem
+*.key
