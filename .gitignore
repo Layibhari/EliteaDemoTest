@@ -46,3 +46,16 @@ out/
 _site/
 *.css
 !petclinic.css
+
+### Python (python-service) ###
+python-service/__pycache__/
+python-service/**/__pycache__/
+python-service/.pytest_cache/
+python-service/.venv/
+python-service/venv/
+*.pyc
+
+### Node.js (node-service) ###
+node-service/node_modules/
+node-service/npm-debug.log*
+node-service/coverage/

@@ -4,6 +4,22 @@ hi triggers 2
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
 
+## Repository layout
+
+This repository is a polyglot monorepo used for a Harness CI/CD lab. It contains **three
+independently buildable services**:
+
+- **Java / Spring Boot** (repo root — `src/`, `pom.xml`, `mvnw`, `Dockerfile`, `k8s/`) — the
+  original Spring PetClinic application, unchanged.
+- **Python / FastAPI** (`python-service/`) — an appointment availability & reminder helper
+  service. See [`python-service/README.md`](python-service/README.md).
+- **Node.js / Express** (`node-service/`) — a clinic inventory tracking service. See
+  [`node-service/README.md`](node-service/README.md).
+
+Each service has its own dependency manifest, test suite, and `Dockerfile`, and can be built and
+deployed independently — this layout is what backs the lab's Looping/Matrix Strategy, Golden
+Template, and artifact-sharing demos.
+
 ## Understanding the Spring Petclinic application with a few diagrams
 
 See the presentation here:  
