@@ -11,6 +11,8 @@ on:
       - 'Dockerfile'
       - 'Dockerfile.runtime'
       - '.dockerignore'
+      - '.trivyignore'
+      - '.trivyignore.md'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
@@ -39,6 +41,76 @@ jobs:
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
           GITLEAKS_ENABLE_SUMMARY: true
 
+  dockerfile-lint:
+    name: Dockerfile Lint (Hadolint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
+          # DL3008: pin apt package versions
+          # DL3009: remove apt lists after install
+          # Accepted project trade-offs.
+          ignore: DL3008,DL3009
+
+      - name: Lint Dockerfile.runtime
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile.runtime
+          failure-threshold: warning
+
+  dependency-check:
+    name: Dependency Scan (Trivy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    # Wait for build job — reuses its Maven cache
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (restore Maven cache)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Populate local Maven cache
+        run: ./mvnw -B dependency:resolve dependency:resolve-plugins -q
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+          format: 'table'
+          output: 'trivy-report.txt'
+
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-report.txt
+          retention-days: 7
+
   build:
     name: Build & Test (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
@@ -57,7 +129,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin'
+          distribution: temurin
           cache: maven
 
       - name: Build and test
@@ -100,8 +172,8 @@ jobs:
           context: .
           file: Dockerfile.runtime
           push: false
-          tags: petclinic:${{ github.sha }}
           load: true
+          tags: petclinic:${{ github.sha }}
 
       - name: Show image size
         run: docker images petclinic:${{ github.sha }}
