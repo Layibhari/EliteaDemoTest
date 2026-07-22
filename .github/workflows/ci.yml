@@ -11,6 +11,7 @@ on:
       - 'Dockerfile'
       - 'Dockerfile.runtime'
       - '.dockerignore'
+      - '.dependency-check-suppression.xml'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
@@ -39,6 +40,67 @@ jobs:
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
           GITLEAKS_ENABLE_SUMMARY: true
 
+  dockerfile-lint:
+    name: Dockerfile Lint (Hadolint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
+          ignore: DL3008,DL3009
+
+      - name: Lint Dockerfile.runtime
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile.runtime
+          failure-threshold: warning
+
+  dependency-check:
+    name: Dependency Scan (OWASP)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: petclinic
+          path: '.'
+          format: 'HTML'
+          args: >
+            --failOnCVSS 7
+            --suppression .dependency-check-suppression.xml
+            --enableRetired
+
+      - name: Upload dependency-check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports/
+          retention-days: 7
+
   build:
     name: Build & Test (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
@@ -57,7 +119,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin'
+          distribution: temurin
           cache: maven
 
       - name: Build and test
