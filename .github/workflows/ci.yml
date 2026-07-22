@@ -74,22 +74,34 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+    # Wait for build job — reuses its Maven cache
+    needs: build
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up JDK 17 (restore Maven cache)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Populate local Maven cache
+        run: ./mvnw -B dependency:resolve dependency:resolve-plugins -q
+
       - name: Run Trivy filesystem scan
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln
-          severity: HIGH,CRITICAL
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          severity: 'HIGH,CRITICAL'
           exit-code: '1'
           ignore-unfixed: true
-          format: table
-          output: trivy-report.txt
+          format: 'table'
+          output: 'trivy-report.txt'
 
       - name: Upload Trivy report
         if: always()
