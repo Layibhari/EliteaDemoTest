@@ -11,7 +11,8 @@ on:
       - 'Dockerfile'
       - 'Dockerfile.runtime'
       - '.dockerignore'
-      - '.dependency-check-suppression.xml'
+      - '.trivyignore'
+      - '.trivyignore.md'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
@@ -56,6 +57,9 @@ jobs:
         with:
           dockerfile: Dockerfile
           failure-threshold: warning
+          # DL3008: pin apt package versions
+          # DL3009: remove apt lists after install
+          # Accepted project trade-offs.
           ignore: DL3008,DL3009
 
       - name: Lint Dockerfile.runtime
@@ -65,9 +69,9 @@ jobs:
           failure-threshold: warning
 
   dependency-check:
-    name: Dependency Scan (OWASP)
+    name: Dependency Scan (Trivy)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -75,30 +79,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.24.0
         with:
-          java-version: '17'
-          distribution: temurin
-          cache: maven
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+          output: trivy-report.txt
 
-      - name: Run OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: petclinic
-          path: '.'
-          format: 'HTML'
-          args: >
-            --failOnCVSS 7
-            --suppression .dependency-check-suppression.xml
-            --enableRetired
-
-      - name: Upload dependency-check report
+      - name: Upload Trivy report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-check-report
-          path: reports/
+          name: trivy-fs-report
+          path: trivy-report.txt
           retention-days: 7
 
   build:
@@ -162,8 +160,8 @@ jobs:
           context: .
           file: Dockerfile.runtime
           push: false
-          tags: petclinic:${{ github.sha }}
           load: true
+          tags: petclinic:${{ github.sha }}
 
       - name: Show image size
         run: docker images petclinic:${{ github.sha }}
