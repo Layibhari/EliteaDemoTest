@@ -1,0 +1,112 @@
+{
+  "tasks": [
+    {
+      "id": "01-externalize-cache-redis",
+      "title": "Externalize cache to Azure Cache for Redis (with local Caffeine fallback)",
+      "description": "Replace in-process JCache/Caffeine with Spring Cache backed by Redis for production; retain Caffeine for local development via Spring profiles.",
+      "estimate": 35,
+      "dependencies": [],
+      "files_likely_to_change": [
+        "src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java",
+        "src/main/java/org/springframework/samples/petclinic/vet/VetRepository.java",
+        "pom.xml",
+        "build.gradle",
+        "src/main/resources/application-production.properties",
+        "src/main/resources/application-local.properties",
+        "src/main/resources/application-redis.properties"
+      ],
+      "suggested_commit_message": "externalize: switch cache to Redis in production, keep Caffeine for local"
+    },
+    {
+      "id": "02-db-parameterize-keyvault",
+      "title": "Parameterize DB connections and migrate secrets to Azure Key Vault",
+      "description": "Remove localhost and hardcoded credentials from properties; read SPRING_DATASOURCE_* from env or Key Vault. Document Azure DB provisioning and migration approach (DMS).",
+      "estimate": 40,
+      "dependencies": [],
+      "files_likely_to_change": [
+        "src/main/resources/application-mysql.properties",
+        "src/main/resources/application-postgres.properties",
+        "src/main/resources/application-production.properties",
+        "pom.xml",
+        "build.gradle",
+        ".github/workflows/*"
+      ],
+      "suggested_commit_message": "config: parameterize DB connections and wire Key Vault secret retrieval"
+    },
+    {
+      "id": "03-update-tests",
+      "title": "Update integration & CI tests to use Testcontainers or env-driven endpoints",
+      "description": "Remove hardcoded localhost URLs in tests; introduce Testcontainers for DB and Redis or support env-driven endpoints for CI.",
+      "estimate": 25,
+      "dependencies": [
+        "01-externalize-cache-redis",
+        "02-db-parameterize-keyvault"
+      ],
+      "files_likely_to_change": [
+        "src/test/java/org/springframework/samples/petclinic/*IntegrationTests.java",
+        "pom.xml",
+        "build.gradle",
+        "src/test/java/org/springframework/samples/petclinic/TestProperties.java"
+      ],
+      "suggested_commit_message": "test: parameterize integration tests and add Testcontainers support"
+    },
+    {
+      "id": "04-containerize-ci-deploy",
+      "title": "Add Dockerfile, build/push to ACR, and staging deploy",
+      "description": "Create multi-stage Dockerfile, update CI to build/push image to ACR, and add a staging deploy to Container Apps or App Service with a smoke test.",
+      "estimate": 30,
+      "dependencies": [
+        "03-update-tests"
+      ],
+      "files_likely_to_change": [
+        "Dockerfile",
+        "build.gradle",
+        "pom.xml",
+        ".github/workflows/containerize-and-deploy.yml",
+        "deploy/azure-containerapp-staging.yml"
+      ],
+      "suggested_commit_message": "ci: add Dockerfile, build and push image to ACR, add staging deploy"
+    },
+    {
+      "id": "05-jakarta-alignment",
+      "title": "Align javax → jakarta packages and resolve mixed dependencies",
+      "description": "Inventory and standardize on jakarta.* APIs; update dependencies and imports to jakarta-compatible versions.",
+      "estimate": 30,
+      "dependencies": [
+        "03-update-tests",
+        "04-containerize-ci-deploy"
+      ],
+      "files_likely_to_change": [
+        "pom.xml",
+        "build.gradle",
+        "src/main/java/**/*.java",
+        "src/main/resources/**/*"
+      ],
+      "suggested_commit_message": "deps: migrate javax imports and dependencies to jakarta versions"
+    },
+    {
+      "id": "06-observability-probes",
+      "title": "Add Spring Actuator, App Insights wiring, and health/readiness probes",
+      "description": "Enable actuator endpoints, configure Application Insights or OTLP exporter, and add liveness/readiness probes in deployment manifests.",
+      "estimate": 13,
+      "dependencies": [
+        "04-containerize-ci-deploy"
+      ],
+      "files_likely_to_change": [
+        "pom.xml",
+        "build.gradle",
+        "src/main/resources/application-*.properties",
+        "deploy/azure-containerapp-staging.yml",
+        ".github/workflows/containerize-and-deploy.yml"
+      ],
+      "suggested_commit_message": "observability: add actuator and App Insights wiring, add health probes"
+    }
+  ],
+  "metadata": {
+    "language": "java",
+    "planName": "plan-20260722-01",
+    "projectName": "spring-petclinic",
+    "createdAt": "2026-07-22T08:03:01+02:00",
+    "version": "1.0"
+  }
+}
