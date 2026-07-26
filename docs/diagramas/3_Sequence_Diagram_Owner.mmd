@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor Cliente as Cliente Autenticado
+    participant Filter as JwtAuthenticationFilter
+    participant Controller as OwnerRestController
+    participant Service as OwnerService
+    participant Repo as OwnerRepository
+    participant Mapper as OwnerMapper
+
+    Cliente->>Filter: GET /api/owners/{id}<br/>Authorization: Bearer [Token]
+    activate Filter
+    
+    Note over Filter: Valida la firma del token<br/>y extrae el 'username'
+    Filter->>Controller: Invoca endpoint (doFilter)
+    deactivate Filter
+    
+    activate Controller
+    Controller->>Service: findById(id)
+    activate Service
+    
+    Service->>Repo: findById(id)
+    activate Repo
+    Repo-->>Service: Entidad Owner (JPA)
+    deactivate Repo
+    
+    Service-->>Controller: Optional<Owner>
+    deactivate Service
+    
+    Controller->>Mapper: toDto(Owner)
+    activate Mapper
+    Mapper-->>Controller: OwnerDTO
+    deactivate Mapper
+    
+    Controller-->>Cliente: 200 OK<br/>{ JSON de OwnerDTO }
+    deactivate Controller

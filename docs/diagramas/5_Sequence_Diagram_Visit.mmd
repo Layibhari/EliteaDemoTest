@@ -1,0 +1,28 @@
+sequenceDiagram
+    actor Cliente
+    participant Controller as VisitRestController
+    participant Service as VisitService
+    participant Mapper as VisitMapper
+    participant Repo as VisitRepository
+
+    Cliente->>Controller: GET /api/visits
+    activate Controller
+    
+    Controller->>Service: findAll()
+    activate Service
+    Service->>Repo: findAll()
+    activate Repo
+    Repo-->>Service: List<Visit> (Entidades JPA)
+    deactivate Repo
+    Service-->>Controller: List<Visit>
+    deactivate Service
+    
+    loop Para cada Visit en la Lista
+        Controller->>Mapper: toDto(Visit)
+        activate Mapper
+        Mapper-->>Controller: VisitDTO
+        deactivate Mapper
+    end
+    
+    Controller-->>Cliente: 200 OK<br/>[ { VisitDTO_1 }, { VisitDTO_2 } ]
+    deactivate Controller

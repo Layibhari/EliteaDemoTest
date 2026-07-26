@@ -1,0 +1,69 @@
+classDiagram
+    %% Capa de Controladores REST
+    class OwnerRestController {
+        +getAllOwners() List~OwnerDTO~
+        +getOwner(id) OwnerDTO
+        +createOwner(OwnerDTO) OwnerDTO
+    }
+    class PetRestController {
+        +getPet(ownerId, petId) PetDTO
+        +createPet(PetDTO) PetDTO
+    }
+    class VisitRestController {
+        +getAllVisits() List~VisitDTO~
+        +createVisit(VisitDTO) VisitDTO
+    }
+    
+    %% Capa de Servicios
+    class OwnerService {
+        +findById(id) Optional~Owner~
+        +findAll() List~Owner~
+        +save(Owner) Owner
+    }
+    class PetService {
+        +findPet(ownerId, petId) Pet
+        +save(Owner, Pet) Pet
+    }
+    class VisitService {
+        +findAll() List~Visit~
+        +save(ownerId, petId, Visit) Visit
+    }
+
+    %% Capa de DTOs y Entidades (Modelos)
+    class Owner {
+        +Integer id
+        +String firstName
+        +String lastName
+        +List~Pet~ pets
+    }
+    class Pet {
+        +Integer id
+        +String name
+        +LocalDate birthDate
+        +List~Visit~ visits
+    }
+    class Visit {
+        +Integer id
+        +LocalDate date
+        +String description
+    }
+    
+    class OwnerDTO
+    class PetDTO
+    class VisitDTO
+
+    %% Relaciones
+    OwnerRestController --> OwnerService
+    PetRestController --> PetService
+    VisitRestController --> VisitService
+    
+    OwnerRestController ..> OwnerDTO : Maneja
+    PetRestController ..> PetDTO : Maneja
+    VisitRestController ..> VisitDTO : Maneja
+    
+    OwnerService --> Owner : Retorna
+    PetService --> Pet : Retorna
+    VisitService --> Visit : Retorna
+    
+    Owner "1" *-- "0..*" Pet : Tiene
+    Pet "1" *-- "0..*" Visit : Tiene

@@ -1,0 +1,65 @@
+graph TD
+    %% Estructura de Paquetes
+    subgraph org.springframework.samples.petclinic
+        
+        subgraph config [paquete: config]
+            OpenApiConfiguration
+        end
+        
+        subgraph security [paquete: security]
+            AuthConfig
+            SecurityConfiguration
+            JwtService
+            JwtAuthenticationFilter
+        end
+        
+        subgraph controller [paquete: controller]
+            AuthenticationController
+            OwnerRestController
+            PetRestController
+            VisitRestController
+        end
+        
+        subgraph service [paquete: service]
+            OwnerService
+            PetService
+            VisitService
+        end
+        
+        subgraph mapper [paquete: mapper]
+            OwnerMapper
+            PetMapper
+            VisitMapper
+        end
+        
+        subgraph dto [paquete: dto]
+            OwnerDTO
+            PetDTO
+            VisitDTO
+            LoginRequest
+            AuthResponse
+        end
+        
+        subgraph model_layer [paquetes heredados: owner / vet / visit]
+            Owner[Owner.java]
+            Pet[Pet.java]
+            Visit[Visit.java]
+            OwnerController[OwnerController.java MVC]
+            OwnerRepository[OwnerRepository.java]
+        end
+        
+    end
+
+    %% Dependencias entre paquetes
+    config --> controller
+    security --> controller
+    security --> service
+    controller --> service
+    controller --> mapper
+    controller --> dto
+    service --> model_layer
+    mapper --> dto
+    mapper --> model_layer
+    
+    classDef package fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    class config,security,controller,service,mapper,dto,model_layer package;

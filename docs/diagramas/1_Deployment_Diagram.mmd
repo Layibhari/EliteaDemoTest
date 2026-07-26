@@ -1,0 +1,48 @@
+graph TD
+    %% Node Configurations
+    classDef client fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef server fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef component fill:#ffffff,stroke:#666,stroke-width:1px;
+    classDef database fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+
+    %% Client Layer
+    subgraph Client_Layer [Capa Cliente]
+        Browser[Navegador Web<br/>Renderiza HTML]:::client
+        RestClient[Cliente REST / Swagger UI<br/>Envía y recibe JSON]:::client
+    end
+
+    %% Server Layer (Tomcat)
+    subgraph Server_Layer [Capa de Servidor Apache Tomcat 11]
+        subgraph Spring_Boot [Spring Boot Application]
+            SecurityFilterChain[Spring Security<br/>JwtAuthenticationFilter]:::component
+
+            subgraph Legacy_App [Aplicación Heredada]
+                Thymeleaf[Motor Thymeleaf]:::component
+                MvcControllers[MVC Controllers]:::component
+            end
+
+            subgraph Modern_App [Aplicación TO-BE]
+                RestControllers[REST Controllers]:::component
+                Services[Capa de Servicios]:::component
+            end
+            
+            Repositories[Data JPA Repositories]:::component
+        end
+    end
+
+    %% Database Layer
+    subgraph DB_Layer [Capa de Datos]
+        H2[(Base de Datos H2<br/>En Memoria)]:::database
+    end
+
+    %% Connections
+    Browser -- "HTTP GET/POST\n/owners, /vets.html" --> Thymeleaf
+    Thymeleaf --> MvcControllers
+    MvcControllers --> Repositories
+    
+    RestClient -- "HTTP GET/POST/PUT\n/api/**\n(Auth: Bearer Token)" --> SecurityFilterChain
+    SecurityFilterChain --> RestControllers
+    RestControllers --> Services
+    Services --> Repositories
+    
+    Repositories -- "JDBC / Hibernate" --> H2

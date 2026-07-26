@@ -1,0 +1,39 @@
+sequenceDiagram
+    actor Cliente as Cliente Autenticado
+    participant Filter as JwtAuthenticationFilter
+    participant Controller as PetRestController
+    participant OwnerService as OwnerService
+    participant PetService as PetService
+    participant Mapper as PetMapper
+
+    Cliente->>Filter: POST /api/pets<br/>Authorization: Bearer [Token]<br/>{ PetDTO JSON }
+    activate Filter
+    Filter->>Controller: Petición Autenticada
+    deactivate Filter
+    
+    activate Controller
+    Note over Controller: Validar petición (@Valid)
+    
+    Controller->>OwnerService: findById(petDto.getOwnerId())
+    activate OwnerService
+    OwnerService-->>Controller: Entidad Owner
+    deactivate OwnerService
+    
+    Controller->>Mapper: toEntity(petDto)
+    activate Mapper
+    Mapper-->>Controller: Entidad Pet (sin persistir)
+    deactivate Mapper
+    
+    Controller->>PetService: save(Owner, Pet)
+    activate PetService
+    Note over PetService: Aplica lógica de negocio<br/>Ej. asocia mascota al dueño
+    PetService-->>Controller: Entidad Pet (Persistida con ID)
+    deactivate PetService
+    
+    Controller->>Mapper: toDto(Pet)
+    activate Mapper
+    Mapper-->>Controller: PetDTO
+    deactivate Mapper
+    
+    Controller-->>Cliente: 201 Created<br/>{ PetDTO JSON }
+    deactivate Controller

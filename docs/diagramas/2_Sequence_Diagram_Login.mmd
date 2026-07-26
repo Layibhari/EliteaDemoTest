@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor Cliente as Cliente (REST / Swagger)
+    participant AuthController as AuthenticationController
+    participant UserDetailsService as UserDetailsService
+    participant JwtService as JwtService
+
+    Cliente->>AuthController: POST /api/auth/login<br/>{ username, password }
+    activate AuthController
+    
+    AuthController->>UserDetailsService: loadUserByUsername(username)
+    activate UserDetailsService
+    UserDetailsService-->>AuthController: UserDetails (si existe)
+    deactivate UserDetailsService
+    
+    Note over AuthController: Valida las credenciales<br/>(AuthenticationManager)
+    
+    alt Credenciales Válidas
+        AuthController->>JwtService: generateToken(UserDetails)
+        activate JwtService
+        JwtService-->>AuthController: "eyJhbGciOiJIUzI1Ni..." (Token Generado)
+        deactivate JwtService
+        AuthController-->>Cliente: 200 OK<br/>{ "token": "..." }
+    else Credenciales Inválidas
+        AuthController-->>Cliente: 401 Unauthorized
+    end
+    deactivate AuthController

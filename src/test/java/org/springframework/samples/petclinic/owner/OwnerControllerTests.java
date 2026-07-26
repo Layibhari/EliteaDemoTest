@@ -62,6 +62,12 @@ class OwnerControllerTests {
 
 	private static final int TEST_OWNER_ID = 1;
 
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.samples.petclinic.security.JwtService jwtService;
+
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
 	@Autowired
 	private MockMvc mockMvc;
 

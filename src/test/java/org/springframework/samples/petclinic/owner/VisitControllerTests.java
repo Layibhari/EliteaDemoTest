@@ -50,6 +50,12 @@ class VisitControllerTests {
 
 	private static final int TEST_PET_ID = 1;
 
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.samples.petclinic.security.JwtService jwtService;
+
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
 	@Autowired
 	private MockMvc mockMvc;
 

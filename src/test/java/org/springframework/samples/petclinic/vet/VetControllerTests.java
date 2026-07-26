@@ -45,6 +45,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisabledInAotMode
 class VetControllerTests {
 
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.samples.petclinic.security.JwtService jwtService;
+
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
 	@Autowired
 	private MockMvc mockMvc;
 

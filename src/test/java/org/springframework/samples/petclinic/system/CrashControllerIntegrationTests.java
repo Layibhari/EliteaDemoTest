@@ -55,6 +55,12 @@ class CrashControllerIntegrationTests {
 	@Value("${local.server.port}")
 	private int port;
 
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.samples.petclinic.security.JwtService jwtService;
+
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
 	@Autowired
 	private TestRestTemplate rest;
 
@@ -94,6 +100,10 @@ class CrashControllerIntegrationTests {
 
 	@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
 			DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+	@org.springframework.context.annotation.Import({
+			org.springframework.samples.petclinic.security.SecurityConfiguration.class,
+			org.springframework.samples.petclinic.security.AuthConfig.class,
+			org.springframework.samples.petclinic.security.JwtAuthenticationFilter.class })
 	static class TestConfiguration {
 
 	}
