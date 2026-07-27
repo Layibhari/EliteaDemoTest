@@ -1,0 +1,18 @@
+name: basic jobs
+on:
+  workflow-dispatch:
+    inputs:
+      environment:
+        decripition: "need to pass env"
+        required: true
+        type: string
+        default: "demo"
+jobs:
+  demo_data
+  runs_on: ubuntu-latest
+    steps:
+    -  name: checkout repo branch
+       uses: actions/checkout@v7
+    -  name: print values input
+       run: |
+       echo "env: ${{github.events.input.environment}}"
