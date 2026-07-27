@@ -1,31 +1,21 @@
-# This workflow will build a Java project with Gradle, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: basic jobs
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "need to pass env"
+        required: true
+        type: string
+        default: "demo"
 
 jobs:
-  build:
-
+  demo_data:                  # job ID
+    name: Demo Data Job        # display name
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ '17' ]
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK ${{matrix.java}}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{matrix.java}}
-          distribution: 'adopt'
-          cache: maven
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Checkout repo branch
+        uses: actions/checkout@v3   # correct version syntax
+
+      - name: Print values
+        run: echo "Environment is ${{ github.event.inputs.environment }}"
