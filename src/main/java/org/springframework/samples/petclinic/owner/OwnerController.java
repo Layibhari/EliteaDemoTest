@@ -127,15 +127,7 @@ class OwnerController {
 	 * Normalize pageSize parameter: default 5, allowed range 5-20, invalid/out-of-range -> 5
 	 */
 	private int normalizePageSize(Integer pageSize) {
-		int normalized = 5; // default
-		if (pageSize != null) {
-			try {
-				normalized = pageSize;
-			}
-			catch (Exception e) {
-				// fallback to default
-			}
-		}
+		int normalized = (pageSize != null) ? pageSize : 5;
 		// Enforce bounds: 5-20
 		if (normalized < 5 || normalized > 20) {
 			normalized = 5;
