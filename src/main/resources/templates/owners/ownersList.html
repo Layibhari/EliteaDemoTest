@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~::body},'owners')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
 
-body>
+<body>
 
   <h2 th:text="#{owners}">Owners</h2>
 
@@ -30,12 +30,12 @@ body>
   </table>
   <div th:if="${totalPages > 1}">
     <span th:text="#{pages}">Pages:</span>
-    <span>[</span>
+    <span>[ </span>
     <span th:each="i: ${#numbers.sequence(1, totalPages)}">
       <a th:if="${currentPage != i}" th:href="@{'/owners?lastName=' + ${lastName} + '&page=' + ${i} + '&pageSize=' + ${pageSize}}">[[${i}]]</a>
       <span th:unless="${currentPage != i}">[[${i}]]</span>
     </span>
-    <span>]&nbsp;</span>
+    <span>] ]</span>
     <span>
       <a th:if="${currentPage > 1}" th:href="@{'/owners?lastName=' + ${lastName} + '&page=1&pageSize=' + ${pageSize}}" th:title="#{first}" class="fa fa-fast-backward"></a>
       <span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
