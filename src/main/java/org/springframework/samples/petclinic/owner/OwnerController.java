@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -92,7 +93,8 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners")
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
+	public String processFindForm(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) Integer pageSize, Owner owner, BindingResult result,
 			Model model) {
 		// allow parameterless GET request for /owners to return all records
 		String lastName = owner.getLastName();
@@ -100,8 +102,11 @@ class OwnerController {
 			lastName = ""; // empty string signifies broadest possible search
 		}
 
+		// Normalize pageSize: default 5, allowed range 5-20, invalid/out-of-range -> 5
+		int normalizedPageSize = normalizePageSize(pageSize);
+
 		// find owners by last name
-		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName, normalizedPageSize);
 		if (ownersResults.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
@@ -115,21 +120,40 @@ class OwnerController {
 		}
 
 		// multiple owners found
-		return addPaginationModel(page, model, ownersResults);
+		return addPaginationModel(page, normalizedPageSize, lastName, model, ownersResults);
 	}
 
-	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
+	/**
+	 * Normalize pageSize parameter: default 5, allowed range 5-20, invalid/out-of-range -> 5
+	 */
+	private int normalizePageSize(Integer pageSize) {
+		int normalized = (pageSize != null) ? pageSize : 5;
+		// Enforce bounds: 5-20
+		if (normalized < 5 || normalized > 20) {
+			normalized = 5;
+		}
+		return normalized;
+	}
+
+	private String addPaginationModel(int page, int pageSize, String lastName, Model model,
+			Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("listOwners", listOwners);
+		// Add pageSize and lastName to model for pagination link preservation
+		model.addAttribute("pageSize", pageSize);
+		model.addAttribute("lastName", lastName);
 		return "owners/ownersList";
 	}
 
-	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
+	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname, int pageSize) {
+		// Normalize page (negative -> 0)
+		int normalizedPage = (page < 1) ? 0 : page - 1;
+		// Add deterministic ascending sort: lastName, firstName, id
+		Sort sort = Sort.by(Sort.Order.asc("lastName"), Sort.Order.asc("firstName"), Sort.Order.asc("id"));
+		Pageable pageable = PageRequest.of(normalizedPage, pageSize, sort);
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
 
