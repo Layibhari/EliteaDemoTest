@@ -11,8 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print Hello
-        run: echo "Hello DevOps"
+      - name: Checkout Repository
+        uses: actions/checkout@v5
 
-      - name: Print
-        run: echo "Hi"
+      - name: Print Working Directory
+        run: pwd
+
+      - name: List Repository Files
+        run: ls -la
