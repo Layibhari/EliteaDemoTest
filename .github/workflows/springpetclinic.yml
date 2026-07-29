@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print Hello
+      -name: Print Hello
         run: echo "Hello DevOps"
       -name: Print
        run: echo "Hi"
