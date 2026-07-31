@@ -63,6 +63,15 @@ public class PetClinicIntegrationTests {
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
+	@Test
+	void ownerListWithSqlInjectionPayload() {
+		RestTemplate template = builder.baseUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template
+			.exchange(RequestEntity.get("/owners?lastName=%27%20OR%20%271%27%3D%271").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(result.getBody()).doesNotContain("George Franklin");
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(PetClinicApplication.class, "--spring.docker.compose.lifecycle-management=NONE");
 	}

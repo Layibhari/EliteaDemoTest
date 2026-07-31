@@ -196,6 +196,21 @@ class OwnerControllerTests {
 	}
 
 	@Test
+	void processFindFormSqlInjectionPayloadDoesNotBypassSearch() throws Exception {
+		String payload = "' OR '1'='1";
+		Page<Owner> tasks = new PageImpl<>(List.of());
+		when(this.owners.findByLastNameStartingWith(eq(payload), any(Pageable.class))).thenReturn(tasks);
+
+		mockMvc.perform(get("/owners?page=1").param("lastName", payload))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+			.andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
+			.andExpect(view().name("owners/findOwners"));
+
+		verify(this.owners).findByLastNameStartingWith(eq(payload), any(Pageable.class));
+	}
+
+	@Test
 	void initUpdateOwnerForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
 			.andExpect(status().isOk())
