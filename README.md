@@ -47,7 +47,7 @@ java -version
 1. Clone the team's fork of the repository:
 
    ```bash
-   git clone (https://github.com/Fauxbear95/spring-petclinic.git)
+   git clone https://github.com/Fauxbear95/spring-petclinic.git
    ```
 
 2. Move into the project directory:
