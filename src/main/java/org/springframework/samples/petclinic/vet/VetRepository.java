@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.vet;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,4 +56,12 @@ public interface VetRepository extends Repository<Vet, Integer> {
 	@Cacheable("vets")
 	Page<Vet> findAll(Pageable pageable) throws DataAccessException;
 
+		/**
+	 * Save a veterinarian and clear the cached veterinarian list.
+	 * @param vet veterinarian being saved
+	 * @return saved veterinarian
+	 */
+	@Transactional
+	@CacheEvict(value = "vets", allEntries = true)
+	Vet save(Vet vet) throws DataAccessException;
 }
