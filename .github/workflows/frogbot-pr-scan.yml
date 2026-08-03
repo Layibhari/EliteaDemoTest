@@ -22,7 +22,7 @@ jobs:
       - name: Run Frogbot Scan
         uses: jfrog/frogbot@v2
         env:
-          JF_URL: ${{ secrets.JF_URL }}
-          JF_GIT_TOKEN: ${{ secrets.JF_GIT_TOKEN }}
+          JF_URL: ${{ vars.JF_URL }}
+          JF_GIT_TOKEN: ${{ vars.JF_GIT_TOKEN }}
           # OIDC authentication parameter
           JF_OIDC_PROVIDER: "github-oidc"

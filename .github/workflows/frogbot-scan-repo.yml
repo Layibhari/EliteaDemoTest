@@ -27,6 +27,6 @@ jobs:
         with:
           frogbot-command: "scan-repository"
         env:
-          JF_URL: ${{ secrets.JF_URL }}
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_URL: ${{ vars.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ vars.JF_ACCESS_TOKEN }}
+          JF_GIT_TOKEN: ${{ vars.GITHUB_TOKEN }}
