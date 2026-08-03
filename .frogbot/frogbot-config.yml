@@ -1,0 +1,5 @@
+version: 2
+projects:
+  - packageManager: "maven"
+    # Specify the directory containing your root pom.xml (defaults to root "." if omitted)
+    path: "." 
