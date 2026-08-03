@@ -1,28 +1,21 @@
-name: "Frogbot PR Security Scan"
-
+name: "Frogbot Scan Pull Request"
 on:
   pull_request_target:
-    types: [opened, synchronize]
-
+    types: [ opened, synchronize ]
 permissions:
-  contents: read
   pull-requests: write
+  contents: read
   security-events: write
-  id-token: write # Required for OIDC authentication
+  id-token: write
 
 jobs:
-  frogbot-scan:
+  scan-pull-request:
     runs-on: ubuntu-latest
+    environment: frogbot
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Run Frogbot Scan
-        uses: jfrog/frogbot@v2
+      - uses: jfrog/frogbot@v2
         env:
           JF_URL: ${{ vars.JF_URL }}
-          JF_GIT_TOKEN: ${{ vars.JF_GIT_TOKEN }}
-          # OIDC authentication parameter
-          JF_OIDC_PROVIDER: "github-oidc"
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          oidc-provider-name: jonw-apac/spring-petclinic@github

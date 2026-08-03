@@ -1,32 +1,31 @@
-name: "Frogbot Repo Scan and Fix"
+name: "Frogbot Scan Repository"
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight. Customize as needed.
-  workflow_dispatch: # Allows manual trigger from the Actions tab.
-
+    # The repository will be scanned once a day at 00:00 GMT.
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
 permissions:
-  contents: write
   pull-requests: write
+  contents: write
+  security-events: write
+  id-token: write
 
 jobs:
-  frogbot-repo-scan:
+  scan-repository:
     runs-on: ubuntu-latest
+    name: Scan Repository (${{ matrix.branch }} branch)
+    strategy:
+      matrix:
+        branch: [ "main" ]
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven' # Speeds up subsequent scans by caching dependencies
-     
-      - name: Run Frogbot Repo Scan
-        uses: jfrog/frogbot@v2
-        with:
-          frogbot-command: "scan-repository"
+      - uses: jfrog/frogbot@v2
         env:
-          JF_URL: ${{ vars.JF_URL }}
-          JF_ACCESS_TOKEN: ${{ vars.JF_ACCESS_TOKEN }}
-          JF_GIT_TOKEN: ${{ vars.GITHUB_TOKEN }}
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
+        with:
+          oidc-provider-name: jonw-apac/spring-petclinic@github
