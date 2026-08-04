@@ -23,6 +23,13 @@
       </tr>
     </tbody>
   </table>
+
+  <a class="btn btn-primary"
+     th:href="@{/vets/new}"
+     th:text="#{addVet}">
+    Add Veterinarian
+  </a>
+  
   <div th:if="${totalPages > 1}">
     <span th:text="#{pages}">Pages:</span>
     <span>[</span>

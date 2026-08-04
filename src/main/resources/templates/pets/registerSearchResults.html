@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'registerPet')}">
+
+<body>
+
+  <h2 th:text="#{registerPet}">Register a Pet</h2>
+
+  <p th:text="#{selectOwnerInstructions}">More than one owner matched. Select the correct owner to continue.</p>
+
+  <table id="registerOwners" class="table table-striped">
+    <thead>
+      <tr>
+        <th th:text="#{name}" style="width: 150px;">Name</th>
+        <th th:text="#{address}" style="width: 200px;">Address</th>
+        <th th:text="#{city}">City</th>
+        <th th:text="#{telephone}" style="width: 120px">Telephone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="owner : ${owners}">
+        <td>
+          <a th:href="@{/pets/register/__${owner.id}__}" th:text="${owner.firstName + ' ' + owner.lastName}" />
+        </td>
+        <td th:text="${owner.address}" />
+        <td th:text="${owner.city}" />
+        <td th:text="${owner.telephone}" />
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+
+</html>

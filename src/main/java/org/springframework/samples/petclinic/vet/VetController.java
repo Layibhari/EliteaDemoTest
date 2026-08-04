@@ -25,6 +25,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.validation.Valid;
 
 /**
  * @author Juergen Hoeller
@@ -34,11 +40,62 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 class VetController {
+	private static final String VIEWS_VET_CREATE_FORM = "vets/createVetForm";
 
 	private final VetRepository vetRepository;
+	private final SpecialtyRepository specialtyRepository;
 
-	public VetController(VetRepository vetRepository) {
+	public VetController(VetRepository vetRepository, SpecialtyRepository specialtyRepository) {
 		this.vetRepository = vetRepository;
+		this.specialtyRepository = specialtyRepository;
+	}
+
+	@GetMapping("/vets/new")
+	public String initCreationForm(Model model) {
+		model.addAttribute("vetForm", new VetForm());
+		addSpecialtiesToModel(model);
+		return VIEWS_VET_CREATE_FORM;
+	}
+
+	@PostMapping("/vets/new")
+	public String processCreationForm(
+			@Valid @ModelAttribute("vetForm") VetForm vetForm,
+			BindingResult result,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+
+		if (result.hasErrors()) {
+			addSpecialtiesToModel(model);
+			return VIEWS_VET_CREATE_FORM;
+		}
+
+		Vet vet = new Vet();
+		vet.setFirstName(vetForm.getFirstName().strip());
+		vet.setLastName(vetForm.getLastName().strip());
+
+		for (Integer specialtyId : vetForm.getSpecialtyIds()) {
+			Specialty specialty = this.specialtyRepository.findById(specialtyId)
+				.orElseThrow(() -> new IllegalArgumentException(
+					"Specialty not found with id: " + specialtyId));
+
+			vet.addSpecialty(specialty);
+		}
+
+		this.vetRepository.save(vet);
+
+		redirectAttributes.addFlashAttribute(
+			"message",
+			"New Veterinarian Created"
+		);
+
+		return "redirect:/vets.html";
+	}
+
+	private void addSpecialtiesToModel(Model model) {
+		model.addAttribute(
+			"specialties",
+			this.specialtyRepository.findAllByOrderByNameAsc()
+		);
 	}
 
 	@GetMapping("/vets.html")
