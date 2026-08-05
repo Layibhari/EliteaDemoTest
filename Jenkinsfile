@@ -30,10 +30,7 @@ pipeline {
 
                     junit testResults: '**/TEST-*.xml'
 
-                    mail subject: 'Build stage succeeded',
-                         from: 'build@learningthoughts.io',
-                         to: 'all@learningthoughts.io',
-                         body: "Refer to $BUILD_URL for more details"
+                
                 }
 
                 failure {
