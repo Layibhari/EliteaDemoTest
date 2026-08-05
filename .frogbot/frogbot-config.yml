@@ -1,4 +1,3 @@
 params:
   - installCommand: "mvn clean compile -DskipTests=true"
-    # Specify relative path if pom.xml is not in root
-    # workingDir: "."
+    workingDir: "."
