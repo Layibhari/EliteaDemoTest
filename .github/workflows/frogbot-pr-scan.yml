@@ -16,6 +16,6 @@ jobs:
       - uses: jfrog/frogbot@v2
         env:
           JF_URL: ${{ vars.JF_URL }}
-          JF_GIT_TOKEN: ${{ vars.GITHUB_TOKEN }}
+          JF_GIT_TOKEN: ${{ vars.JF_GIT_TOKEN }}
         with:
           oidc-provider-name: jonw-apac/spring-petclinic@github

@@ -1,13 +1,4 @@
-# .frogbot/frogbot-config.yml
-version: 2
-projects:
-  - packageManager: "maven"
-    # Specify the directory containing your root pom.xml (defaults to root "." if omitted)
-    path: "." 
-    
-    # Custom installation command if your build requires specific profiles or configurations
-    # Frogbot executes this to accurately map the dependency tree
-    installCommand: "mvn clean compile -DskipTests=true"
-    
-    # Optional: Handle private or internal dependency resolution
-    # depsRepo: "your-maven-virtual-or-remote-repo-in-jfrog"
+params:
+  - installCommand: "mvn clean compile -DskipTests=true"
+    # Specify relative path if pom.xml is not in root
+    # workingDir: "."
