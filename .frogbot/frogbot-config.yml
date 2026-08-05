@@ -1,4 +1,3 @@
-pool:
-  - projects:
-      - installCommand: "mvn clean compile -DskipTests=true"
-        workingDir: "."
+- params:
+    installCommand: "mvn clean compile -DskipTests=true"
+    workingDir: "."
