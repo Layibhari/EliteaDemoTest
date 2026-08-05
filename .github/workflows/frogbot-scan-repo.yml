@@ -21,6 +21,14 @@ jobs:
       matrix:
         branch: [ "main" ]
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
       - uses: jfrog/frogbot@v2
         env:
           JF_URL: ${{ vars.JF_URL }}
