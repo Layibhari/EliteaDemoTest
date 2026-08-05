@@ -16,7 +16,7 @@ pipeline {
             steps {
 
                 git url: 'https://github.com/nagendhrakothapalli/spring-petclinic.git'
-                branch: 'dev'
+                branch: 'developer'
             }
         }
 
