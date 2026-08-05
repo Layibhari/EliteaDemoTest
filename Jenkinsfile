@@ -1,31 +1,28 @@
 pipeline {
-   agent{ label 'MAVEN' }
-   options {
+    agent { label 'MAVEN' }
+
+    options {
         // Timeout counter starts AFTER agent is allocated
         timeout(time: 30, unit: 'MINUTES')
     }
-   
-   triggers {
+
+    triggers {
         pollSCM('* * * * *')
     }
 
     stages {
 
-        stage ('git') {
-
+        stage('git') {
             steps {
-
-                git url: 'https://github.com/nagendhrakothapalli/spring-petclinic.git'
-                branch: 'developer'
+                git url: 'https://github.com/nagendhrakothapalli/spring-petclinic.git',
+                    branch: 'developer'
             }
         }
 
         stage('build') {
             steps {
                 sh 'mvn clean package'
-
             }
         }
     }
-
 }
