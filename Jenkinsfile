@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = "rainis17/test"
         IMAGE_TAG    = "${env.BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        EC2_HOST = credentials('ec2-host')
     }
     
     stages {
@@ -29,13 +30,18 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                echo 'placeholder - will SSH into EC2 and run the container'
+                sshagent(credentials: ['ec2-ssh-key;]) {
+                    sh "ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars 'image_tag=${IMAGE_TAG}'"
+                }
             }
         }
         
         stage('Health Check') {
             steps {
-                echo 'placeholder - will curl the app to confirm if its live'
+                sh """
+                    sleep 20
+                    curl -f http://${EC2_HOST}:8080 || (echo "Health check failed" && exit 1)
+                """
             }
         }
     }
