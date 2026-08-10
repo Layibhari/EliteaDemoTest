@@ -30,7 +30,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(credentials: ['ec2-ssh-key;]) {
+                sshagent(credentials: ['ec2-ssh-key']) {
                     sh "ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars 'image_tag=${IMAGE_TAG}'"
                 }
             }
