@@ -1,0 +1,10 @@
+---
+- name: Deploy Spring Petclinic
+  hosts: app
+  become: true
+
+  tasks:
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
