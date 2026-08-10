@@ -9,17 +9,23 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'placeholder - will build the image'
+                checkout scm
             }
         }
         
         stage('Build Docker Image') {
             steps {
-                echo 'placeholder - will pull code from github'
+                sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
             }
         }
         
         stage('Push to Docker Hub') {
+            steps {
+                echo 'placeholder - will push to Docker Hub'
+            }
+        }
+
+        stage('Deploy to EC2') {
             steps {
                 echo 'placeholder - will SSH into EC2 and run the container'
             }
