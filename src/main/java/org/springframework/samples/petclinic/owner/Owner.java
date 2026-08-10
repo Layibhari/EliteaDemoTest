@@ -95,7 +95,7 @@ public class Owner extends Person {
 	}
 
 	public void addPet(Pet pet) {
-		if (pet.isNew()) {
+		if (pet.isNew() || getPet(pet.getId()) == null) {
 			getPets().add(pet);
 		}
 	}
