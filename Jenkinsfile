@@ -28,13 +28,19 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['ec2-ssh-key']) {
-                    sh "ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars 'image_tag=${IMAGE_TAG}'"
+                    sh """
+                        cat > ansible/inventory.ini << EOF
+          [app]
+          ${EC2_HOST} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+          EOF
+                          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars 'image_tag=${IMAGE_TAG}'
+                       """
+                    }
                 }
             }
-        }
         
         stage('Health Check') {
             steps {
