@@ -84,6 +84,18 @@ class PetValidatorTests {
 		assertFalse(errors.hasErrors());
 	}
 
+	@Test
+	void validateWithPetNameOfMaxLength() {
+		petType.setName(petTypeName);
+		pet.setName("123456789012345678901234567890");
+		pet.setType(petType);
+		pet.setBirthDate(petBirthDate);
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasFieldErrors("name"));
+	}
+
 	@Nested
 	class ValidateHasErrors {
 
@@ -91,6 +103,18 @@ class PetValidatorTests {
 		void validateWithInvalidPetName() {
 			petType.setName(petTypeName);
 			pet.setName("");
+			pet.setType(petType);
+			pet.setBirthDate(petBirthDate);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("name"));
+		}
+
+		@Test
+		void validateWithPetNameTooLong() {
+			petType.setName(petTypeName);
+			pet.setName("1234567890123456789012345678901");
 			pet.setType(petType);
 			pet.setBirthDate(petBirthDate);
 
