@@ -2,8 +2,9 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_IMAGE = "filler/ops"
+        DOCKER_IMAGE = "rainis17/test"
         IMAGE_TAG    = "${env.BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     }
     
     stages {
@@ -21,7 +22,8 @@ pipeline {
         
         stage('Push to Docker Hub') {
             steps {
-                echo 'placeholder - will push to Docker Hub'
+                sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
             }
         }
 
