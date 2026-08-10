@@ -3,8 +3,32 @@
   hosts: app
   become: true
 
+  vars:
+    docker_image: sandissarkovskis/devops-final-project:latest
+    container_name: petclinic
+    app_port: 8080
+
   tasks:
     - name: Ensure Docker is running
       service:
         name: docker
         state: started
+
+    - name: Stop old Petclinic container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+
+    - name: Pull Petclinic Docker image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Start Petclinic container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ app_port }}:8080"
