@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'placeholder - will build the image'
+                checkout scm
             }
         }
         
