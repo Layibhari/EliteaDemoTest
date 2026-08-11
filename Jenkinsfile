@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_IMAGE = "rainis17/test"
+        DOCKER_IMAGE = "sandissarkovskis/devops-final-project"
         IMAGE_TAG    = "${env.BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         EC2_HOST = credentials('ec2-host')
