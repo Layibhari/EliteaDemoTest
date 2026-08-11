@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    triggers { githubPush() }
     
     environment {
         DOCKER_IMAGE = "sandissarkovskis/devops-final-project"
@@ -31,23 +32,21 @@ pipeline {
          stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['ec2-ssh-key']) {
-                    sh """
+                    sh '''
                         cat > ansible/inventory.ini << EOF
           [app]
-          ${EC2_HOST} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+          $EC2_HOST ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
           EOF
-                          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars 'image_tag=${IMAGE_TAG}'
-                       """
+                          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars "image_tag=$IMAGE_TAG"
+                       '''
                     }
                 }
             }
         
         stage('Health Check') {
             steps {
-                sh """
-                    sleep 20
-                    curl -f http://${EC2_HOST}:8080 || (echo "Health check failed" && exit 1)
-                """
+                sh 'sleep 20'
+                sh 'curl -f http://$EC2_HOST:8080 || (echo "Health check failed" && exit 1)'
             }
         }
     }
