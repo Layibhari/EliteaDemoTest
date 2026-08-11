@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    triggers { githubPush() }
     
     environment {
         DOCKER_IMAGE = "sandissarkovskis/devops-final-project"
