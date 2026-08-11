@@ -33,7 +33,7 @@
         ports:
           - "{{ app_port }}:8080"
 
-        - name: Install NGINX
+    - name: Install NGINX
       ansible.builtin.dnf:
         name: nginx
         state: present
