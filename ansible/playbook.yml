@@ -1,0 +1,63 @@
+---
+- name: Deploy Spring Petclinic
+  hosts: app
+  become: true
+
+  vars:
+    docker_image: sandissarkovskis/devops-final-project:latest
+    container_name: petclinic
+    app_port: 8080
+
+  tasks:
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+
+    - name: Stop old Petclinic container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+
+    - name: Pull Petclinic Docker image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Start Petclinic container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ app_port }}:8080"
+
+    - name: Install NGINX
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Configure NGINX reverse proxy
+      ansible.builtin.template:
+        src: templates/petclinic.conf.j2
+        dest: /etc/nginx/conf.d/petclinic.conf
+        mode: "0644"
+      notify: Restart NGINX
+
+    - name: Test NGINX configuration
+      ansible.builtin.command:
+        cmd: nginx -t
+      changed_when: false
+
+    - name: Ensure NGINX is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Restart NGINX
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
