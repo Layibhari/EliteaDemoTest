@@ -44,10 +44,8 @@ pipeline {
         
         stage('Health Check') {
             steps {
-                sh """
-                    sleep 20
-                    curl -f http://${EC2_HOST}:8080 || (echo "Health check failed" && exit 1)
-                """
+                sh 'sleep 20'
+                sh 'curl -f http://$EC2_HOST:8080 || (echo "Health check failed" && exit 1)'
             }
         }
     }
