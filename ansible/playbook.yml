@@ -9,8 +9,8 @@
     blue_container: petclinic-blue
     green_container: petclinic-green
 
-    blue_port: 8081
-    green_port: 8082
+    blue_port: 8082
+    green_port: 8083
 
     active_color: blue
     active_port: "{{ blue_port }}"
