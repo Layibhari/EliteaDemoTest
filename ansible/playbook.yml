@@ -5,8 +5,15 @@
 
   vars:
     docker_image: sandissarkovskis/devops-final-project:latest
-    container_name: petclinic
-    app_port: 8080
+
+    blue_container: petclinic-blue
+    green_container: petclinic-green
+
+    blue_port: 8082
+    green_port: 8083
+
+    active_color: blue
+    active_port: "{{ blue_port }}"
 
   tasks:
     - name: Ensure Docker is running
@@ -14,31 +21,75 @@
         name: docker
         state: started
 
-    - name: Stop old Petclinic container
-      community.docker.docker_container:
-        name: "{{ container_name }}"
-        state: absent
+    - name: Install NGINX
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
 
     - name: Pull Petclinic Docker image
       community.docker.docker_image:
         name: "{{ docker_image }}"
         source: pull
 
-    - name: Start Petclinic container
+    - name: Remove existing blue container
       community.docker.docker_container:
-        name: "{{ container_name }}"
+        name: "{{ blue_container }}"
+        state: absent
+
+    - name: Start blue Petclinic container
+      community.docker.docker_container:
+        name: "{{ blue_container }}"
         image: "{{ docker_image }}"
         state: started
         restart_policy: always
         ports:
-          - "{{ app_port }}:8080"
+          - "{{ blue_port }}:8080"
 
-    - name: Install NGINX
-      ansible.builtin.dnf:
-        name: nginx
-        state: present
+    - name: Wait for blue Petclinic to become available
+      ansible.builtin.uri:
+        url: "http://localhost:{{ blue_port }}"
+        status_code: 200
+      register: blue_health
+      retries: 12
+      delay: 5
+      until: blue_health.status == 200
 
-    - name: Configure NGINX reverse proxy
+    - name: Configure NGINX to use blue deployment
+      ansible.builtin.template:
+        src: templates/petclinic.conf.j2
+        dest: /etc/nginx/conf.d/petclinic.conf
+        mode: "0644"
+      notify: Restart NGINX
+
+    - name: Remove existing green container
+      community.docker.docker_container:
+        name: "{{ green_container }}"
+        state: absent
+
+    - name: Start green Petclinic container
+      community.docker.docker_container:
+        name: "{{ green_container }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ green_port }}:8080"
+
+    - name: Wait for green Petclinic to become available
+      ansible.builtin.uri:
+        url: "http://localhost:{{ green_port }}"
+        status_code: 200
+      register: green_health
+      retries: 12
+      delay: 5
+      until: green_health.status == 200
+
+    - name: Switch active deployment to green
+      ansible.builtin.set_fact:
+        active_color: green
+        active_port: "{{ green_port }}"
+
+    - name: Configure NGINX to use green deployment
       ansible.builtin.template:
         src: templates/petclinic.conf.j2
         dest: /etc/nginx/conf.d/petclinic.conf
@@ -55,6 +106,14 @@
         name: nginx
         state: started
         enabled: true
+
+    - name: Apply NGINX switch immediately
+      ansible.builtin.meta: flush_handlers
+
+    - name: Remove old blue Petclinic container
+      community.docker.docker_container:
+        name: "{{ blue_container }}"
+        state: absent
 
   handlers:
     - name: Restart NGINX
