@@ -13,7 +13,7 @@ resource "aws_instance" "petclinic" {
   instance_type          = "t3.medium"
   key_name               = aws_key_pair.petclinic_key.key_name
   vpc_security_group_ids = [aws_security_group.petclinic_sg.id]
-
+  iam_instance_profile  = "AmazonSSMRoleForInstancesQuickSetup"
   user_data = file("${path.module}/install.sh")
 
   tags = {
