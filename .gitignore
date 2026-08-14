@@ -42,6 +42,11 @@ out/
 ### VS Code ###
 .vscode/
 
+### Local AI tooling ###
+/.claude/
+/_bmad/
+/_bmad-output/
+
 ### CSS ###
 _site/
 *.css
