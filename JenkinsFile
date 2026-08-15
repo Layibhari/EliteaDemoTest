@@ -7,13 +7,13 @@ pipeline {
         stage ('clone the repo') 
         {
             steps {
-                'sh git clone 'https://github.com/saurabhgore-code/spring-petclinic.git'
+                sh 'git clone https://github.com/saurabhgore-code/spring-petclinic.git'
             }
         }
         stage ('build the image') 
         {
             steps {
-                'sh ./mvnw spring-boot:build-image'
+                sh './mvnw spring-boot:build-image'
         }
         
     }
