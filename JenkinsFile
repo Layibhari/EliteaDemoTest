@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    environment {
+        DOCKERHUB_CREDENTIALS=credentials('dockerhub')
+    }
+    stages {
+        stage ('clone the repo') 
+        {
+            steps {
+                'sh git clone 'https://github.com/saurabhgore-code/spring-petclinic.git'
+            }
+        }
+        stage ('build the image') 
+        {
+            steps {
+                'sh ./mvnw spring-boot:build-image'
+        }
+        
+    }
+          stage ('login to dockerhub')  
+          {
+            steps {
+     sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+          }
+          stage ('deploy a new version of the image')
+          {
+            steps {
+    sh 'docker tag spring-petclinic:4.0.0-SNAPSHOT goresaurabh2025/spring-petclinic:pune'
+    sh 'docker push goresaurabh2025/spring-petclinic:pune'
+            }
+        }
+          stage ('Deploy using k8s')
+          {
+            steps {
+                sh 'kubectl create -f springboot-petclinic.yml'
+            }
+          }
+            stage ('run the k8s pod externally')
+            {
+                steps {
+                    sh 'kubectl create -f springboot-petclinic.yml'
+                }
+            }
+          }
+}
